@@ -1,1 +1,1 @@
-En este curso veremos un video educacional de Harvard que nos servirá como breve repaso de conocimientos básicos para el desarrollo web. Posteriormente, se realizará una evaluación para revisar la comprensión del material presentado. ¡Asegúrate de prestar atención y prepararte para la prueba!
+Desarrollo de software Grado11 Javiera/Pascual
