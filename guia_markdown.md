@@ -69,3 +69,6 @@ Puedes leer más sobre esto en la [Documentación de Mozilla](https://developer.
 
 ---
 **Tip:** Presta mucha atención a los espacios y saltos de línea. En Markdown, para que un salto de línea se refleje en el documento final, generalmente debes dejar una línea en blanco entre párrafos.
+
+### Actividad
+Elabora un archivo Markdown utilizando los conceptos que aprendiste en esta guía. Incluye al menos un título, una lista, un bloque de código y un enlace. Este será entregado como parte de tu evaluación.
