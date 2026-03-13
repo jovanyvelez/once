@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construcción de Tablas en HTML</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800;900&family=Nunito:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #070d18;
+  --surface:  #0d1a2d;
+  --card:     #122038;
+  --border:   #1c3354;
+  --border2:  #2a4a70;
+  --cyan:     #00d4ff;
+  --cyan-dim: #0095b8;
+  --purple:   #a855f7;
+  --amber:    #f59e0b;
+  --green:    #22d3a0;
+  --red:      #f87171;
+  --text:     #dde8f5;
+  --muted:    #6b8aad;
+  --nav-w:    270px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ── SIDEBAR ──────────────────────────────────── */
+#sidebar {
+  width: var(--nav-w);
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo .logo-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.sidebar-logo h2 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.sidebar-logo p {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.nav-section {
+  padding: 14px 16px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all .2s;
+  cursor: pointer;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text);
+  background: rgba(0,212,255,.07);
+  border-left-color: var(--cyan);
+}
+
+.nav-link .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .4;
+  flex-shrink: 0;
+}
+
+.nav-link.active .dot { opacity: 1; background: var(--cyan); }
+
+.nav-break {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--amber);
+  opacity: .8;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ── MAIN CONTENT ─────────────────────────────── */
+#main {
+  margin-left: var(--nav-w);
+  flex: 1;
+  max-width: calc(100vw - var(--nav-w));
+}
+
+/* ── HERO ─────────────────────────────────────── */
+#hero {
+  background: linear-gradient(135deg, #070d18 0%, #0d1f3a 50%, #071626 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 64px 64px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,212,255,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+#hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 20%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(168,85,247,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,212,255,.1);
+  border: 1px solid rgba(0,212,255,.25);
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+#hero h1 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #e2efff 0%, var(--cyan) 60%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#hero p {
+  font-size: 17px;
+  color: #8faec8;
+  max-width: 600px;
+  margin-bottom: 36px;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.hero-meta-item span { color: var(--text); }
+
+/* ── SESSION MAP ──────────────────────────────── */
+#session-map {
+  padding: 0 64px 48px;
+  background: linear-gradient(180deg, #0d1f3a, var(--bg));
+  border-bottom: 1px solid var(--border);
+}
+
+#session-map h3 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  padding-top: 40px;
+}
+
+/* ── SECTIONS ─────────────────────────────────── */
+.section {
+  padding: 64px 64px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:nth-child(even) { background: rgba(13,26,45,.5); }
+
+.block-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.badge-green  { background: rgba(34,211,160,.12); color: var(--green); border: 1px solid rgba(34,211,160,.25); }
+.badge-blue   { background: rgba(0,212,255,.1);   color: var(--cyan);  border: 1px solid rgba(0,212,255,.2); }
+.badge-purple { background: rgba(168,85,247,.12); color: var(--purple);border: 1px solid rgba(168,85,247,.25); }
+.badge-amber  { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.25); }
+
+.section-title {
+  font-family: 'Exo 2', sans-serif;
+  font-size: clamp(22px, 2.5vw, 32px);
+  font-weight: 800;
+  color: #e2efff;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 40px;
+}
+
+.section-subtitle em {
+  color: var(--cyan);
+  font-style: normal;
+  font-weight: 600;
+}
+
+h3.sub {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cyan);
+  margin: 36px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h3.sub::before {
+  content: '';
+  display: block;
+  width: 4px; height: 18px;
+  background: var(--cyan);
+  border-radius: 2px;
+}
+
+p { margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+
+strong { color: var(--cyan); font-weight: 700; }
+
+/* ── CALLOUTS ─────────────────────────────────── */
+.callout {
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  font-size: 14px;
+}
+
+.callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+.callout-warn  { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); }
+.callout-info  { background: rgba(0,212,255,.07);  border: 1px solid rgba(0,212,255,.18); }
+.callout-tip   { background: rgba(34,211,160,.07); border: 1px solid rgba(34,211,160,.2); }
+
+.callout-warn  .callout-icon { color: var(--amber); }
+.callout-info  .callout-icon { color: var(--cyan); }
+.callout-tip   .callout-icon { color: var(--green); }
+
+/* ── CODE BLOCKS ──────────────────────────────── */
+.code-wrap {
+  background: #050b14;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 20px 0;
+  font-size: 13px;
+}
+
+.code-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-dots { display: flex; gap: 6px; }
+.code-dots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.code-dots .d1 { background: #ff5f56; }
+.code-dots .d2 { background: #ffbd2e; }
+.code-dots .d3 { background: #27c93f; }
+
+.code-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.code-body {
+  padding: 20px 24px;
+  overflow-x: auto;
+}
+
+pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #c9d8ea;
+  white-space: pre;
+}
+
+.ht { color: #7dd3fc; }   /* tag */
+.ha { color: #fcd34d; }   /* attribute */
+.hv { color: #86efac; }   /* value */
+.hc { color: #64748b; }   /* comment */
+.hs { color: #f9a8d4; }   /* string */
+
+/* ── SVG DIAGRAMS ─────────────────────────────── */
+.diagram-wrap {
+  margin: 28px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.diagram-wrap svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── INFO GRID ─────────────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.info-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color .2s, transform .2s;
+}
+
+.info-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+
+.info-card h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+
+.info-card p { font-size: 13px; color: #8faec8; margin: 0; }
+
+/* ── TABLES ───────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 13.5px;
+}
+
+.data-table th {
+  background: var(--surface);
+  color: var(--cyan);
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 2px solid var(--border2);
+}
+
+.data-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.data-table tr:hover td { background: rgba(0,212,255,.04); }
+
+.data-table code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--amber);
+  background: rgba(245,158,11,.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ── EXERCISE ─────────────────────────────────── */
+.exercise {
+  background: linear-gradient(135deg, rgba(34,211,160,.06), rgba(0,212,255,.06));
+  border: 1px solid rgba(34,211,160,.22);
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin: 32px 0;
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.exercise-num {
+  width: 36px; height: 36px;
+  background: var(--green);
+  color: var(--bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.exercise h4 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--green);
+}
+
+.exercise-time {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  background: rgba(34,211,160,.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* ── BREAK SECTION ────────────────────────────── */
+.break-section {
+  padding: 64px;
+  background: linear-gradient(135deg, rgba(245,158,11,.07), rgba(245,158,11,.02));
+  border-bottom: 2px dashed rgba(245,158,11,.3);
+  border-top: 2px dashed rgba(245,158,11,.3);
+  text-align: center;
+}
+
+.break-inner {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.break-icon-wrap {
+  margin-bottom: 20px;
+}
+
+.break-section h2 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+
+.break-section p {
+  color: #a07a3a;
+  font-size: 15px;
+}
+
+.break-activity {
+  background: rgba(245,158,11,.1);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--amber);
+  font-weight: 600;
+}
+
+/* ── ERROR / CORRECT CALLOUTS ─────────────────── */
+.code-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+@media (max-width: 700px) { .code-compare { grid-template-columns: 1fr; } }
+
+.code-bad  .code-header { background: rgba(248,113,113,.1); }
+.code-good .code-header { background: rgba(34,211,160,.08); }
+.code-bad  { border-color: rgba(248,113,113,.3); }
+.code-good { border-color: rgba(34,211,160,.3); }
+
+.code-bad-label  { color: var(--red); }
+.code-good-label { color: var(--green); }
+
+/* ── SOLUTION TOGGLE ──────────────────────────── */
+details {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+details summary {
+  padding: 14px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--cyan);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+
+details summary::before {
+  content: '';
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid var(--cyan);
+  transition: transform .2s;
+}
+
+details[open] summary::before { transform: rotate(90deg); }
+
+details > :not(summary) { padding: 0 20px 20px; }
+
+/* ── CHECKLIST ────────────────────────────────── */
+.checklist {
+  list-style: none;
+  margin: 16px 0;
+}
+
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.checklist li:nth-child(odd) { background: rgba(255,255,255,.03); }
+
+.checklist li::before {
+  content: '';
+  width: 18px; height: 18px;
+  border: 2px solid var(--border2);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ── TREE DIAGRAM ─────────────────────────────── */
+.tree-wrap {
+  background: #050b14;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+/* ── EVAL TABLE ───────────────────────────────── */
+.eval-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--cyan);
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.eval-item .pct {
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+
+/* ── FINAL CARD ───────────────────────────────── */
+.final-card {
+  background: linear-gradient(135deg, rgba(0,212,255,.07), rgba(168,85,247,.07));
+  border: 1px solid rgba(0,212,255,.2);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  margin-top: 32px;
+}
+
+.final-card h3 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #e2efff;
+  margin: 16px 0 10px;
+}
+
+.final-card p { color: var(--muted); font-size: 15px; max-width: 500px; margin: 0 auto; }
+
+/* ── BOLETA PREVIEW ───────────────────────────── */
+.boleta-preview {
+  background: #fefefe;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 28px 0;
+  overflow-x: auto;
+}
+
+.boleta-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: #1a1a2e;
+}
+
+.boleta-preview table th, .boleta-preview table td {
+  border: 1px solid #c0c8d8;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.bp-header { background: #003366; color: white !important; font-size: 14px; font-weight: bold; }
+.bp-info { background: #e8f0fe; text-align: left !important; font-size: 12px; }
+.bp-col-head { background: #0055aa; color: white !important; }
+.bp-even { background: #f0f7ff; }
+.bp-ok { color: #1a7a1a; font-weight: bold; }
+.bp-bad { color: #cc0000; font-weight: bold; }
+.bp-foot { background: #003366; color: white !important; font-weight: bold; }
+
+/* ── REFS ─────────────────────────────────────── */
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.ref-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-decoration: none;
+  transition: border-color .2s, transform .2s;
+  display: block;
+}
+
+.ref-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+.ref-card h5 { font-size: 13px; font-weight: 700; color: var(--cyan); margin-bottom: 4px; }
+.ref-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+/* ── SCROLLBAR ────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="2" width="24" height="24" rx="5" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+        <rect x="6" y="7" width="7" height="4" rx="1" fill="#00d4ff" opacity=".8"/>
+        <rect x="15" y="7" width="7" height="4" rx="1" fill="#a855f7" opacity=".8"/>
+        <rect x="6" y="13" width="7" height="4" rx="1" fill="#22d3a0" opacity=".8"/>
+        <rect x="15" y="13" width="7" height="4" rx="1" fill="#f59e0b" opacity=".8"/>
+        <rect x="6" y="19" width="16" height="2" rx="1" fill="#00d4ff" opacity=".3"/>
+      </svg>
+      <h2>HTML Tables</h2>
+    </div>
+    <p>Clase completa &mdash; 210 min</p>
+  </div>
+
+  <div class="nav-section">Mapa de sesión</div>
+  <a class="nav-link" href="#hero"><span class="dot"></span>Inicio</a>
+  <a class="nav-link" href="#session-map"><span class="dot"></span>Mapa de la sesión</a>
+
+  <div class="nav-section">Bloque 1–4 &middot; 120 min</div>
+  <a class="nav-link" href="#b1"><span class="dot"></span>B1 &mdash; Intro a las tablas</a>
+  <a class="nav-link" href="#b2"><span class="dot"></span>B2 &mdash; thead, tbody, tfoot</a>
+  <a class="nav-link" href="#b3"><span class="dot"></span>B3 &mdash; colspan y rowspan</a>
+  <a class="nav-link" href="#b4"><span class="dot"></span>B4 &mdash; Taller Parte 1</a>
+  <div class="nav-break">&#9749; Descanso 1 &mdash; 15 min</div>
+
+  <div class="nav-section">Bloque 5 &middot; 45 min</div>
+  <a class="nav-link" href="#b5"><span class="dot"></span>B5 &mdash; Boleta de calificaciones</a>
+  <div class="nav-break">&#9749; Descanso 2 &mdash; 15 min</div>
+
+  <div class="nav-section">Bloque 6–7 &middot; 75 min</div>
+  <a class="nav-link" href="#b6"><span class="dot"></span>B6 &mdash; Validación de etiquetas</a>
+  <a class="nav-link" href="#b7"><span class="dot"></span>B7 &mdash; Reto final y cierre</a>
+
+  <div class="sidebar-bottom">
+    Tecnología e Informática &middot; Grado 10°
+  </div>
+</nav>
+
+<!-- ═══ MAIN ════════════════════════════════════ -->
+<main id="main">
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-tag">
+    <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#00d4ff"/></svg>
+    HTML &mdash; Nivel introductorio
+  </div>
+  <h1>Construcción de<br>Tablas en HTML</h1>
+  <p>Aprende a organizar información en la web usando las etiquetas <code style="font-family:'JetBrains Mono';color:#00d4ff;background:rgba(0,212,255,.1);padding:2px 7px;border-radius:4px">table</code>, <code style="font-family:'JetBrains Mono';color:#a855f7;background:rgba(168,85,247,.1);padding:2px 7px;border-radius:4px">tr</code>, <code style="font-family:'JetBrains Mono';color:#22d3a0;background:rgba(34,211,160,.1);padding:2px 7px;border-radius:4px">td</code> y más.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b8aad" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Duración: <span>210 min + 2 descansos</span>
+    </div>
+    <div class="hero-meta-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b8aad" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Para: <span>Grado 10° &mdash; 15-16 años</span>
+    </div>
+    <div class="hero-meta-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b8aad" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Área: <span>Tecnología e Informática</span>
+    </div>
+  </div>
+</section>
+
+<!-- SESSION MAP -->
+<section id="session-map">
+  <h3>Mapa de la sesión</h3>
+  <!-- SVG Timeline -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 820 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:820px">
+      <defs>
+        <linearGradient id="gb1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22d3a0"/><stop offset="100%" stop-color="#0ea5e9"/></linearGradient>
+        <linearGradient id="gb2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#a855f7"/></linearGradient>
+      </defs>
+      <!-- Main line -->
+      <line x1="20" y1="44" x2="800" y2="44" stroke="#1c3354" stroke-width="2"/>
+      <!-- B1 30min -->
+      <rect x="20" y="28" width="80" height="32" rx="8" fill="#22d3a0" opacity=".85"/>
+      <text x="60" y="42" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B1</text>
+      <text x="60" y="54" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">30 min</text>
+      <text x="60" y="78" text-anchor="middle" fill="#22d3a0" font-family="Nunito,sans-serif" font-size="10">Intro tablas</text>
+      <!-- B2 30min -->
+      <rect x="110" y="28" width="80" height="32" rx="8" fill="#22d3a0" opacity=".85"/>
+      <text x="150" y="42" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B2</text>
+      <text x="150" y="54" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">30 min</text>
+      <text x="150" y="78" text-anchor="middle" fill="#22d3a0" font-family="Nunito,sans-serif" font-size="10">thead/tbody</text>
+      <!-- B3 30min -->
+      <rect x="200" y="28" width="80" height="32" rx="8" fill="#22d3a0" opacity=".85"/>
+      <text x="240" y="42" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B3</text>
+      <text x="240" y="54" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">30 min</text>
+      <text x="240" y="78" text-anchor="middle" fill="#22d3a0" font-family="Nunito,sans-serif" font-size="10">Atributos</text>
+      <!-- B4 30min -->
+      <rect x="290" y="28" width="80" height="32" rx="8" fill="#22d3a0" opacity=".85"/>
+      <text x="330" y="42" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B4</text>
+      <text x="330" y="54" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">30 min</text>
+      <text x="330" y="78" text-anchor="middle" fill="#22d3a0" font-family="Nunito,sans-serif" font-size="10">Taller 1</text>
+      <!-- BREAK 1 -->
+      <rect x="378" y="22" width="64" height="44" rx="8" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 3"/>
+      <text x="410" y="40" text-anchor="middle" fill="#f59e0b" font-family="Nunito,sans-serif" font-size="18">&#9749;</text>
+      <text x="410" y="56" text-anchor="middle" fill="#f59e0b" font-family="Exo 2,sans-serif" font-weight="800" font-size="9">15 min</text>
+      <text x="410" y="78" text-anchor="middle" fill="#f59e0b" font-family="Nunito,sans-serif" font-size="10">Descanso 1</text>
+      <!-- B5 45min -->
+      <rect x="452" y="28" width="120" height="32" rx="8" fill="#0ea5e9" opacity=".85"/>
+      <text x="512" y="42" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B5</text>
+      <text x="512" y="54" text-anchor="middle" fill="#070d18" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">45 min</text>
+      <text x="512" y="78" text-anchor="middle" fill="#7dd3fc" font-family="Nunito,sans-serif" font-size="10">Boleta de notas</text>
+      <!-- BREAK 2 -->
+      <rect x="580" y="22" width="64" height="44" rx="8" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 3"/>
+      <text x="612" y="40" text-anchor="middle" fill="#f59e0b" font-family="Nunito,sans-serif" font-size="18">&#9749;</text>
+      <text x="612" y="56" text-anchor="middle" fill="#f59e0b" font-family="Exo 2,sans-serif" font-weight="800" font-size="9">15 min</text>
+      <text x="612" y="78" text-anchor="middle" fill="#f59e0b" font-family="Nunito,sans-serif" font-size="10">Descanso 2</text>
+      <!-- B6 45min -->
+      <rect x="652" y="28" width="80" height="32" rx="8" fill="#a855f7" opacity=".85"/>
+      <text x="692" y="42" text-anchor="middle" fill="#fff" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B6</text>
+      <text x="692" y="54" text-anchor="middle" fill="#fff" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">45 min</text>
+      <text x="692" y="78" text-anchor="middle" fill="#c4b5fd" font-family="Nunito,sans-serif" font-size="10">Validación</text>
+      <!-- B7 30min -->
+      <rect x="740" y="28" width="60" height="32" rx="8" fill="#a855f7" opacity=".85"/>
+      <text x="770" y="42" text-anchor="middle" fill="#fff" font-family="Exo 2,sans-serif" font-weight="800" font-size="10">B7</text>
+      <text x="770" y="54" text-anchor="middle" fill="#fff" font-family="Exo 2,sans-serif" font-weight="600" font-size="9">30 min</text>
+      <text x="770" y="78" text-anchor="middle" fill="#c4b5fd" font-family="Nunito,sans-serif" font-size="10">Reto final</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══ BLOQUE 1 ══════════════════════════════ -->
+<section id="b1" class="section">
+  <div class="block-badge badge-green">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#22d3a0"/></svg>
+    Bloque 1 &middot; 30 minutos
+  </div>
+  <h2 class="section-title">Introducción a las Tablas HTML</h2>
+  <p class="section-subtitle">Entendemos qué son, para qué sirven y aprendemos las etiquetas <em>&lt;table&gt;</em>, <em>&lt;tr&gt;</em>, <em>&lt;td&gt;</em> y <em>&lt;th&gt;</em></p>
+
+  <h3 class="sub">¿Qué es una tabla y para qué sirve?</h3>
+  <p>Imagina que tienes que organizar los resultados de un torneo de videojuegos: jugadores, puntajes y posiciones. ¿Cómo lo harías en papel? Probablemente dibujarías filas y columnas. En HTML, las <strong>tablas</strong> hacen exactamente eso: organizan información en filas y columnas de forma visual y ordenada.</p>
+
+  <div class="info-grid">
+    <div class="info-card"><h4>Horarios y calendarios</h4><p>Organiza días, horas y actividades en una cuadrícula clara.</p></div>
+    <div class="info-card"><h4>Resultados deportivos</h4><p>Clasifica equipos, puntajes, partidos ganados y perdidos.</p></div>
+    <div class="info-card"><h4>Boletas de notas</h4><p>Presenta materias, períodos y promedios de forma estructurada.</p></div>
+    <div class="info-card"><h4>Comparativas</h4><p>Compara características de productos, planes o servicios.</p></div>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">&#9888;</span>
+    <div><strong>Importante:</strong> Las tablas son para <strong>datos tabulares</strong>, no para hacer el diseño general de una página web. ¡Ese es el trabajo del CSS!</div>
+  </div>
+
+  <h3 class="sub">Las etiquetas fundamentales</h3>
+
+  <!-- SVG: Anatomía de una tabla -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#6b8aad"/>
+        </marker>
+      </defs>
+      <!-- Background -->
+      <rect width="700" height="340" rx="14" fill="#050b14"/>
+      <!-- Title -->
+      <text x="24" y="36" font-family="Exo 2,sans-serif" font-weight="800" font-size="14" fill="#6b8aad" letter-spacing="2">ANATOMÍA DE UNA TABLA</text>
+
+      <!-- table border -->
+      <rect x="24" y="56" width="340" height="260" rx="8" fill="none" stroke="#00d4ff" stroke-width="2"/>
+
+      <!-- Row 1: encabezados -->
+      <rect x="30" y="62" width="110" height="44" rx="4" fill="#003d6b"/>
+      <rect x="146" y="62" width="110" height="44" rx="4" fill="#003d6b"/>
+      <rect x="262" y="62" width="97" height="44" rx="4" fill="#003d6b"/>
+      <text x="85" y="84" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7dd3fc" font-weight="700">&lt;th&gt;</text>
+      <text x="85" y="97" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Encabezado</text>
+      <text x="201" y="84" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7dd3fc" font-weight="700">&lt;th&gt;</text>
+      <text x="201" y="97" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Encabezado</text>
+      <text x="310" y="84" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7dd3fc" font-weight="700">&lt;th&gt;</text>
+      <text x="310" y="97" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Encab.</text>
+
+      <!-- Row 2 -->
+      <rect x="30" y="112" width="110" height="44" rx="4" fill="#0d1a2d"/>
+      <rect x="146" y="112" width="110" height="44" rx="4" fill="#0d1a2d"/>
+      <rect x="262" y="112" width="97" height="44" rx="4" fill="#0d1a2d"/>
+      <text x="85" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0" font-weight="700">&lt;td&gt;</text>
+      <text x="85" y="147" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+      <text x="201" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0" font-weight="700">&lt;td&gt;</text>
+      <text x="201" y="147" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+      <text x="310" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0" font-weight="700">&lt;td&gt;</text>
+      <text x="310" y="147" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+
+      <!-- Row 3 -->
+      <rect x="30" y="162" width="110" height="44" rx="4" fill="#0d1a2d"/>
+      <rect x="146" y="162" width="110" height="44" rx="4" fill="#0d1a2d"/>
+      <rect x="262" y="162" width="97" height="44" rx="4" fill="#0d1a2d"/>
+      <text x="85" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="85" y="197" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+      <text x="201" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="201" y="197" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+      <text x="310" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="310" y="197" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+
+      <!-- Row 4 -->
+      <rect x="30" y="212" width="110" height="44" rx="4" fill="#0d1a2d"/>
+      <rect x="146" y="212" width="110" height="44" rx="4" fill="#0d1a2d"/>
+      <rect x="262" y="212" width="97" height="44" rx="4" fill="#0d1a2d"/>
+      <text x="85" y="234" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="85" y="247" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+      <text x="201" y="234" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="201" y="247" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+      <text x="310" y="234" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="310" y="247" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">dato</text>
+
+      <!-- TR brackets -->
+      <rect x="26" y="108" width="342" height="52" rx="5" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4 3" opacity=".6"/>
+      <text x="372" y="138" font-family="JetBrains Mono,monospace" font-size="12" fill="#a855f7" font-weight="700">&lt;tr&gt;</text>
+
+      <!-- table bracket label -->
+      <text x="24" y="50" font-family="JetBrains Mono,monospace" font-size="12" fill="#00d4ff" font-weight="700">&lt;table&gt;</text>
+
+      <!-- Legend right -->
+      <text x="430" y="70" font-family="Exo 2,sans-serif" font-weight="700" font-size="13" fill="#e2efff">Etiquetas</text>
+
+      <rect x="430" y="90" width="16" height="16" rx="3" fill="#003d6b"/>
+      <text x="454" y="102" font-family="JetBrains Mono,monospace" font-size="12" fill="#7dd3fc">&lt;th&gt;</text>
+      <text x="454" y="116" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Celda de encabezado</text>
+
+      <rect x="430" y="132" width="16" height="16" rx="3" fill="#0d1a2d" stroke="#22d3a0" stroke-width="1"/>
+      <text x="454" y="144" font-family="JetBrains Mono,monospace" font-size="12" fill="#22d3a0">&lt;td&gt;</text>
+      <text x="454" y="158" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Celda de datos</text>
+
+      <rect x="430" y="174" width="16" height="16" rx="3" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="454" y="186" font-family="JetBrains Mono,monospace" font-size="12" fill="#a855f7">&lt;tr&gt;</text>
+      <text x="454" y="200" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Fila completa</text>
+
+      <rect x="430" y="216" width="16" height="16" rx="3" fill="none" stroke="#00d4ff" stroke-width="2"/>
+      <text x="454" y="228" font-family="JetBrains Mono,monospace" font-size="12" fill="#00d4ff">&lt;table&gt;</text>
+      <text x="454" y="242" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Contenedor general</text>
+
+      <!-- Note -->
+      <rect x="430" y="268" width="240" height="36" rx="8" fill="rgba(245,158,11,.08)" stroke="rgba(245,158,11,.2)" stroke-width="1"/>
+      <text x="550" y="282" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#f59e0b">th = negrita + centrado</text>
+      <text x="550" y="296" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#9a7730">automáticamente</text>
+    </svg>
+  </div>
+
+  <h3 class="sub">Código de ejemplo</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <span class="code-label">tabla-basica.html</span>
+    </div>
+    <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;tr&gt;</span>
+    <span class="ht">&lt;th&gt;</span>Jugador<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;th&gt;</span>Puntaje<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;th&gt;</span>Nivel<span class="ht">&lt;/th&gt;</span>
+  <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;tr&gt;</span>
+    <span class="ht">&lt;td&gt;</span>Carlos<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;td&gt;</span>9800<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;td&gt;</span>Experto<span class="ht">&lt;/td&gt;</span>
+  <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;tr&gt;</span>
+    <span class="ht">&lt;td&gt;</span>Sofía<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;td&gt;</span>11200<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;td&gt;</span>Maestra<span class="ht">&lt;/td&gt;</span>
+  <span class="ht">&lt;/tr&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+  </div>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">&#128161;</span>
+    <div>El atributo <code style="font-family:'JetBrains Mono';color:#f59e0b;background:rgba(245,158,11,.1);padding:2px 6px;border-radius:4px">border="1"</code> le agrega bordes visibles a la tabla. Sin él, las celdas no tienen borde y es difícil verlas al inicio.</div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-header">
+      <div class="exercise-num">1</div>
+      <h4>Ejercicio &mdash; Tu primera tabla</h4>
+      <span class="exercise-time">10 min</span>
+    </div>
+    <p style="margin-bottom:14px">Crea una tabla con la siguiente información sobre tus 3 series o películas favoritas:</p>
+    <table class="data-table">
+      <thead><tr><th>Columna requerida</th><th>Tipo de dato</th></tr></thead>
+      <tbody>
+        <tr><td>Nombre de la serie / película</td><td>Texto</td></tr>
+        <tr><td>Género</td><td>Texto (Acción, Comedia, etc.)</td></tr>
+        <tr><td>Calificación personal</td><td>Número del 1 al 10</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ BLOQUE 2 ══════════════════════════════ -->
+<section id="b2" class="section">
+  <div class="block-badge badge-green">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#22d3a0"/></svg>
+    Bloque 2 &middot; 30 minutos
+  </div>
+  <h2 class="section-title">Estructura semántica</h2>
+  <p class="section-subtitle">Usamos <em>&lt;thead&gt;</em>, <em>&lt;tbody&gt;</em> y <em>&lt;tfoot&gt;</em> para organizar la tabla en secciones significativas</p>
+
+  <p>Así como un libro tiene portada, contenido e índice, una tabla HTML bien construida tiene <strong>tres secciones claras</strong>. Esto no es solo por estética: ayuda a los navegadores, lectores de pantalla y herramientas de accesibilidad a entender mejor la información.</p>
+
+  <!-- SVG: Secciones de la tabla -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <rect width="680" height="300" rx="14" fill="#050b14"/>
+
+      <!-- Table container -->
+      <rect x="200" y="24" width="220" height="256" rx="8" fill="none" stroke="#1c3354" stroke-width="1.5"/>
+
+      <!-- THEAD zone -->
+      <rect x="200" y="24" width="220" height="56" rx="8" fill="#003366" opacity=".9"/>
+      <rect x="200" y="62" width="220" height="18" fill="#003366" opacity=".9"/>
+      <text x="310" y="57" text-anchor="middle" font-family="Exo 2,sans-serif" font-weight="800" font-size="13" fill="#7dd3fc">ENCABEZADO</text>
+      <text x="208" y="48" font-family="JetBrains Mono,monospace" font-size="10" fill="#7dd3fc" opacity=".6">Columna 1</text>
+      <text x="268" y="48" font-family="JetBrains Mono,monospace" font-size="10" fill="#7dd3fc" opacity=".6">Columna 2</text>
+      <text x="340" y="48" font-family="JetBrains Mono,monospace" font-size="10" fill="#7dd3fc" opacity=".6">Col 3</text>
+
+      <!-- TBODY zone -->
+      <rect x="200" y="80" width="220" height="140" rx="0" fill="#0d1a2d"/>
+      <!-- rows -->
+      <line x1="200" y1="113" x2="420" y2="113" stroke="#1c3354" stroke-width="1"/>
+      <line x1="200" y1="146" x2="420" y2="146" stroke="#1c3354" stroke-width="1"/>
+      <line x1="200" y1="179" x2="420" y2="179" stroke="#1c3354" stroke-width="1"/>
+      <text x="310" y="100" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Fila de datos 1</text>
+      <text x="310" y="133" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Fila de datos 2</text>
+      <text x="310" y="166" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Fila de datos 3</text>
+      <text x="310" y="199" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Fila de datos 4</text>
+      <text x="310" y="136" text-anchor="middle" font-family="Exo 2,sans-serif" font-weight="800" font-size="22" fill="#22d3a0" opacity=".08">BODY</text>
+
+      <!-- TFOOT zone -->
+      <rect x="200" y="220" width="220" height="60" rx="0" fill="#001a33" opacity=".9"/>
+      <rect x="200" y="268" width="220" height="12" rx="8" fill="#001a33" opacity=".9"/>
+      <line x1="200" y1="220" x2="420" y2="220" stroke="#0055aa" stroke-width="1.5"/>
+      <text x="310" y="247" text-anchor="middle" font-family="Exo 2,sans-serif" font-weight="800" font-size="12" fill="#7dd3fc" opacity=".7">TOTAL / RESUMEN</text>
+
+      <!-- Labels left -->
+      <rect x="24" y="36" width="80" height="28" rx="6" fill="rgba(0,100,200,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="64" y="54" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7dd3fc" font-weight="700">&lt;thead&gt;</text>
+      <line x1="104" y1="50" x2="199" y2="52" stroke="rgba(0,212,255,.3)" stroke-width="1" marker-end="url(#arr)"/>
+
+      <rect x="24" y="138" width="80" height="28" rx="6" fill="rgba(34,211,160,.08)" stroke="rgba(34,211,160,.25)" stroke-width="1"/>
+      <text x="64" y="156" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#22d3a0" font-weight="700">&lt;tbody&gt;</text>
+      <line x1="104" y1="152" x2="199" y2="150" stroke="rgba(34,211,160,.3)" stroke-width="1" marker-end="url(#arr)"/>
+
+      <rect x="24" y="234" width="80" height="28" rx="6" fill="rgba(168,85,247,.1)" stroke="rgba(168,85,247,.3)" stroke-width="1"/>
+      <text x="64" y="252" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a855f7" font-weight="700">&lt;tfoot&gt;</text>
+      <line x1="104" y1="248" x2="199" y2="248" stroke="rgba(168,85,247,.3)" stroke-width="1" marker-end="url(#arr)"/>
+
+      <!-- Right description -->
+      <text x="448" y="48" font-family="Nunito,sans-serif" font-size="12" fill="#7dd3fc" font-weight="700">Encabezados de columnas</text>
+      <text x="448" y="62" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Contiene &lt;th&gt; con los títulos</text>
+
+      <text x="448" y="150" font-family="Nunito,sans-serif" font-size="12" fill="#22d3a0" font-weight="700">Datos principales</text>
+      <text x="448" y="164" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Todas las filas de información</text>
+
+      <text x="448" y="244" font-family="Nunito,sans-serif" font-size="12" fill="#a855f7" font-weight="700">Totales y resumen</text>
+      <text x="448" y="258" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Promedios, sumas, notas finales</text>
+    </svg>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <span class="code-label">tabla-semántica.html</span>
+    </div>
+    <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span><span class="ht">&gt;</span>
+
+  <span class="ht">&lt;thead&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Materia<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Nota 1<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Nota 2<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Promedio<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Matemáticas<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.2<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>3.8<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.0<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Lengua Castellana<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.5<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.7<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.6<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+
+  <span class="ht">&lt;tfoot&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="ht">&lt;strong&gt;</span>Promedio General<span class="ht">&lt;/strong&gt;&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="ht">&lt;strong&gt;</span>4.3<span class="ht">&lt;/strong&gt;&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tfoot&gt;</span>
+
+<span class="ht">&lt;/table&gt;</span></pre></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-header">
+      <div class="exercise-num">2</div>
+      <h4>Ejercicio &mdash; Tabla estructurada</h4>
+      <span class="exercise-time">10 min</span>
+    </div>
+    <p>Toma la tabla del Ejercicio 1 y agrégale <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:13px">&lt;thead&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:13px">&lt;tbody&gt;</code> y <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:13px">&lt;tfoot&gt;</code>. En el <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:13px">&lt;tfoot&gt;</code> escribe: <strong>"Total de favoritos: 3"</strong>.</p>
+  </div>
+</section>
+
+<!-- ═══ BLOQUE 3 ══════════════════════════════ -->
+<section id="b3" class="section">
+  <div class="block-badge badge-green">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#22d3a0"/></svg>
+    Bloque 3 &middot; 30 minutos
+  </div>
+  <h2 class="section-title">Atributos: colspan y rowspan</h2>
+  <p class="section-subtitle">Aprende a unir <em>columnas</em> con colspan y <em>filas</em> con rowspan para crear tablas más expresivas</p>
+
+  <h3 class="sub">colspan — Unir columnas horizontalmente</h3>
+  <p><code style="font-family:'JetBrains Mono';color:#f59e0b;background:rgba(245,158,11,.1);padding:2px 6px;border-radius:4px">colspan</code> le dice a una celda que ocupe el espacio de <strong>varias columnas</strong>. Se usa típicamente en títulos que deben abarcar toda la tabla.</p>
+
+  <!-- SVG colspan -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="max-width:620px;width:100%">
+      <rect width="620" height="200" rx="14" fill="#050b14"/>
+      <text x="24" y="32" font-family="Exo 2,sans-serif" font-weight="700" font-size="12" fill="#6b8aad" letter-spacing="1">ANTES (sin colspan)</text>
+      <!-- Before -->
+      <rect x="24" y="44" width="80" height="36" rx="4" fill="#1c3354"/>
+      <rect x="108" y="44" width="80" height="36" rx="4" fill="#1c3354"/>
+      <rect x="192" y="44" width="80" height="36" rx="4" fill="#1c3354"/>
+      <text x="64" y="66" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Celda 1</text>
+      <text x="148" y="66" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Celda 2</text>
+      <text x="232" y="66" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Celda 3</text>
+      <rect x="24" y="84" width="80" height="36" rx="4" fill="#0d1a2d"/>
+      <rect x="108" y="84" width="80" height="36" rx="4" fill="#0d1a2d"/>
+      <rect x="192" y="84" width="80" height="36" rx="4" fill="#0d1a2d"/>
+      <text x="64" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">dato</text>
+      <text x="148" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">dato</text>
+      <text x="232" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">dato</text>
+
+      <!-- Arrow -->
+      <text x="296" y="88" text-anchor="middle" font-family="Nunito,sans-serif" font-size="28" fill="#f59e0b">&#8594;</text>
+      <text x="296" y="108" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f59e0b">colspan="3"</text>
+
+      <!-- After -->
+      <text x="330" y="32" font-family="Exo 2,sans-serif" font-weight="700" font-size="12" fill="#22d3a0" letter-spacing="1">DESPUÉS (con colspan)</text>
+      <rect x="330" y="44" width="264" height="36" rx="4" fill="rgba(0,212,255,.15)" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="462" y="66" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#00d4ff" font-weight="700">colspan="3"</text>
+      <text x="462" y="54" text-anchor="middle" font-family="Nunito,sans-serif" font-size="9" fill="#6b8aad">&#8592;&#8212;&#8212; una sola celda ocupa 3 columnas &#8212;&#8212;&#8594;</text>
+      <rect x="330" y="84" width="80" height="36" rx="4" fill="#0d1a2d"/>
+      <rect x="414" y="84" width="80" height="36" rx="4" fill="#0d1a2d"/>
+      <rect x="498" y="84" width="96" height="36" rx="4" fill="#0d1a2d"/>
+      <text x="370" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">dato</text>
+      <text x="454" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">dato</text>
+      <text x="546" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">dato</text>
+
+      <!-- Code hint -->
+      <rect x="330" y="140" width="264" height="46" rx="8" fill="#050b14" stroke="#1c3354" stroke-width="1"/>
+      <text x="345" y="158" font-family="JetBrains Mono,monospace" font-size="11" fill="#7dd3fc">&lt;<tspan fill="#7dd3fc">th</tspan> <tspan fill="#fcd34d">colspan</tspan>=<tspan fill="#86efac">"3"</tspan>&gt;Título<tspan fill="#7dd3fc">&lt;/th&gt;</tspan></text>
+      <text x="345" y="175" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Esta celda ocupa el ancho de 3 columnas normales</text>
+    </svg>
+  </div>
+
+  <h3 class="sub">rowspan — Unir filas verticalmente</h3>
+  <p><code style="font-family:'JetBrains Mono';color:#f59e0b;background:rgba(245,158,11,.1);padding:2px 6px;border-radius:4px">rowspan</code> hace que una celda ocupe el espacio de <strong>varias filas</strong> hacia abajo. Ideal para agrupar elementos por categoría.</p>
+
+  <!-- SVG rowspan -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="max-width:620px;width:100%">
+      <rect width="620" height="200" rx="14" fill="#050b14"/>
+      <text x="24" y="32" font-family="Exo 2,sans-serif" font-weight="700" font-size="12" fill="#6b8aad" letter-spacing="1">ANTES (sin rowspan)</text>
+      <rect x="24" y="44" width="80" height="36" rx="4" fill="#1c3354"/>
+      <rect x="108" y="44" width="100" height="36" rx="4" fill="#0d1a2d"/>
+      <text x="64" y="66" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Ciencias</text>
+      <text x="158" y="66" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Biología</text>
+      <rect x="24" y="84" width="80" height="36" rx="4" fill="#1c3354"/>
+      <rect x="108" y="84" width="100" height="36" rx="4" fill="#0d1a2d"/>
+      <text x="64" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Ciencias</text>
+      <text x="158" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Química</text>
+      <text x="64" y="140" text-anchor="middle" font-family="Exo 2,sans-serif" font-size="10" fill="#f87171">Repetición innecesaria</text>
+
+      <!-- Arrow -->
+      <text x="310" y="88" text-anchor="middle" font-family="Nunito,sans-serif" font-size="28" fill="#f59e0b">&#8594;</text>
+      <text x="310" y="108" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f59e0b">rowspan="2"</text>
+
+      <!-- After -->
+      <text x="360" y="32" font-family="Exo 2,sans-serif" font-weight="700" font-size="12" fill="#22d3a0" letter-spacing="1">DESPUÉS (con rowspan)</text>
+      <rect x="360" y="44" width="80" height="76" rx="4" fill="rgba(168,85,247,.15)" stroke="#a855f7" stroke-width="1.5"/>
+      <text x="400" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a855f7" font-weight="700">rowspan</text>
+      <text x="400" y="96" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a855f7" font-weight="700">="2"</text>
+      <text x="400" y="64" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#c4b5fd">Ciencias</text>
+      <text x="400" y="115" text-anchor="middle" font-family="Nunito,sans-serif" font-size="8" fill="#6b8aad">ocupa 2 filas</text>
+      <rect x="444" y="44" width="100" height="36" rx="4" fill="#0d1a2d"/>
+      <rect x="444" y="84" width="100" height="36" rx="4" fill="#0d1a2d"/>
+      <text x="494" y="66" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Biología</text>
+      <text x="494" y="106" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Química</text>
+      <text x="494" y="140" text-anchor="middle" font-family="Exo 2,sans-serif" font-size="10" fill="#22d3a0">Sin repetición</text>
+    </svg>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-header">
+      <div class="exercise-num">3</div>
+      <h4>Ejercicio &mdash; Usando colspan y rowspan</h4>
+      <span class="exercise-time">15 min</span>
+    </div>
+    <p style="margin-bottom:14px">Crea un horario semanal donde:</p>
+    <ul style="margin-left:20px;margin-bottom:14px;font-size:14px;color:#8faec8">
+      <li>El título "Horario Semanal" ocupe todas las columnas con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">colspan</code></li>
+      <li>Cada día (Lunes, Martes...) ocupe 2 filas con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">rowspan="2"</code></li>
+      <li>Cada día tenga 2 clases (columna Materia y columna Período)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ BLOQUE 4 ══════════════════════════════ -->
+<section id="b4" class="section">
+  <div class="block-badge badge-green">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#22d3a0"/></svg>
+    Bloque 4 &middot; 30 minutos
+  </div>
+  <h2 class="section-title">Taller — Campeonato Escolar</h2>
+  <p class="section-subtitle">Construyes desde cero una tabla completa aplicando todo lo aprendido en los bloques anteriores</p>
+
+  <p>Vas a crear la tabla de posiciones de un campeonato de fútbol escolar. La tabla debe incluir estructura semántica completa y al menos un uso de <code style="font-family:'JetBrains Mono';color:#f59e0b;background:rgba(245,158,11,.1);padding:2px 6px;border-radius:4px">colspan</code>.</p>
+
+  <h3 class="sub">Datos del campeonato</h3>
+  <table class="data-table">
+    <thead><tr><th>Equipo</th><th>PJ</th><th>PG</th><th>PP</th><th>PE</th><th>GF</th><th>GC</th><th>Puntos</th></tr></thead>
+    <tbody>
+      <tr><td>Los Dragones</td><td>4</td><td>3</td><td>0</td><td>1</td><td>9</td><td>3</td><td>10</td></tr>
+      <tr><td>Águilas FC</td><td>4</td><td>2</td><td>1</td><td>1</td><td>7</td><td>5</td><td>7</td></tr>
+      <tr><td>Tigres United</td><td>4</td><td>2</td><td>2</td><td>0</td><td>6</td><td>7</td><td>6</td></tr>
+      <tr><td>Leones SC</td><td>4</td><td>1</td><td>2</td><td>1</td><td>4</td><td>6</td><td>4</td></tr>
+      <tr><td>Panteras CF</td><td>4</td><td>0</td><td>3</td><td>1</td><td>2</td><td>7</td><td>1</td></tr>
+    </tbody>
+    <tfoot><tr><td colspan="8" style="font-size:12px;color:#6b8aad">PJ=Partidos Jugados &nbsp;|&nbsp; PG=Ganados &nbsp;|&nbsp; PP=Perdidos &nbsp;|&nbsp; PE=Empatados &nbsp;|&nbsp; GF/GC=Goles</td></tr></tfoot>
+  </table>
+
+  <h3 class="sub">Requisitos de la tabla</h3>
+  <ul class="checklist">
+    <li>Título principal con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">colspan="8"</code> que abarque todas las columnas</li>
+    <li>Estructura completa: <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tbody&gt;</code> y <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code></li>
+    <li>Los 5 equipos con todos sus datos en el cuerpo</li>
+    <li>En el <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code> indicar el campeón: Los Dragones</li>
+    <li>Usar <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">cellpadding="8"</code> para mejor apariencia</li>
+  </ul>
+
+  <details>
+    <summary>Ver solución de referencia</summary>
+    <div class="code-wrap" style="margin-top:0">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label">campeonato.html</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span> <span class="ha">cellpadding</span>=<span class="hv">"8"</span> <span class="ha">cellspacing</span>=<span class="hv">"0"</span> <span class="ha">width</span>=<span class="hv">"700"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;thead&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th</span> <span class="ha">colspan</span>=<span class="hv">"8"</span><span class="ht">&gt;</span>Tabla de Posiciones 2024<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Equipo<span class="ht">&lt;/th&gt;&lt;th&gt;</span>PJ<span class="ht">&lt;/th&gt;&lt;th&gt;</span>PG<span class="ht">&lt;/th&gt;&lt;th&gt;</span>PP<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>PE<span class="ht">&lt;/th&gt;&lt;th&gt;</span>GF<span class="ht">&lt;/th&gt;&lt;th&gt;</span>GC<span class="ht">&lt;/th&gt;&lt;th&gt;</span>Puntos<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Los Dragones<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4<span class="ht">&lt;/td&gt;&lt;td&gt;</span>3<span class="ht">&lt;/td&gt;&lt;td&gt;</span>0<span class="ht">&lt;/td&gt;&lt;td&gt;</span>1<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>9<span class="ht">&lt;/td&gt;&lt;td&gt;</span>3<span class="ht">&lt;/td&gt;&lt;td&gt;</span>10<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="hc">&lt;!-- ... más filas ... --&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+  <span class="ht">&lt;tfoot&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td</span> <span class="ha">colspan</span>=<span class="hv">"8"</span><span class="ht">&gt;</span>
+        Campeón: <span class="ht">&lt;strong&gt;</span>Los Dragones<span class="ht">&lt;/strong&gt;</span> con 10 puntos
+      <span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tfoot&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+  </details>
+</section>
+
+<!-- ═══ DESCANSO 1 ════════════════════════════ -->
+<div id="descanso1" class="break-section">
+  <div class="break-inner">
+    <div class="break-icon-wrap">
+      <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="40" r="36" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.3)" stroke-width="2"/>
+        <text x="40" y="52" text-anchor="middle" font-size="36">&#9749;</text>
+      </svg>
+    </div>
+    <h2>Descanso — 15 minutos</h2>
+    <p>Llevamos 120 minutos de trabajo intenso. ¡Es momento de recargar energías!</p>
+    <div class="break-activity">
+      &#127919; Actividad sugerida: cierra el computador, estira las manos y explícale a un compañero con tus propias palabras qué es <code style="font-family:'JetBrains Mono'">&lt;thead&gt;</code> y para qué sirve.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BLOQUE 5 ══════════════════════════════ -->
+<section id="b5" class="section">
+  <div class="block-badge badge-blue">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#00d4ff"/></svg>
+    Bloque 5 &middot; 45 minutos
+  </div>
+  <h2 class="section-title">Boleta de Calificaciones</h2>
+  <p class="section-subtitle">Simulamos una boleta real de notas. El ejemplo perfecto que reúne <em>colspan</em>, <em>thead</em>, <em>tbody</em> y <em>tfoot</em></p>
+
+  <h3 class="sub">Análisis de estructura antes de codificar</h3>
+  <p>Antes de escribir código, siempre es buena idea <strong>planear la tabla visualmente</strong>. Identifica qué celdas necesitan colspan o rowspan.</p>
+
+  <!-- SVG: Boleta structure plan -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <rect width="700" height="280" rx="14" fill="#050b14"/>
+
+      <!-- Fila header colegio -->
+      <rect x="24" y="24" width="548" height="36" rx="6" fill="#003366"/>
+      <text x="298" y="47" text-anchor="middle" font-family="Exo 2,sans-serif" font-weight="800" font-size="13" fill="#7dd3fc">INSTITUCIÓN EDUCATIVA &mdash; colspan="6"</text>
+
+      <!-- Fila info estudiante -->
+      <rect x="24" y="64" width="200" height="32" rx="4" fill="#1c3b6a"/>
+      <rect x="228" y="64" width="120" height="32" rx="4" fill="#1c3b6a"/>
+      <rect x="352" y="64" width="220" height="32" rx="4" fill="#1c3b6a"/>
+      <text x="124" y="84" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#93c5fd">Estudiante (colspan="2")</text>
+      <text x="288" y="84" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#93c5fd">Grado</text>
+      <text x="462" y="84" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#93c5fd">Docente (colspan="2")</text>
+
+      <!-- Fila encabezados columnas -->
+      <rect x="24" y="100" width="170" height="32" rx="4" fill="#0055aa"/>
+      <rect x="198" y="100" width="70" height="32" rx="4" fill="#0055aa"/>
+      <rect x="272" y="100" width="70" height="32" rx="4" fill="#0055aa"/>
+      <rect x="346" y="100" width="70" height="32" rx="4" fill="#0055aa"/>
+      <rect x="420" y="100" width="70" height="32" rx="4" fill="#0055aa"/>
+      <rect x="494" y="100" width="78" height="32" rx="4" fill="#0055aa"/>
+      <text x="109" y="120" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="white">Asignatura</text>
+      <text x="233" y="120" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="white">P1</text>
+      <text x="307" y="120" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="white">P2</text>
+      <text x="381" y="120" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="white">P3</text>
+      <text x="455" y="120" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="white">P4</text>
+      <text x="533" y="120" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="white">Promedio</text>
+
+      <!-- Rows -->
+      <rect x="24" y="136" width="548" height="28" rx="3" fill="#0a1524"/>
+      <rect x="24" y="168" width="548" height="28" rx="3" fill="#0d1a2d"/>
+      <rect x="24" y="200" width="548" height="28" rx="3" fill="#0a1524"/>
+      <text x="109" y="154" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Matemáticas</text>
+      <text x="109" y="186" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Lengua Castellana</text>
+      <text x="109" y="218" text-anchor="middle" font-family="Nunito,sans-serif" font-size="11" fill="#6b8aad">Ciencias Naturales</text>
+
+      <!-- tfoot -->
+      <rect x="24" y="232" width="548" height="32" rx="4" fill="#001a33"/>
+      <text x="298" y="252" text-anchor="middle" font-family="Exo 2,sans-serif" font-weight="700" font-size="12" fill="#7dd3fc">Promedio General &mdash; tfoot colspan="5" + celda nota</text>
+
+      <!-- Labels -->
+      <text x="584" y="42" font-family="Exo 2,sans-serif" font-size="11" fill="#7dd3fc" font-weight="700">thead</text>
+      <line x1="578" y1="42" x2="578" y2="116" stroke="#0055aa" stroke-width="1.5"/>
+      <text x="584" y="186" font-family="Exo 2,sans-serif" font-size="11" fill="#22d3a0" font-weight="700">tbody</text>
+      <text x="584" y="248" font-family="Exo 2,sans-serif" font-size="11" fill="#a855f7" font-weight="700">tfoot</text>
+    </svg>
+  </div>
+
+  <h3 class="sub">Vista previa — Boleta completa</h3>
+  <div class="boleta-preview">
+    <table>
+      <thead>
+        <tr><th colspan="6" class="bp-header">&#127867; INSTITUCIÓN EDUCATIVA DEMO</th></tr>
+        <tr>
+          <td colspan="2" class="bp-info"><strong>Estudiante:</strong> Juan Camilo Pérez Rodríguez</td>
+          <td class="bp-info"><strong>Grado:</strong> 10°A</td>
+          <td class="bp-info"><strong>Año:</strong> 2024</td>
+          <td colspan="2" class="bp-info"><strong>Director de grupo:</strong> Prof. García</td>
+        </tr>
+        <tr>
+          <th class="bp-col-head">Asignatura</th>
+          <th class="bp-col-head">Período 1</th>
+          <th class="bp-col-head">Período 2</th>
+          <th class="bp-col-head">Período 3</th>
+          <th class="bp-col-head">Período 4</th>
+          <th class="bp-col-head">Promedio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Matemáticas</td><td class="bp-ok">4.2</td><td class="bp-bad">2.8</td><td class="bp-ok">4.5</td><td class="bp-ok">4.1</td><td class="bp-ok">3.9</td></tr>
+        <tr class="bp-even"><td>Lengua Castellana</td><td class="bp-ok">4.5</td><td class="bp-ok">4.7</td><td class="bp-ok">4.3</td><td class="bp-ok">4.6</td><td class="bp-ok">4.5</td></tr>
+        <tr><td>Ciencias Naturales</td><td class="bp-ok">3.9</td><td class="bp-ok">4.1</td><td class="bp-bad">2.7</td><td class="bp-ok">4.0</td><td class="bp-ok">3.7</td></tr>
+        <tr class="bp-even"><td>Inglés</td><td class="bp-ok">4.0</td><td class="bp-ok">3.5</td><td class="bp-ok">4.2</td><td class="bp-ok">4.4</td><td class="bp-ok">4.0</td></tr>
+        <tr><td>Educación Física</td><td class="bp-ok">4.8</td><td class="bp-ok">4.9</td><td class="bp-ok">5.0</td><td class="bp-ok">4.7</td><td class="bp-ok">4.9</td></tr>
+        <tr class="bp-even"><td>Informática</td><td class="bp-ok">4.3</td><td class="bp-ok">4.6</td><td class="bp-ok">4.8</td><td class="bp-ok">5.0</td><td class="bp-ok">4.7</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td colspan="5" class="bp-foot">&#128202; Promedio General del Año</td><td class="bp-foot">4.28</td></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <h3 class="sub">Código completo de la boleta</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <span class="code-label">boleta.html</span>
+    </div>
+    <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span> <span class="ha">cellpadding</span>=<span class="hv">"10"</span> <span class="ha">cellspacing</span>=<span class="hv">"0"</span> <span class="ha">width</span>=<span class="hv">"700"</span><span class="ht">&gt;</span>
+
+  <span class="hc">&lt;!-- ======= ENCABEZADO ======= --&gt;</span>
+  <span class="ht">&lt;thead&gt;</span>
+    <span class="hc">&lt;!-- Título del colegio --&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th</span> <span class="ha">colspan</span>=<span class="hv">"6"</span><span class="ht">&gt;</span>INSTITUCIÓN EDUCATIVA DEMO<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="hc">&lt;!-- Datos del estudiante --&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td</span> <span class="ha">colspan</span>=<span class="hv">"2"</span><span class="ht">&gt;</span>Estudiante: Juan Pérez<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Grado: 10°A<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Año: 2024<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td</span> <span class="ha">colspan</span>=<span class="hv">"2"</span><span class="ht">&gt;</span>Director: Prof. García<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="hc">&lt;!-- Encabezados de columnas --&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Asignatura<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Período 1<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Período 2<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Período 3<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Período 4<span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Promedio<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+
+  <span class="hc">&lt;!-- ======= CUERPO ======= --&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Matemáticas<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.2<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>2.8<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.5<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.1<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>3.9<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="hc">&lt;!-- ... agregar más filas de materias ... --&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+
+  <span class="hc">&lt;!-- ======= PIE ======= --&gt;</span>
+  <span class="ht">&lt;tfoot&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td</span> <span class="ha">colspan</span>=<span class="hv">"5"</span><span class="ht">&gt;</span>Promedio General del Año<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>4.18<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tfoot&gt;</span>
+
+<span class="ht">&lt;/table&gt;</span></pre></div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-header">
+      <div class="exercise-num">4</div>
+      <h4>Taller de Boleta — Crea la tuya</h4>
+      <span class="exercise-time">20 min</span>
+    </div>
+    <p style="margin-bottom:14px">Crea tu propia boleta de calificaciones. Requisitos obligatorios:</p>
+    <ul class="checklist">
+      <li>Encabezado del colegio con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">colspan</code> total</li>
+      <li>Tu nombre, grado y año en la segunda fila</li>
+      <li>Mínimo 5 materias con notas en 4 períodos</li>
+      <li>Columna de promedio por materia</li>
+      <li><code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code> con el promedio general</li>
+      <li>Estructura completa con las tres secciones semánticas</li>
+    </ul>
+    <div class="callout callout-tip" style="margin-top:16px;margin-bottom:0">
+      <span class="callout-icon">&#11088;</span>
+      <div><strong>Desafío extra:</strong> Agrega una columna "Estado" con &#9989; Aprobado o &#10060; Reprobado según si el promedio es mayor o menor a 3.0</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DESCANSO 2 ════════════════════════════ -->
+<div id="descanso2" class="break-section">
+  <div class="break-inner">
+    <div class="break-icon-wrap">
+      <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="40" r="36" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.3)" stroke-width="2"/>
+        <text x="40" y="52" text-anchor="middle" font-size="36">&#9749;</text>
+      </svg>
+    </div>
+    <h2>Descanso — 15 minutos</h2>
+    <p>¡Excelente trabajo construyendo la boleta! Ya dominas lo fundamental. Ahora viene el bloque de validación.</p>
+    <div class="break-activity">
+      &#128084; Actividad sugerida: muéstrale tu boleta a un compañero y explícale qué hace cada etiqueta mientras señalas el código.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BLOQUE 6 ══════════════════════════════ -->
+<section id="b6" class="section">
+  <div class="block-badge badge-purple">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#a855f7"/></svg>
+    Bloque 6 &middot; 45 minutos
+  </div>
+  <h2 class="section-title">Validación de Etiquetas Anidadas</h2>
+  <p class="section-subtitle">Identificamos y corregimos los errores más frecuentes en el <em>anidamiento</em> de etiquetas de tabla</p>
+
+  <h3 class="sub">¿Qué es el anidamiento?</h3>
+  <p>En HTML, <strong>anidar</strong> significa poner una etiqueta dentro de otra. Las tablas tienen reglas muy específicas sobre qué puede ir dentro de qué. Si las rompes, el navegador puede mostrar resultados inesperados.</p>
+
+  <!-- SVG: árbol de jerarquía -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;width:100%">
+      <rect width="660" height="280" rx="14" fill="#050b14"/>
+      <text x="24" y="30" font-family="Exo 2,sans-serif" font-weight="700" font-size="12" fill="#6b8aad" letter-spacing="1.5">ÁRBOL DE JERARQUÍA — TABLA HTML</text>
+
+      <!-- table -->
+      <rect x="270" y="44" width="120" height="32" rx="8" fill="rgba(0,212,255,.15)" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="330" y="64" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="13" fill="#00d4ff" font-weight="700">&lt;table&gt;</text>
+
+      <!-- lines from table -->
+      <line x1="280" y1="76" x2="140" y2="110" stroke="#1c3354" stroke-width="1.5"/>
+      <line x1="330" y1="76" x2="330" y2="110" stroke="#1c3354" stroke-width="1.5"/>
+      <line x1="380" y1="76" x2="520" y2="110" stroke="#1c3354" stroke-width="1.5"/>
+
+      <!-- thead -->
+      <rect x="80" y="110" width="120" height="30" rx="7" fill="rgba(0,100,200,.2)" stroke="rgba(0,212,255,.4)" stroke-width="1"/>
+      <text x="140" y="129" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7dd3fc" font-weight="700">&lt;thead&gt;</text>
+
+      <!-- tbody -->
+      <rect x="270" y="110" width="120" height="30" rx="7" fill="rgba(34,211,160,.08)" stroke="rgba(34,211,160,.35)" stroke-width="1"/>
+      <text x="330" y="129" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#22d3a0" font-weight="700">&lt;tbody&gt;</text>
+
+      <!-- tfoot -->
+      <rect x="460" y="110" width="120" height="30" rx="7" fill="rgba(168,85,247,.1)" stroke="rgba(168,85,247,.4)" stroke-width="1"/>
+      <text x="520" y="129" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a855f7" font-weight="700">&lt;tfoot&gt;</text>
+
+      <!-- tr under thead -->
+      <line x1="140" y1="140" x2="140" y2="168" stroke="#1c3354" stroke-width="1.5"/>
+      <rect x="80" y="168" width="120" height="28" rx="6" fill="#0a1524" stroke="#1c3354" stroke-width="1"/>
+      <text x="140" y="186" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#c084fc">&lt;tr&gt;</text>
+
+      <!-- tr under tbody -->
+      <line x1="330" y1="140" x2="330" y2="168" stroke="#1c3354" stroke-width="1.5"/>
+      <rect x="270" y="168" width="120" height="28" rx="6" fill="#0a1524" stroke="#1c3354" stroke-width="1"/>
+      <text x="330" y="186" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#c084fc">&lt;tr&gt;</text>
+
+      <!-- tr under tfoot -->
+      <line x1="520" y1="140" x2="520" y2="168" stroke="#1c3354" stroke-width="1.5"/>
+      <rect x="460" y="168" width="120" height="28" rx="6" fill="#0a1524" stroke="#1c3354" stroke-width="1"/>
+      <text x="520" y="186" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#c084fc">&lt;tr&gt;</text>
+
+      <!-- th/td under thead tr -->
+      <line x1="120" y1="196" x2="100" y2="224" stroke="#1c3354" stroke-width="1.5"/>
+      <line x1="160" y1="196" x2="180" y2="224" stroke="#1c3354" stroke-width="1.5"/>
+      <rect x="60" y="224" width="66" height="26" rx="6" fill="rgba(0,100,200,.15)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="93" y="241" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7dd3fc">&lt;th&gt;</text>
+      <rect x="135" y="224" width="66" height="26" rx="6" fill="rgba(34,211,160,.07)" stroke="rgba(34,211,160,.25)" stroke-width="1"/>
+      <text x="168" y="241" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+
+      <!-- td under tbody tr -->
+      <line x1="300" y1="196" x2="280" y2="224" stroke="#1c3354" stroke-width="1.5"/>
+      <line x1="360" y1="196" x2="380" y2="224" stroke="#1c3354" stroke-width="1.5"/>
+      <rect x="245" y="224" width="66" height="26" rx="6" fill="rgba(34,211,160,.07)" stroke="rgba(34,211,160,.25)" stroke-width="1"/>
+      <text x="278" y="241" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+      <rect x="350" y="224" width="66" height="26" rx="6" fill="rgba(34,211,160,.07)" stroke="rgba(34,211,160,.25)" stroke-width="1"/>
+      <text x="383" y="241" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+
+      <!-- td under tfoot tr -->
+      <line x1="520" y1="196" x2="520" y2="224" stroke="#1c3354" stroke-width="1.5"/>
+      <rect x="490" y="224" width="60" height="26" rx="6" fill="rgba(34,211,160,.07)" stroke="rgba(34,211,160,.25)" stroke-width="1"/>
+      <text x="520" y="241" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#22d3a0">&lt;td&gt;</text>
+    </svg>
+  </div>
+
+  <h3 class="sub">Errores comunes de anidamiento</h3>
+
+  <!-- Error 1 -->
+  <p style="font-weight:700;color:#f87171;margin-bottom:10px">&#10060; Error 1 &mdash; &lt;td&gt; directamente dentro de &lt;table&gt;</p>
+  <div class="code-compare">
+    <div class="code-wrap code-bad">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-bad-label">&#10060; Incorrecto</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;table&gt;</span>
+  <span style="color:#f87171">&lt;td&gt;</span>Esto está mal<span style="color:#f87171">&lt;/td&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+    <div class="code-wrap code-good">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-good-label">&#10003; Correcto</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;table&gt;</span>
+  <span class="ht">&lt;tr&gt;</span>
+    <span class="ht">&lt;td&gt;</span>Esto está bien<span class="ht">&lt;/td&gt;</span>
+  <span class="ht">&lt;/tr&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+  </div>
+  <div class="callout callout-info">
+    <span class="callout-icon">&#128161;</span>
+    <div>Las celdas <code style="font-family:'JetBrains Mono';font-size:12px;color:#f59e0b">&lt;td&gt;</code> y <code style="font-family:'JetBrains Mono';font-size:12px;color:#f59e0b">&lt;th&gt;</code> <strong>SIEMPRE</strong> deben estar dentro de una fila <code style="font-family:'JetBrains Mono';font-size:12px;color:#f59e0b">&lt;tr&gt;</code>. Sin <code style="font-family:'JetBrains Mono';font-size:12px;color:#f59e0b">&lt;tr&gt;</code>, la tabla no sabe dónde poner la celda.</div>
+  </div>
+
+  <!-- Error 2 -->
+  <p style="font-weight:700;color:#f87171;margin-top:28px;margin-bottom:10px">&#10060; Error 2 &mdash; &lt;tr&gt; dentro de &lt;tr&gt;</p>
+  <div class="code-compare">
+    <div class="code-wrap code-bad">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-bad-label">&#10060; Incorrecto</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;tr&gt;</span>
+  <span class="ht">&lt;td&gt;</span>Celda 1<span class="ht">&lt;/td&gt;</span>
+  <span style="color:#f87171">&lt;tr&gt;</span>  <span class="hc">&lt;!-- ERROR --&gt;</span>
+    <span class="ht">&lt;td&gt;</span>Celda 2<span class="ht">&lt;/td&gt;</span>
+  <span style="color:#f87171">&lt;/tr&gt;</span>
+<span class="ht">&lt;/tr&gt;</span></pre></div>
+    </div>
+    <div class="code-wrap code-good">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-good-label">&#10003; Correcto</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;tr&gt;</span>
+  <span class="ht">&lt;td&gt;</span>Celda 1<span class="ht">&lt;/td&gt;</span>
+<span class="ht">&lt;/tr&gt;</span>
+<span class="ht">&lt;tr&gt;</span>
+  <span class="ht">&lt;td&gt;</span>Celda 2<span class="ht">&lt;/td&gt;</span>
+<span class="ht">&lt;/tr&gt;</span></pre></div>
+    </div>
+  </div>
+
+  <!-- Error 3 -->
+  <p style="font-weight:700;color:#f87171;margin-top:28px;margin-bottom:10px">&#10060; Error 3 &mdash; &lt;thead&gt; fuera de lugar</p>
+  <div class="code-compare">
+    <div class="code-wrap code-bad">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-bad-label">&#10060; Incorrecto</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;table&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>...<span class="ht">&lt;/tbody&gt;</span>
+  <span style="color:#f87171">&lt;thead&gt;</span>  <span class="hc">&lt;!-- thead al final --&gt;</span>
+    <span class="ht">&lt;tr&gt;&lt;th&gt;</span>...<span class="ht">&lt;/th&gt;&lt;/tr&gt;</span>
+  <span style="color:#f87171">&lt;/thead&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+    <div class="code-wrap code-good">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-good-label">&#10003; Correcto</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;table&gt;</span>
+  <span class="ht">&lt;thead&gt;</span>  <span class="hc">&lt;!-- thead primero --&gt;</span>
+    <span class="ht">&lt;tr&gt;&lt;th&gt;</span>...<span class="ht">&lt;/th&gt;&lt;/tr&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>...<span class="ht">&lt;/tbody&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+  </div>
+
+  <h3 class="sub">Taller de Validación — Encuentra los errores</h3>
+
+  <!-- Código con errores 1 -->
+  <div class="exercise">
+    <div class="exercise-header">
+      <div class="exercise-num">5</div>
+      <h4>Código 1 &mdash; Encuentra los 2 errores</h4>
+      <span class="exercise-time">7 min</span>
+    </div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+        <span class="code-label code-bad-label">&#128269; Encuentra los errores</span>
+      </div>
+      <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;thead&gt;</span>
+    <span style="color:#f87171">&lt;td&gt;</span>Nombre<span style="color:#f87171">&lt;/td&gt;</span>   <span class="hc">&lt;!-- ¿Qué falta aquí? --&gt;</span>
+    <span style="color:#f87171">&lt;td&gt;</span>Edad<span style="color:#f87171">&lt;/td&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Ana<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>15<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+    <details>
+      <summary>Ver solución</summary>
+      <p style="margin-bottom:12px"><strong>Error 1:</strong> Dentro de <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code> hay <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;td&gt;</code> pero falta el <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tr&gt;</code> que las contenga.<br><strong>Error 2:</strong> Los encabezados deben ser <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;th&gt;</code>, no <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;td&gt;</code>.</p>
+      <div class="code-wrap code-good">
+        <div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-label code-good-label">&#10003; Solución</span></div>
+        <div class="code-body"><pre><span class="ht">&lt;thead&gt;</span>
+  <span class="ht">&lt;tr&gt;</span>
+    <span class="ht">&lt;th&gt;</span>Nombre<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;th&gt;</span>Edad<span class="ht">&lt;/th&gt;</span>
+  <span class="ht">&lt;/tr&gt;</span>
+<span class="ht">&lt;/thead&gt;</span></pre></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Código con errores 2 -->
+  <div class="exercise">
+    <div class="exercise-header">
+      <div class="exercise-num">6</div>
+      <h4>Código 2 &mdash; Encuentra los 3 errores</h4>
+      <span class="exercise-time">8 min</span>
+    </div>
+    <div class="code-wrap">
+      <div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-label code-bad-label">&#128269; Nivel medio</span></div>
+      <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;tr&gt;</span>                       <span class="hc">&lt;!-- fila suelta sin thead/tbody --&gt;</span>
+    <span class="ht">&lt;th</span> <span class="ha">colspan</span>=<span class="hv">"2"</span><span class="ht">&gt;</span>Mi Horario<span class="ht">&lt;/th&gt;</span>
+  <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Lunes<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Matemáticas<span class="ht">&lt;/td&gt;</span>
+    <span style="color:#f87171">&lt;tr&gt;</span>                     <span class="hc">&lt;!-- &lt;/tr&gt; olvidado arriba --&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Martes<span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span>Inglés<span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+  <span style="color:#f87171">&lt;thead&gt;</span>                   <span class="hc">&lt;!-- thead al final --&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th&gt;</span>Día<span class="ht">&lt;/th&gt;&lt;th&gt;</span>Materia<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span style="color:#f87171">&lt;/thead&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+    </div>
+    <details>
+      <summary>Ver solución</summary>
+      <p style="margin-bottom:12px"><strong>Error 1:</strong> Primera fila <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tr&gt;</code> flotando fuera de cualquier sección semántica.<br><strong>Error 2:</strong> La segunda fila no está cerrada (falta <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;/tr&gt;</code>).<br><strong>Error 3:</strong> El <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code> está al final del código cuando debería ir al principio.</p>
+      <div class="code-wrap code-good">
+        <div class="code-header"><div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div><span class="code-label code-good-label">&#10003; Solución</span></div>
+        <div class="code-body"><pre><span class="ht">&lt;table</span> <span class="ha">border</span>=<span class="hv">"1"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;thead&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th</span> <span class="ha">colspan</span>=<span class="hv">"2"</span><span class="ht">&gt;</span>Mi Horario<span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="ht">&lt;tr&gt;&lt;th&gt;</span>Día<span class="ht">&lt;/th&gt;&lt;th&gt;</span>Materia<span class="ht">&lt;/th&gt;&lt;/tr&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;&lt;td&gt;</span>Lunes<span class="ht">&lt;/td&gt;&lt;td&gt;</span>Matemáticas<span class="ht">&lt;/td&gt;&lt;/tr&gt;</span>
+    <span class="ht">&lt;tr&gt;&lt;td&gt;</span>Martes<span class="ht">&lt;/td&gt;&lt;td&gt;</span>Inglés<span class="ht">&lt;/td&gt;&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+<span class="ht">&lt;/table&gt;</span></pre></div>
+      </div>
+    </details>
+  </div>
+
+  <h3 class="sub">Lista de verificación &mdash; Antes de entregar cualquier tabla</h3>
+  <ul class="checklist">
+    <li>La tabla comienza con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;table&gt;</code> y termina con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;/table&gt;</code></li>
+    <li>Usé <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tbody&gt;</code> y <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code> correctamente</li>
+    <li>Cada sección tiene al menos una fila <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tr&gt;</code></li>
+    <li>Todas las <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;td&gt;</code> y <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;th&gt;</code> están dentro de un <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tr&gt;</code></li>
+    <li>Todos los <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tr&gt;</code> están dentro de <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tbody&gt;</code> o <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code></li>
+    <li>Cerré correctamente todas las etiquetas con <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;/etiqueta&gt;</code></li>
+    <li>El número de mi <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">colspan</code> coincide con las columnas reales que cubre</li>
+    <li>Usé <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;th&gt;</code> para encabezados y <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;td&gt;</code> para datos</li>
+  </ul>
+</section>
+
+<!-- ═══ BLOQUE 7 ══════════════════════════════ -->
+<section id="b7" class="section">
+  <div class="block-badge badge-purple">
+    <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#a855f7"/></svg>
+    Bloque 7 &middot; 30 minutos
+  </div>
+  <h2 class="section-title">Reto Final y Cierre</h2>
+  <p class="section-subtitle">Aplicamos <em>todo lo aprendido</em> en un reto integrador y revisamos los conceptos clave de la clase</p>
+
+  <div class="exercise" style="border-color: rgba(168,85,247,.3);background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(0,212,255,.04))">
+    <div class="exercise-header">
+      <div class="exercise-num" style="background:var(--purple)">&#9733;</div>
+      <h4 style="color:var(--purple)">Reto Final — Torneo de Videojuegos</h4>
+      <span class="exercise-time" style="color:var(--purple);background:rgba(168,85,247,.1)">25 min</span>
+    </div>
+    <p style="margin-bottom:16px">Construye una tabla de clasificación de un torneo de videojuegos que cumpla con todos estos requisitos:</p>
+    <table class="data-table" style="margin-bottom:16px">
+      <thead><tr><th>Requisito</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">colspan</code></td><td>El título principal abarca todas las columnas</td></tr>
+        <tr><td><code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">rowspan</code></td><td>Agrupa equipos por región (2 regiones, 2 equipos cada una)</td></tr>
+        <tr><td><code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code></td><td>Con título del torneo y encabezados de columnas</td></tr>
+        <tr><td><code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tbody&gt;</code></td><td>4 equipos mínimo, agrupados por región con rowspan</td></tr>
+        <tr><td><code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code></td><td>Campeón y número total de participantes</td></tr>
+        <tr><td>Estilos CSS</td><td>Mínimo 3 propiedades CSS diferentes aplicadas</td></tr>
+        <tr><td>Sin errores</td><td>Pasar la lista de verificación completa</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:14px;color:#8faec8"><strong>Datos sugeridos:</strong> Región Norte: Equipo Alpha (980 pts), Equipo Beta (870 pts) | Región Sur: Equipo Gamma (920 pts), Equipo Delta (750 pts)</p>
+  </div>
+
+  <h3 class="sub">Mapa mental &mdash; Todo lo aprendido hoy</h3>
+  <!-- SVG: mind map resumen -->
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <rect width="700" height="360" rx="14" fill="#050b14"/>
+
+      <!-- Center -->
+      <ellipse cx="350" cy="180" rx="68" ry="42" fill="rgba(0,212,255,.15)" stroke="#00d4ff" stroke-width="2"/>
+      <text x="350" y="175" text-anchor="middle" font-family="Exo 2,sans-serif" font-weight="800" font-size="14" fill="#00d4ff">TABLAS</text>
+      <text x="350" y="192" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7dd3fc">HTML</text>
+
+      <!-- table -->
+      <ellipse cx="140" cy="80" rx="52" ry="26" fill="rgba(34,211,160,.1)" stroke="#22d3a0" stroke-width="1.5"/>
+      <text x="140" y="84" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#22d3a0" font-weight="700">&lt;table&gt;</text>
+      <line x1="190" y1="96" x2="288" y2="152" stroke="#22d3a0" stroke-width="1" opacity=".5"/>
+      <text x="140" y="118" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Contenedor raíz</text>
+
+      <!-- tr -->
+      <ellipse cx="560" cy="80" rx="52" ry="26" fill="rgba(168,85,247,.1)" stroke="#a855f7" stroke-width="1.5"/>
+      <text x="560" y="84" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a855f7" font-weight="700">&lt;tr&gt;</text>
+      <line x1="510" y1="96" x2="412" y2="152" stroke="#a855f7" stroke-width="1" opacity=".5"/>
+      <text x="560" y="118" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Fila de tabla</text>
+
+      <!-- td/th -->
+      <ellipse cx="80" cy="200" rx="56" ry="26" fill="rgba(245,158,11,.08)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="80" y="200" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f59e0b" font-weight="700">&lt;td&gt; / &lt;th&gt;</text>
+      <line x1="135" y1="200" x2="284" y2="188" stroke="#f59e0b" stroke-width="1" opacity=".5"/>
+      <text x="80" y="240" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Celdas de datos</text>
+      <text x="80" y="253" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">y encabezados</text>
+
+      <!-- thead -->
+      <ellipse cx="150" cy="290" rx="56" ry="26" fill="rgba(0,100,200,.15)" stroke="rgba(0,212,255,.5)" stroke-width="1.5"/>
+      <text x="150" y="294" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7dd3fc" font-weight="700">&lt;thead&gt;</text>
+      <line x1="200" y1="278" x2="304" y2="210" stroke="rgba(0,212,255,.4)" stroke-width="1" opacity=".5"/>
+      <text x="150" y="328" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Sección encabezado</text>
+
+      <!-- tbody -->
+      <ellipse cx="350" cy="310" rx="56" ry="26" fill="rgba(34,211,160,.07)" stroke="rgba(34,211,160,.4)" stroke-width="1.5"/>
+      <text x="350" y="314" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#22d3a0" font-weight="700">&lt;tbody&gt;</text>
+      <line x1="350" y1="284" x2="350" y2="222" stroke="rgba(34,211,160,.4)" stroke-width="1" opacity=".5"/>
+      <text x="350" y="348" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Sección datos</text>
+
+      <!-- tfoot -->
+      <ellipse cx="550" cy="290" rx="56" ry="26" fill="rgba(168,85,247,.08)" stroke="rgba(168,85,247,.4)" stroke-width="1.5"/>
+      <text x="550" y="294" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a855f7" font-weight="700">&lt;tfoot&gt;</text>
+      <line x1="500" y1="278" x2="396" y2="210" stroke="rgba(168,85,247,.4)" stroke-width="1" opacity=".5"/>
+      <text x="550" y="328" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Sección pie/resumen</text>
+
+      <!-- colspan -->
+      <ellipse cx="620" cy="200" rx="58" ry="26" fill="rgba(248,113,113,.08)" stroke="rgba(248,113,113,.4)" stroke-width="1.5"/>
+      <text x="620" y="200" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f87171" font-weight="700">colspan/rowspan</text>
+      <line x1="563" y1="194" x2="416" y2="185" stroke="rgba(248,113,113,.4)" stroke-width="1" opacity=".5"/>
+      <text x="620" y="238" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">Unir columnas</text>
+      <text x="620" y="251" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" fill="#6b8aad">y filas</text>
+    </svg>
+  </div>
+
+  <h3 class="sub">Criterios de evaluación</h3>
+  <div class="eval-item"><span>Estructura correcta: <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;table&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tr&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;td&gt;</code></span><span class="pct">20%</span></div>
+  <div class="eval-item"><span>Uso de <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;thead&gt;</code>, <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tbody&gt;</code> y <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">&lt;tfoot&gt;</code></span><span class="pct">20%</span></div>
+  <div class="eval-item"><span>Uso correcto de <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">colspan</code> y/o <code style="font-family:'JetBrains Mono';color:#f59e0b;font-size:12px">rowspan</code></span><span class="pct">20%</span></div>
+  <div class="eval-item"><span>Boleta de calificaciones funcional</span><span class="pct">20%</span></div>
+  <div class="eval-item"><span>Validación de etiquetas (sin errores)</span><span class="pct">10%</span></div>
+  <div class="eval-item" style="border-left-color:var(--purple)"><span>Creatividad y presentación visual</span><span class="pct" style="color:var(--purple)">10%</span></div>
+
+  <h3 class="sub">Referencias y recursos</h3>
+  <div class="ref-grid">
+    <div class="ref-card">
+      <h5>MDN Web Docs</h5>
+      <p>Documentación oficial de <code style="font-family:'JetBrains Mono';font-size:11px">&lt;table&gt;</code> en español</p>
+    </div>
+    <div class="ref-card">
+      <h5>W3Schools Tables</h5>
+      <p>Tutoriales interactivos con editor en línea</p>
+    </div>
+    <div class="ref-card">
+      <h5>Validator W3C</h5>
+      <p>Pega tu código HTML para verificar errores en tiempo real</p>
+    </div>
+    <div class="ref-card">
+      <h5>CodePen</h5>
+      <p>Escribe y prueba HTML + CSS directamente en el navegador</p>
+    </div>
+  </div>
+
+  <div class="final-card">
+    <svg viewBox="0 0 64 64" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="30" fill="rgba(0,212,255,.1)" stroke="rgba(0,212,255,.3)" stroke-width="1.5"/>
+      <text x="32" y="42" text-anchor="middle" font-size="28">&#127881;</text>
+    </svg>
+    <h3>¡Felicitaciones!</h3>
+    <p>Hoy aprendiste a construir tablas HTML profesionales desde cero. Con práctica constante, pronto podrás combinar HTML con CSS avanzado para crear tablas aún más expresivas. ¡Sigue adelante!</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+// Scroll-spy para el sidebar
+const sections = document.querySelectorAll('section[id], div[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.35 });
+
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
