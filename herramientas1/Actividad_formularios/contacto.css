@@ -1,0 +1,237 @@
+/* === Variables y reset básico === */
+:root {
+  --primario: #2563eb;
+  --primario-oscuro: #1d4ed8;
+  --texto: #1f2937;
+  --texto-suave: #6b7280;
+  --borde: #d1d5db;
+  --fondo: #f9fafb;
+  --blanco: #ffffff;
+  --error: #dc2626;
+  --exito: #16a34a;
+  --radio: 8px;
+  --sombra: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+/* === Contenedor principal === */
+.contenedor {
+  background: var(--blanco);
+  border-radius: 16px;
+  box-shadow: var(--sombra);
+  width: 100%;
+  max-width: 680px;
+  overflow: hidden;
+}
+
+/* === Encabezado === */
+.encabezado {
+  background: var(--primario);
+  color: white;
+  padding: 30px 40px;
+}
+
+.encabezado h1 {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+.encabezado p {
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+
+/* === Formulario === */
+.formulario-contacto {
+  padding: 35px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* === Fila doble (dos campos lado a lado) === */
+.fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 520px) {
+  .fila-doble {
+    grid-template-columns: 1fr;
+  }
+  .formulario-contacto {
+    padding: 25px 20px;
+  }
+}
+
+/* === Campos individuales === */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label,
+.label-grupo {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--texto);
+}
+
+.obligatorio {
+  color: var(--error);
+  margin-left: 3px;
+}
+
+/* === Inputs, select, textarea === */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio);
+  font-size: 0.95rem;
+  color: var(--texto);
+  background: var(--blanco);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primario);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+input:invalid:not(:placeholder-shown),
+textarea:invalid:not(:placeholder-shown) {
+  border-color: var(--error);
+}
+
+input:valid:not(:placeholder-shown) {
+  border-color: var(--exito);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+select {
+  cursor: pointer;
+}
+
+/* === Texto de ayuda === */
+.ayuda {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+
+/* === Radios y checkboxes === */
+.opciones-radio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.opciones-radio input[type="radio"] {
+  width: auto;
+  accent-color: var(--primario);
+}
+
+.opciones-radio label {
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.campo-check {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.campo-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--primario);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.campo-check label {
+  font-weight: normal;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.campo-check a {
+  color: var(--primario);
+  text-decoration: underline;
+}
+
+/* === Botones === */
+.acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-primario,
+.btn-secundario {
+  padding: 12px 28px;
+  border-radius: var(--radio);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-primario {
+  background: var(--primario);
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primario:hover {
+  background: var(--primario-oscuro);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.btn-secundario {
+  background: transparent;
+  color: var(--texto-suave);
+  border: 1.5px solid var(--borde);
+}
+
+.btn-secundario:hover {
+  background: var(--fondo);
+}

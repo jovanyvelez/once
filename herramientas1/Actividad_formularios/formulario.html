@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contáctanos</title>
+  <link rel="stylesheet" href="contacto.css">
+</head>
+<body>
+
+  <main class="contenedor">
+
+    <header class="encabezado">
+      <h1>💬 Contáctanos</h1>
+      <p>Responderemos en menos de 24 horas.</p>
+    </header>
+
+    <form class="formulario-contacto" action="#" method="post" novalidate>
+
+      <!-- Nombre y Email en una fila -->
+      <div class="fila-doble">
+
+        <div class="campo">
+          <label for="contacto-nombre">
+            Nombre completo <span class="obligatorio">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="contacto-nombre" 
+            name="nombre"
+            placeholder="¿Cómo te llamas?"
+            required
+            autocomplete="name"
+            minlength="2"
+            maxlength="60">
+          <span class="ayuda">Mínimo 2 caracteres</span>
+        </div>
+
+        <div class="campo">
+          <label for="contacto-email">
+            Correo electrónico <span class="obligatorio">*</span>
+          </label>
+          <input 
+            type="email" 
+            id="contacto-email" 
+            name="email"
+            placeholder="correo@ejemplo.com"
+            required
+            autocomplete="email">
+        </div>
+
+      </div>
+
+      <!-- Tipo de consulta -->
+      <div class="campo">
+        <label for="tipo-consulta">
+          Tipo de consulta <span class="obligatorio">*</span>
+        </label>
+        <select id="tipo-consulta" name="tipo_consulta" required>
+          <option value="">-- Selecciona el motivo --</option>
+          <optgroup label="Soporte">
+            <option value="tecnico">Problema técnico</option>
+            <option value="cuenta">Mi cuenta</option>
+          </optgroup>
+          <optgroup label="Información">
+            <option value="precios">Precios y planes</option>
+            <option value="servicios">Servicios disponibles</option>
+          </optgroup>
+          <optgroup label="Otros">
+            <option value="sugerencia">Sugerencia o idea</option>
+            <option value="otro">Otro motivo</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Asunto -->
+      <div class="campo">
+        <label for="asunto">Asunto</label>
+        <input 
+          type="text" 
+          id="asunto" 
+          name="asunto"
+          placeholder="Resume tu consulta en una frase"
+          maxlength="100">
+      </div>
+
+      <!-- Mensaje -->
+      <div class="campo">
+        <label for="mensaje">
+          Mensaje <span class="obligatorio">*</span>
+        </label>
+        <textarea 
+          id="mensaje" 
+          name="mensaje"
+          rows="6"
+          placeholder="Describe con detalle tu consulta..."
+          required
+          minlength="20"
+          maxlength="1000">
+        </textarea>
+        <span class="ayuda">Mínimo 20 caracteres · Máximo 1000</span>
+      </div>
+
+      <!-- Cómo prefiere ser contactado -->
+      <div class="campo">
+        <p class="label-grupo">¿Cómo prefieres que te contactemos?</p>
+
+        <div class="opciones-radio">
+          <input type="radio" id="via-email" name="via_contacto" value="email" checked>
+          <label for="via-email">📧 Por email</label>
+
+          <input type="radio" id="via-whatsapp" name="via_contacto" value="whatsapp">
+          <label for="via-whatsapp">📱 Por WhatsApp</label>
+
+          <input type="radio" id="via-llamada" name="via_contacto" value="llamada">
+          <label for="via-llamada">📞 Llamada telefónica</label>
+        </div>
+      </div>
+
+      <!-- Teléfono condicional -->
+      <div class="campo" id="campo-telefono">
+        <label for="telefono">Teléfono</label>
+        <input 
+          type="tel" 
+          id="telefono" 
+          name="telefono"
+          placeholder="300 123 4567"
+          pattern="[0-9\s\-\+]{7,15}">
+        <span class="ayuda">Solo si elegiste WhatsApp o llamada</span>
+      </div>
+
+      <!-- Términos y condiciones -->
+      <div class="campo campo-check">
+        <input type="checkbox" id="terminos" name="terminos" value="acepto" required>
+        <label for="terminos">
+          He leído y acepto la 
+          <a href="#" target="_blank">política de privacidad</a> 
+          y los 
+          <a href="#" target="_blank">términos de uso</a>
+          <span class="obligatorio">*</span>
+        </label>
+      </div>
+
+      <!-- Suscripción opcional -->
+      <div class="campo campo-check">
+        <input type="checkbox" id="newsletter" name="newsletter" value="si">
+        <label for="newsletter">
+          📬 Quiero recibir novedades y recursos gratuitos
+        </label>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="acciones">
+        <button type="submit" class="btn-primario">
+          ✉️ Enviar mensaje
+        </button>
+        <button type="reset" class="btn-secundario">
+          🗑️ Borrar todo
+        </button>
+      </div>
+
+    </form>
+
+  </main>
+
+</body>
+</html>
