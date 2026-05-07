@@ -29,6 +29,9 @@ SESIÓN 4 ──► Historial, eliminar, bucles, reto final
 ```bash
 mkdir maquina_magica && cd maquina_magica
 mkdir templates static
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# En Windows: .venv\Scripts\activate
 pip install "fastapi[standard]"
 ```
 
@@ -441,7 +444,7 @@ body {
 }
 ```
 
-> El CSS es el "traje" de la web. No necesitas entenderlo línea por línea. Lo importante: se enlaza con `<link href="{{ url_for('static', path='style.css') }}">`. `url_for('static', ...)` usa el `name="static"` que definiste en `app.mount("/static", StaticFiles(directory="static"), name="static")`.
+> El CSS es el "traje" de la web. No necesitas entenderlo línea por línea. Lo importante: se enlaza con `<link href="/static/style.css">`. La carpeta `/static/` la definiste en `app.mount("/static", StaticFiles(directory="static"))`.
 
 ## 2.2 La plantilla base: `templates/base.html`
 
@@ -454,15 +457,15 @@ Este es EL corazón de Jinja2. Una plantilla que las demás heredan:
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block titulo %}Máquina Mágica{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
+    <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
     <header class="navbar-magica">
         <div class="container">
-            <a class="nav-brand" href="{{ url_for('inicio') }}">🔮 Máquina Mágica</a>
+            <a class="nav-brand" href="/">🔮 Máquina Mágica</a>
             <nav class="nav-links">
-                <a href="{{ url_for('inicio') }}">Inicio</a>
-                <a href="{{ url_for('historial') }}">Historial</a>
+                <a href="/">Inicio</a>
+                <a href="/historial">Historial</a>
             </nav>
         </div>
     </header>
@@ -501,54 +504,45 @@ Cada página hija empieza con esta línea. Significa: _"Copia todo el esqueleto 
 
 Como `base.html` es la madre, cualquier variable del `context` está disponible en TODAS las páginas hijas. El año aparece en el footer automáticamente.
 
-#### `{{ url_for('nombre_de_ruta') }}` — Generador de URLs
+#### Las rutas en los `<a>` y `<form>` — Apuntar a las páginas
 
-En vez de escribir rutas a mano (`href="/historial"`), Jinja2 + FastAPI te dan `url_for`:
+Los enlaces y formularios usan las mismas rutas que definiste en `main.py` con `@app.get` y `@app.post`:
 
 ```html
-<!-- SIN url_for (rutas quemadas) -->
+<!-- Enlaces: la ruta de @app.get -->
+<a href="/">Inicio</a>
 <a href="/historial">Historial</a>
+
+<!-- Formularios: la ruta de @app.post -->
 <form action="/procesar_pregunta" method="POST">
-
-<!-- CON url_for (rutas dinámicas) -->
-<a href="{{ url_for('historial') }}">Historial</a>
-<form action="{{ url_for('procesar_pregunta') }}" method="POST">
 ```
 
-**¿Qué hace `url_for`?** Le dices el nombre de la función de Python y él te devuelve la ruta correcta. Si algún día cambias `@app.get("/historial")` por `@app.get("/archivo")`, NO necesitas cambiar ningún HTML — `url_for` se actualiza solo.
-
-**¿De dónde salen los nombres?** Del nombre de la función en `main.py`:
+**¿De dónde salen esas rutas?** Directamente de tu `main.py`:
 
 ```python
-@app.get("/")                →  url_for('inicio')
-@app.get("/historial")       →  url_for('historial')
-@app.post("/procesar_pregunta")  →  url_for('procesar_pregunta')
-@app.get("/respuesta_magica")    →  url_for('respuesta_magica')
+@app.get("/")                     →  href="/"
+@app.get("/historial")            →  href="/historial"
+@app.post("/procesar_pregunta")   →  action="/procesar_pregunta"
+@app.get("/respuesta_magica")     →  href="/respuesta_magica"
 ```
 
-**¿Y si la ruta tiene parámetros?** Los pasas como argumentos extra:
+**¿Y si la ruta tiene parámetros?** Los pones directo en la ruta:
 
 ```python
-@app.post("/eliminar_pregunta/{indice}")  →  url_for('eliminar_pregunta', indice=loop.index0)
+@app.post("/eliminar_pregunta/{indice}")  →  action="/eliminar_pregunta/{{ loop.index0 }}"
 ```
 
-**¿Y para archivos estáticos como el CSS?** Usas el `name` que pusiste en `app.mount`:
+**¿Y para el CSS?** La carpeta `/static/` sirve los archivos directamente:
 
 ```python
 # En main.py
-app.mount("/static", StaticFiles(directory="static"), name="static")
-#                                                        └──┬──┘
-#                                                 este nombre es la clave
+app.mount("/static", StaticFiles(directory="static"))
 
 # En el HTML
-<link href="{{ url_for('static', path='style.css') }}">
-<!--                └──┬──┘            └────┬────┘
-                mismo name           ruta dentro de static/ -->
+<link href="/static/style.css">
 ```
 
-**Regla simple:** `url_for` siempre usa el `name` que definiste en Python, sea una ruta (`name="static"` del mount) o una función (`inicio`, `historial`).
-
-> 🎒 **Analogía:** `url_for` es como el GPS de tu app. En vez de memorizar calles (`/historial`), le dices el nombre del destino (`'historial'`) y él calcula la ruta. Si algún día cambian las calles, tu GPS se actualiza solo.
+> 📝 **Regla simple:** La ruta en el HTML es exactamente la misma que pusiste en el `@app.get(...)` o `@app.post(...)`.
 
 ## 2.3 El formulario real: actualiza `templates/formulario.html`
 
@@ -567,7 +561,7 @@ Reemplaza el formulario simple de la Sesión 1:
 
 <div style="max-width: 600px; margin: 0 auto;">
     <div class="card-magica">
-        <form action="{{ url_for('procesar_pregunta') }}" method="POST" class="form-magico">
+        <form action="/procesar_pregunta" method="POST" class="form-magico">
             <label for="nombre">Tu nombre</label>
             <input type="text" id="nombre" name="nombre" required
                    placeholder="¿Cómo te llamas?" />
@@ -582,7 +576,7 @@ Reemplaza el formulario simple de la Sesión 1:
 </div>
 
 <div class="acciones-centradas mt-4">
-    <a href="{{ url_for('historial') }}" class="btn-secundario">📜 Ver historial</a>
+    <a href="/historial" class="btn-secundario">📜 Ver historial</a>
 </div>
 {% endblock %}
 ```
@@ -772,8 +766,8 @@ async def eliminar_pregunta(indice: int):
     </div>
 
     <div class="acciones-centradas mt-4">
-        <a href="{{ url_for('inicio') }}" class="btn-magico" style="width: auto;">Hacer otra pregunta</a>
-        <a href="{{ url_for('historial') }}" class="btn-secundario">📜 Ver historial</a>
+        <a href="/" class="btn-magico" style="width: auto;">Hacer otra pregunta</a>
+        <a href="/historial" class="btn-secundario">📜 Ver historial</a>
     </div>
 </div>
 {% endblock %}
@@ -848,7 +842,7 @@ fastapi dev main.py
                 <p class="pregunta">"{{ item.pregunta }}"</p>
                 <p class="respuesta">💬 {{ item.respuesta }}</p>
                 <div class="card-historial-footer">
-                    <form action="{{ url_for('eliminar_pregunta', indice=loop.index0) }}" method="POST" style="display: inline;">
+                    <form action="/eliminar_pregunta/{{ loop.index0 }}" method="POST" style="display: inline;">
                         <button type="submit" class="btn-peligro">🗑️ Eliminar</button>
                     </form>
                 </div>
@@ -859,12 +853,12 @@ fastapi dev main.py
     <div class="estado-vacio">
         <span class="icono">🔮</span>
         <p class="mensaje">No hay preguntas todavía.</p>
-        <a href="{{ url_for('inicio') }}" class="btn-magico" style="width: auto;">¡Sé el primero en preguntar!</a>
+        <a href="/" class="btn-magico" style="width: auto;">¡Sé el primero en preguntar!</a>
     </div>
 {% endif %}
 
 <div class="acciones-centradas mt-4">
-    <a href="{{ url_for('inicio') }}" class="btn-secundario">← Volver al inicio</a>
+    <a href="/" class="btn-secundario">← Volver al inicio</a>
 </div>
 {% endblock %}
 ```
@@ -1008,7 +1002,7 @@ Si tu campo nuevo aparece en respuesta e historial... **¡dominaste el flujo!**
 | `loop.index0` | Índice base 0 (0,1,2...) |
 | `{% extends "base.html" %}` | Hereda plantilla base |
 | `{% block nombre %}...{% endblock %}` | Define/reemplaza bloque |
-| `{{ url_for('ruta') }}` | Genera URL desde nombre de función |
+| `href="/ruta"` | Enlace directo a una página |
 | `{# comentario #}` | Comentario invisible |
 | `|length` | Cantidad de elementos |
 | `|reverse` | Invierte lista |
@@ -1022,7 +1016,7 @@ Si tu campo nuevo aparece en respuesta e historial... **¡dominaste el flujo!**
 | **Mochila (context)** | Diccionario que viaja Python→Jinja2 | `{"nombre": "Ana"}` |
 | **Herencia** | Molde que reutilizas | `{% extends "base.html" %}` |
 | **Bloques** | Huecos que llenas a tu manera | `{% block contenido %}` |
-| **url_for** | GPS de rutas: nombre de función → URL | `url_for('historial')` |
+| **Rutas** | Apuntas directo a las páginas | `href="/historial"` |
 | **Filtros** | Transforman valor al vuelo | `|reverse`, `|length` |
 | **Form(...)** | Lee datos del formulario | `nombre: str = Form(...)` |
 

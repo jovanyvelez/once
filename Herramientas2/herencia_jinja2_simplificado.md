@@ -36,6 +36,9 @@ FASE 3 — CON herencia (8 min)
 ```bash
 mkdir mi_primera_web && cd mi_primera_web
 mkdir templates static
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# En Windows: .venv\Scripts\activate
 pip install "fastapi[standard]"
 ```
 
