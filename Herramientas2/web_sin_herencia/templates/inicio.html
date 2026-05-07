@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio — Mi Web</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Inicio</a>
+        <a href="/about">🙋 Sobre mí</a>
+        <a href="/contacto">📧 Contacto</a>
+    </nav>
+
+    <main>
+        <h1>👋 ¡Bienvenido a mi primera web!</h1>
+        <p>Esta página fue creada con <strong>FastAPI</strong> y <strong>Jinja2</strong>.</p>
+        <p>El año actual es: <strong>{{ ano_actual }}</strong></p>
+    </main>
+
+    <footer>
+        <p>© {{ ano_actual }} — Hecho con FastAPI + Jinja2</p>
+    </footer>
+</body>
+</html>

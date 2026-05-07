@@ -37,16 +37,16 @@ pip install "fastapi[standard]"
 ## 1.2 Crea `main.py`
 
 ```python
+from datetime import datetime
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from datetime import datetime
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
 templates = Jinja2Templates(directory="templates")
 
 
@@ -64,7 +64,7 @@ async def inicio(request: Request):
 | Línea | Explicación |
 |--------|------------|
 | `app = FastAPI()` | Crea tu servidor web |
-| `app.mount("/static", StaticFiles(directory="static"))` | Sirve archivos desde la carpeta `static/` (ruta relativa) |
+| `app.mount("/static", StaticFiles(directory="static"))` | Sirve archivos desde `static/` (ruta relativa) |
 | `templates = Jinja2Templates(directory="templates")` | Activa Jinja2, busca .html en `templates/` (ruta relativa) |
 | `@app.get("/")` | Cuando visiten la raíz del sitio, ejecuta esta función |
 | `templates.TemplateResponse(...)` | Toma un .html, llénalo con datos, entrégalo |
@@ -537,8 +537,8 @@ En vez de escribir rutas a mano (`href="/historial"`), Jinja2 + FastAPI te dan `
 ```python
 # En main.py
 app.mount("/static", StaticFiles(directory="static"), name="static")
-#                                                      └──┬──┘
-#                                               este nombre es la clave
+#                                                        └──┬──┘
+#                                                 este nombre es la clave
 
 # En el HTML
 <link href="{{ url_for('static', path='style.css') }}">
