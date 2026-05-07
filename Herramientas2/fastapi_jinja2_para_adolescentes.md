@@ -4,6 +4,8 @@
 > **¿Para quién?** Para ti que sabes escribir `print("hola")` y crear funciones. Nada más.
 > **¿Cuánto dura?** 4 sesiones de 30-40 min. Cada una termina con algo que funciona.
 > **La promesa:** Copias, pegas, ejecutas y ENTIENDES. Sin frustraciones.
+>
+> 💡 **¿Nunca has usado Jinja2?** Empieza por el complemento ultra-simple: [Tu Primera Web con Herencia](./herencia_jinja2_simplificado.md) (15 min, solo herencia pura).
 
 ---
 
@@ -40,15 +42,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -64,10 +63,9 @@ async def inicio(request: Request):
 
 | Línea | Explicación |
 |--------|------------|
-| `BASE_DIR = Path(...)` | Descubre en qué carpeta está main.py |
 | `app = FastAPI()` | Crea tu servidor web |
-| `app.mount("/static", ...)` | Sirve archivos estáticos desde la carpeta `static/` |
-| `templates = Jinja2Templates(...)` | Activa Jinja2, busca .html en `templates/` |
+| `app.mount("/static", StaticFiles(directory="static"))` | Sirve archivos desde la carpeta `static/` (ruta relativa) |
+| `templates = Jinja2Templates(directory="templates")` | Activa Jinja2, busca .html en `templates/` (ruta relativa) |
 | `@app.get("/")` | Cuando visiten la raíz del sitio, ejecuta esta función |
 | `templates.TemplateResponse(...)` | Toma un .html, llénalo con datos, entrégalo |
 | `context={"ano_actual": ...}` | La **mochila**: diccionario que viaja de Python al HTML |
@@ -443,7 +441,7 @@ body {
 }
 ```
 
-> El CSS es el "traje" de la web. No necesitas entenderlo línea por línea. Lo importante: se enlaza con `<link href="/static/style.css">` y esa ruta funciona gracias a `app.mount("/static", ...)` en main.py.
+> El CSS es el "traje" de la web. No necesitas entenderlo línea por línea. Lo importante: se enlaza con `<link href="{{ url_for('static', path='style.css') }}">`. `url_for('static', ...)` usa el `name="static"` que definiste en `app.mount("/static", StaticFiles(directory="static"), name="static")`.
 
 ## 2.2 La plantilla base: `templates/base.html`
 
@@ -456,15 +454,15 @@ Este es EL corazón de Jinja2. Una plantilla que las demás heredan:
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block titulo %}Máquina Mágica{% endblock %}</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
 </head>
 <body>
     <header class="navbar-magica">
         <div class="container">
-            <a class="nav-brand" href="/">🔮 Máquina Mágica</a>
+            <a class="nav-brand" href="{{ url_for('inicio') }}">🔮 Máquina Mágica</a>
             <nav class="nav-links">
-                <a href="/">Inicio</a>
-                <a href="/historial">Historial</a>
+                <a href="{{ url_for('inicio') }}">Inicio</a>
+                <a href="{{ url_for('historial') }}">Historial</a>
             </nav>
         </div>
     </header>
@@ -503,6 +501,55 @@ Cada página hija empieza con esta línea. Significa: _"Copia todo el esqueleto 
 
 Como `base.html` es la madre, cualquier variable del `context` está disponible en TODAS las páginas hijas. El año aparece en el footer automáticamente.
 
+#### `{{ url_for('nombre_de_ruta') }}` — Generador de URLs
+
+En vez de escribir rutas a mano (`href="/historial"`), Jinja2 + FastAPI te dan `url_for`:
+
+```html
+<!-- SIN url_for (rutas quemadas) -->
+<a href="/historial">Historial</a>
+<form action="/procesar_pregunta" method="POST">
+
+<!-- CON url_for (rutas dinámicas) -->
+<a href="{{ url_for('historial') }}">Historial</a>
+<form action="{{ url_for('procesar_pregunta') }}" method="POST">
+```
+
+**¿Qué hace `url_for`?** Le dices el nombre de la función de Python y él te devuelve la ruta correcta. Si algún día cambias `@app.get("/historial")` por `@app.get("/archivo")`, NO necesitas cambiar ningún HTML — `url_for` se actualiza solo.
+
+**¿De dónde salen los nombres?** Del nombre de la función en `main.py`:
+
+```python
+@app.get("/")                →  url_for('inicio')
+@app.get("/historial")       →  url_for('historial')
+@app.post("/procesar_pregunta")  →  url_for('procesar_pregunta')
+@app.get("/respuesta_magica")    →  url_for('respuesta_magica')
+```
+
+**¿Y si la ruta tiene parámetros?** Los pasas como argumentos extra:
+
+```python
+@app.post("/eliminar_pregunta/{indice}")  →  url_for('eliminar_pregunta', indice=loop.index0)
+```
+
+**¿Y para archivos estáticos como el CSS?** Usas el `name` que pusiste en `app.mount`:
+
+```python
+# En main.py
+app.mount("/static", StaticFiles(directory="static"), name="static")
+#                                                      └──┬──┘
+#                                               este nombre es la clave
+
+# En el HTML
+<link href="{{ url_for('static', path='style.css') }}">
+<!--                └──┬──┘            └────┬────┘
+                mismo name           ruta dentro de static/ -->
+```
+
+**Regla simple:** `url_for` siempre usa el `name` que definiste en Python, sea una ruta (`name="static"` del mount) o una función (`inicio`, `historial`).
+
+> 🎒 **Analogía:** `url_for` es como el GPS de tu app. En vez de memorizar calles (`/historial`), le dices el nombre del destino (`'historial'`) y él calcula la ruta. Si algún día cambian las calles, tu GPS se actualiza solo.
+
 ## 2.3 El formulario real: actualiza `templates/formulario.html`
 
 Reemplaza el formulario simple de la Sesión 1:
@@ -520,7 +567,7 @@ Reemplaza el formulario simple de la Sesión 1:
 
 <div style="max-width: 600px; margin: 0 auto;">
     <div class="card-magica">
-        <form action="/procesar_pregunta" method="POST" class="form-magico">
+        <form action="{{ url_for('procesar_pregunta') }}" method="POST" class="form-magico">
             <label for="nombre">Tu nombre</label>
             <input type="text" id="nombre" name="nombre" required
                    placeholder="¿Cómo te llamas?" />
@@ -535,7 +582,7 @@ Reemplaza el formulario simple de la Sesión 1:
 </div>
 
 <div class="acciones-centradas mt-4">
-    <a href="/historial" class="btn-secundario">📜 Ver historial</a>
+    <a href="{{ url_for('historial') }}" class="btn-secundario">📜 Ver historial</a>
 </div>
 {% endblock %}
 ```
@@ -581,19 +628,16 @@ Reemplaza tu main.py con esta versión final:
 ```python
 import random
 from datetime import datetime
-from pathlib import Path
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-BASE_DIR = Path(__file__).resolve().parent
-
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 # Base de datos simulada
 preguntas_db = []
@@ -728,8 +772,8 @@ async def eliminar_pregunta(indice: int):
     </div>
 
     <div class="acciones-centradas mt-4">
-        <a href="/" class="btn-magico" style="width: auto;">Hacer otra pregunta</a>
-        <a href="/historial" class="btn-secundario">📜 Ver historial</a>
+        <a href="{{ url_for('inicio') }}" class="btn-magico" style="width: auto;">Hacer otra pregunta</a>
+        <a href="{{ url_for('historial') }}" class="btn-secundario">📜 Ver historial</a>
     </div>
 </div>
 {% endblock %}
@@ -804,7 +848,7 @@ fastapi dev main.py
                 <p class="pregunta">"{{ item.pregunta }}"</p>
                 <p class="respuesta">💬 {{ item.respuesta }}</p>
                 <div class="card-historial-footer">
-                    <form action="/eliminar_pregunta/{{ loop.index0 }}" method="POST" style="display: inline;">
+                    <form action="{{ url_for('eliminar_pregunta', indice=loop.index0) }}" method="POST" style="display: inline;">
                         <button type="submit" class="btn-peligro">🗑️ Eliminar</button>
                     </form>
                 </div>
@@ -815,12 +859,12 @@ fastapi dev main.py
     <div class="estado-vacio">
         <span class="icono">🔮</span>
         <p class="mensaje">No hay preguntas todavía.</p>
-        <a href="/" class="btn-magico" style="width: auto;">¡Sé el primero en preguntar!</a>
+        <a href="{{ url_for('inicio') }}" class="btn-magico" style="width: auto;">¡Sé el primero en preguntar!</a>
     </div>
 {% endif %}
 
 <div class="acciones-centradas mt-4">
-    <a href="/" class="btn-secundario">← Volver al inicio</a>
+    <a href="{{ url_for('inicio') }}" class="btn-secundario">← Volver al inicio</a>
 </div>
 {% endblock %}
 ```
@@ -964,6 +1008,7 @@ Si tu campo nuevo aparece en respuesta e historial... **¡dominaste el flujo!**
 | `loop.index0` | Índice base 0 (0,1,2...) |
 | `{% extends "base.html" %}` | Hereda plantilla base |
 | `{% block nombre %}...{% endblock %}` | Define/reemplaza bloque |
+| `{{ url_for('ruta') }}` | Genera URL desde nombre de función |
 | `{# comentario #}` | Comentario invisible |
 | `|length` | Cantidad de elementos |
 | `|reverse` | Invierte lista |
@@ -977,6 +1022,7 @@ Si tu campo nuevo aparece en respuesta e historial... **¡dominaste el flujo!**
 | **Mochila (context)** | Diccionario que viaja Python→Jinja2 | `{"nombre": "Ana"}` |
 | **Herencia** | Molde que reutilizas | `{% extends "base.html" %}` |
 | **Bloques** | Huecos que llenas a tu manera | `{% block contenido %}` |
+| **url_for** | GPS de rutas: nombre de función → URL | `url_for('historial')` |
 | **Filtros** | Transforman valor al vuelo | `|reverse`, `|length` |
 | **Form(...)** | Lee datos del formulario | `nombre: str = Form(...)` |
 
@@ -996,10 +1042,11 @@ maquina_magica/
 
 ## 🚀 ¿Y después?
 
-1. **Guardar en archivo JSON** — que los datos sobrevivan al reinicio
-2. **Base de datos SQLite** — el siguiente paso natural
-3. **Desplegar en Vercel** (gratis) — para que tus amigos lo usen
-4. **Agregar más magia** — fecha de nacimiento, signo zodiacal...
+1. **Refuerza herencia** — haz el complemento [Tu Primera Web con Herencia](./herencia_jinja2_simplificado.md) (15 min)
+2. **Guardar en archivo JSON** — que los datos sobrevivan al reinicio
+3. **Base de datos SQLite** — el siguiente paso natural
+4. **Desplegar en Vercel** (gratis) — para que tus amigos lo usen
+5. **Agregar más magia** — fecha de nacimiento, signo zodiacal...
 
 ---
 
