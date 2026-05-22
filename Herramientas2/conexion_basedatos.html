@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase: FastAPI + asyncpg — Backend Profesional desde Cero</title>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4CAF50;
+            --danger: #E53E3E;
+            --dark: #2D3748;
+            --light: #F7FAFC;
+            --text: #4A5568;
+            --code-bg: #1A202C;
+            --yellow: #D69E2E;
+            --blue-light: #EBF4FF;
+            --green-light: #F0FFF4;
+            --red-light: #FFF5F5;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.75;
+            color: var(--text);
+            background-color: var(--light);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ===== NAV LATERAL ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--dark);
+            color: white;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1.5rem 1rem;
+            z-index: 100;
+            font-size: 0.9rem;
+            transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+        }
+        nav.collapsed {
+            width: 0;
+            padding: 1.5rem 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .nav-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, left 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .nav-toggle:hover { background: #5A52E0; }
+        .nav-toggle.shifted { left: 1rem; }
+        nav.collapsed + .nav-toggle { left: 0.5rem; }
+        nav h2 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-top: 0;
+            border: none;
+            white-space: nowrap;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        nav ul li { margin-bottom: 0.4rem; }
+        nav ul li a {
+            color: #A0AEC0;
+            text-decoration: none;
+            display: block;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        nav ul li a:hover,
+        nav ul li a.active {
+            color: white;
+            background: var(--primary);
+        }
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        main {
+            margin-left: 260px;
+            padding-bottom: 3rem;
+            transition: margin-left 0.3s ease;
+        }
+        nav.collapsed ~ main {
+            margin-left: 0;
+        }
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1E1E4A 50%, var(--primary) 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 60px;
+            height: 60px;
+            background: var(--light);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.8rem;
+        }
+        header .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.85;
+            max-width: 700px;
+            margin: 1rem auto 0;
+            font-weight: 300;
+        }
+        header .badges {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary);
+            transition: box-shadow 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+        }
+        .card.intro        { border-top-color: var(--primary); }
+        .card.fundamentos  { border-top-color: #4299E1; }
+        .card.lifespan     { border-top-color: #ED8936; }
+        .card.depends      { border-top-color: #9F7AEA; }
+        .card.asyncpg      { border-top-color: #48BB78; }
+        .card.pool         { border-top-color: #38B2AC; }
+        .card.capas        { border-top-color: var(--danger); }
+        .card.transacciones{ border-top-color: #D69E2E; }
+        .card.resumen      { border-top-color: #319795; }
+
+        h2 {
+            color: var(--dark);
+            margin-top: 0;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #EDF2F7;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h2 .icon { font-size: 1.5rem; }
+
+        h3 {
+            color: var(--primary);
+            margin-top: 2rem;
+            font-size: 1.3rem;
+        }
+        h4 {
+            color: var(--dark);
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .analogy {
+            background: var(--blue-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #4299E1;
+            color: #2B6CB0;
+            font-size: 1.02rem;
+        }
+        .analogy.green {
+            background: var(--green-light);
+            border-left-color: var(--secondary);
+            color: #276749;
+        }
+        .analogy.red {
+            background: var(--red-light);
+            border-left-color: var(--danger);
+            color: #9B2C2C;
+        }
+        .analogy.yellow {
+            background: #FFFFF0;
+            border-left-color: var(--yellow);
+            color: #975A16;
+        }
+        .analogy strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        code.inline {
+            font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+            background: #EDF2F7;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            color: #DD6B20;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: #E2E8F0;
+            padding: 1.8rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        pre::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            color: #A0AEC0;
+            font-size: 0.75rem;
+            font-family: 'Segoe UI', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .kw  { color: #F6AD55; }
+        .str { color: #9AE6B4; }
+        .func{ color: #63B3ED; }
+        .com { color: #A0AEC0; font-style: italic; }
+        .num { color: #FBBF24; }
+        .cls { color: #F6AD55; font-weight: bold; }
+        .dec { color: #FC8181; }
+        .typ { color: #4FD1C5; }
+
+        /* Tabla comparativa */
+        .comparison {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+        .comparison th, .comparison td {
+            padding: 0.8rem 1rem;
+            border: 1px solid #E2E8F0;
+            text-align: left;
+        }
+        .comparison th {
+            background: var(--dark);
+            color: white;
+            font-weight: 600;
+        }
+        .comparison tr:nth-child(even) { background: var(--blue-light); }
+        .comparison .win {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* Línea de tiempo / pasos */
+        .timeline {
+            counter-reset: step;
+            list-style: none;
+            padding-left: 0;
+        }
+        .timeline li {
+            counter-increment: step;
+            position: relative;
+            padding: 0 0 1.5rem 3.5rem;
+            border-left: 2px solid #E2E8F0;
+        }
+        .timeline li:last-child { border-left-color: transparent; }
+        .timeline li::before {
+            content: counter(step);
+            position: absolute;
+            left: -1.1rem;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .timeline li strong {
+            display: block;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        /* Bloques de advertencia */
+        .warning {
+            background: #FFFFF0;
+            border: 1px solid #F6E05E;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .warning::before {
+            content: "⚠️  ";
+        }
+
+        /* Diagramas SVG */
+        .diagram {
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+        .diagram svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        .diagram svg text {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        .diagram svg .mono {
+            font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            nav:not(.collapsed) { width: 260px; padding: 1.5rem 1rem; opacity: 1; pointer-events: auto; }
+            main  { margin-left: 0; }
+            header h1 { font-size: 2rem; }
+            .card { padding: 1.5rem; }
+            .container { padding: 0 1rem; }
+            .nav-toggle { left: 0.5rem; }
+            nav.collapsed ~ .nav-toggle { left: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== NAVEGACIÓN ==================== -->
+    <button class="nav-toggle" id="navToggle" title="Mostrar/ocultar menú">☰</button>
+    <nav id="sidebarNav">
+        <h2>📖 Contenidos</h2>
+        <ul>
+            <li><a href="#intro">0. ¿Qué vamos a construir?</a></li>
+            <li><a href="#conceptos">1. Conceptos fundamentales</a></li>
+            <li><a href="#lifespan">2. Lifespan — El ciclo de vida</a></li>
+            <li><a href="#depends">3. Depends — Inyección de dependencias</a></li>
+            <li><a href="#asyncpg">4. asyncpg — El traductor relámpago</a></li>
+            <li><a href="#pool">5. Pool de conexiones</a></li>
+            <li><a href="#primera-api">6. Tu primera API completa</a></li>
+            <li><a href="#capas">7. Arquitectura de 3 capas</a></li>
+            <li><a href="#transacciones">8. Transacciones</a></li>
+            <li><a href="#resumen">9. Resumen + ejercicios</a></li>
+        </ul>
+    </nav>
+
+    <!-- ==================== CONTENIDO ==================== -->
+    <main>
+
+        <!-- HEADER -->
+        <header>
+            <h1>🚀 FastAPI + asyncpg</h1>
+            <p class="subtitle">Construí backends profesionales ultrarrápidos con Python asíncrono, paso a paso y desde cero</p>
+            <div class="badges">
+                <span class="badge">Python 3.10+</span>
+                <span class="badge">FastAPI</span>
+                <span class="badge">asyncpg</span>
+                <span class="badge">PostgreSQL</span>
+                <span class="badge">asyncio</span>
+            </div>
+        </header>
+
+        <div class="container">
+
+            <!-- ==================== SECCIÓN 0 ==================== -->
+            <div class="card intro" id="intro">
+                <h2><span class="icon">🎯</span> 0. ¿Qué vamos a construir y por qué?</h2>
+
+                <p>Esta clase te lleva de <strong>cero</strong> a escribir un backend profesional completo usando <strong>FastAPI</strong> (el framework web más rápido de Python) y <strong>asyncpg</strong> (el driver PostgreSQL más veloz del ecosistema).</p>
+
+                <h3>El recorrido</h3>
+                <ol class="timeline">
+                    <li>
+                        <strong>Conceptos fundamentales</strong>
+                        Síncrono vs Asíncrono. ¿Qué es I/O? ¿Por qué importa?
+                    </li>
+                    <li>
+                        <strong>Lifespan</strong>
+                        El "nacer y morir" de tu aplicación. Dónde inicializar recursos.
+                    </li>
+                    <li>
+                        <strong>Depends</strong>
+                        Inyección de dependencias. Cómo FastAPI le da a cada ruta lo que necesita sin código repetido.
+                    </li>
+                    <li>
+                        <strong>asyncpg en profundidad</strong>
+                        Instalación, conexión, ejecución de SQL, fetch, execute, transacciones.
+                    </li>
+                    <li>
+                        <strong>Pool de conexiones</strong>
+                        Por qué no podés abrir 10000 conexiones y cómo el pool lo resuelve.
+                    </li>
+                    <li>
+                        <strong>Arquitectura en 3 capas</strong>
+                        Separación de responsabilidades: rutas (presentación), servicios (negocio), repositorios (datos).
+                    </li>
+                    <li>
+                        <strong>Transacciones</strong>
+                        Atomicidad: o todo ocurre, o nada ocurre.
+                    </li>
+                </ol>
+            </div>
+
+            <!-- ==================== SECCIÓN 1 ==================== -->
+            <div class="card fundamentos" id="conceptos">
+                <h2><span class="icon">🧠</span> 1. Conceptos fundamentales</h2>
+
+                <h3>1.1 ¿Qué es el I/O?</h3>
+                <p>I/O significa <strong>Input / Output</strong> (entrada / salida). Cada vez que tu programa habla con algo externo —disco, red, base de datos— hay <strong>espera</strong>. Y esperar es caro.</p>
+
+                <div class="analogy">
+                    <strong>☕ Analogía: La cafetería</strong>
+                    <strong>Síncrono (bloqueante):</strong> Pedís un café. Te quedás parado en la caja esperando a que esté listo. No hacés nada más. Toda la fila espera detrás tuyo.<br><br>
+                    <strong>Asíncrono (no bloqueante):</strong> Pedís el café, te dan un numerito. Te sentás, revisás el celu, hablás con un amigo. Cuando tu café está listo, te avisan. Mientras tanto, el cajero atendió a 10 personas más.
+                </div>
+
+                <h3>1.2 Tabla comparativa: Dos modelos de ejecución</h3>
+                <table class="comparison">
+                    <thead>
+                        <tr>
+                            <th>Característica</th>
+                            <th>Síncrono (<code>def</code> + <code>requests</code> / <code>psycopg2</code>)</th>
+                            <th>Asíncrono (<code>async def</code> + <code>httpx</code> / <code>asyncpg</code>)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bloquea otras tareas</td>
+                            <td>✅ Sí. Una petición bloquea a las demás.</td>
+                            <td class="win">❌ No. Mientras espera I/O, atiende otras peticiones.</td>
+                        </tr>
+                        <tr>
+                            <td>Concurrencia</td>
+                            <td>Requiere múltiples hilos/procesos (más RAM, más complejidad)</td>
+                            <td class="win">Miles de conexiones concurrentes en un solo hilo.</td>
+                        </tr>
+                        <tr>
+                            <td>Uso de CPU</td>
+                            <td class="win">Usa todos los cores (multithreading real)</td>
+                            <td>Un solo core por proceso. Se escala con réplicas.</td>
+                        </tr>
+                        <tr>
+                            <td>Ideal para</td>
+                            <td>Tareas CPU-intensivas (cálculos, IA, renders)</td>
+                            <td class="win">Tareas I/O-intensivas (APIs, BBDD, microservicios)</td>
+                        </tr>
+                        <tr>
+                            <td>Curva de aprendizaje</td>
+                            <td class="win">Más simple y predecible</td>
+                            <td>Requiere entender <code>async/await</code> y event loop</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="warning">
+                    <strong>Regla de oro:</strong> Nunca mezcles código bloqueante dentro de una función <code class="inline">async def</code>. Si lo hacés, congelás todo el event loop. Usá librerías asíncronas (<code class="inline">asyncpg</code> en vez de <code class="inline">psycopg2</code>, <code class="inline">httpx</code> en vez de <code class="inline">requests</code>, etc.).
+                </div>
+
+                <h3>1.3 El Event Loop (bucle de eventos)</h3>
+                <p>Es el "director de orquesta" del asyncio. Imaginalo como un repartidor con muchas entregas. Mientras espera que un destinatario abra la puerta, no se queda parado: va a otro domicilio, entrega otro paquete, y vuelve.</p>
+
+                <div class="diagram">
+                    <svg viewBox="0 0 720 350" width="720" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background rounded -->
+                        <rect x="1" y="1" width="718" height="348" rx="12" fill="#1A202C" stroke="#4A5568" stroke-width="1.5"/>
+
+                        <!-- Title -->
+                        <text x="360" y="35" text-anchor="middle" fill="#A0AEC0" font-size="15" font-weight="600">EVENT LOOP</text>
+
+                        <defs>
+                            <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                                <path d="M0,0 L8,3 L0,6" fill="#6C63FF"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Task A -->
+                        <rect x="60" y="55" width="170" height="105" rx="10" fill="#2D3748" stroke="#63B3ED" stroke-width="2"/>
+                        <text x="145" y="82" text-anchor="middle" fill="#63B3ED" font-size="14" font-weight="700">Tarea A</text>
+                        <text x="145" y="105" text-anchor="middle" fill="#E2E8F0" font-size="12" class="mono">SELECT * FROM</text>
+                        <text x="145" y="123" text-anchor="middle" fill="#E2E8F0" font-size="12" class="mono">usuarios</text>
+                        <text x="145" y="147" text-anchor="middle" fill="#F6AD55" font-size="12">⏳ esperando I/O</text>
+
+                        <!-- Task B -->
+                        <rect x="275" y="55" width="170" height="105" rx="10" fill="#2D3748" stroke="#48BB78" stroke-width="2"/>
+                        <text x="360" y="82" text-anchor="middle" fill="#48BB78" font-size="14" font-weight="700">Tarea B</text>
+                        <text x="360" y="105" text-anchor="middle" fill="#E2E8F0" font-size="12" class="mono">SELECT * FROM</text>
+                        <text x="360" y="123" text-anchor="middle" fill="#E2E8F0" font-size="12" class="mono">productos</text>
+                        <text x="360" y="147" text-anchor="middle" fill="#F6AD55" font-size="12">⏳ esperando I/O</text>
+
+                        <!-- Task C -->
+                        <rect x="490" y="55" width="170" height="105" rx="10" fill="#2D3748" stroke="#FC8181" stroke-width="2"/>
+                        <text x="575" y="82" text-anchor="middle" fill="#FC8181" font-size="14" font-weight="700">Tarea C</text>
+                        <text x="575" y="105" text-anchor="middle" fill="#E2E8F0" font-size="12" class="mono">INSERT INTO</text>
+                        <text x="575" y="123" text-anchor="middle" fill="#E2E8F0" font-size="12" class="mono">logs(...)</text>
+                        <text x="575" y="147" text-anchor="middle" fill="#F6AD55" font-size="12">⏳ esperando I/O</text>
+
+                        <!-- Label in center -->
+                        <rect x="210" y="195" width="300" height="36" rx="8" fill="#6C63FF" fill-opacity="0.15" stroke="#6C63FF" stroke-width="1"/>
+                        <text x="360" y="218" text-anchor="middle" fill="#6C63FF" font-size="12" font-weight="600">El loop salta entre tareas cuando una hace await</text>
+
+                        <!-- Curva A → B: sale de base de A, baja, llega a base de B -->
+                        <path d="M145,160 C145,265 360,265 360,160" fill="none" stroke="#6C63FF" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr)"/>
+
+                        <!-- Curva B → C: sale de base de B, baja, llega a base de C -->
+                        <path d="M360,160 C360,290 575,290 575,160" fill="none" stroke="#6C63FF" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr)"/>
+
+                        <!-- Curva C → A: sale de base de C, baja mucho, llega a base de A -->
+                        <path d="M575,160 C575,330 145,330 145,160" fill="none" stroke="#6C63FF" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr)"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- ==================== SECCIÓN 2 ==================== -->
+            <div class="card lifespan" id="lifespan">
+                <h2><span class="icon">🔄</span> 2. Lifespan — El ciclo de vida de tu aplicación</h2>
+
+                <h3>2.1 ¿Qué problema resuelve?</h3>
+                <p>Tu backend necesita <strong>recursos que viven toda la ejecución</strong>: conexiones a base de datos, clientes HTTP, modelos de ML, caches. Sin embargo, no querés crearlos cada vez que llega una petición. Querés crearlos <em>una sola vez</em> cuando la app arranca y destruirlos cuando se apaga.</p>
+
+                <div class="analogy yellow">
+                    <strong>🏗️ Analogía: La inauguración de un edificio</strong>
+                    <strong>Lifespan = startup + shutdown</strong><br>
+                    Antes de abrir las puertas (startup), conectás la electricidad, el agua y preparás las oficinas. Una vez listo, abrís y atendés gente <em>todo el día</em>. Al cerrar (shutdown), apagás todo ordenadamente. No instalás la electricidad cada vez que entra un cliente.
+                </div>
+
+                <h3>2.2 El decorador <code class="inline">@asynccontextmanager</code></h3>
+                <p>Python provee <code class="inline">contextlib.asynccontextmanager</code> para crear funciones que tienen un <strong>"antes"</strong> (todo lo que va antes del <code class="inline">yield</code>) y un <strong>"después"</strong> (todo lo que va después del <code class="inline">yield</code>).</p>
+
+<pre data-lang="python"><span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+
+<span class="dec">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="func">lifespan</span>(app: FastAPI):
+    <span class="com"># ===== STARTUP: se ejecuta UNA SOLA VEZ al iniciar =====</span>
+    <span class="kw">print</span>(<span class="str">"🔥 Iniciando..."</span>)
+    app.state.db = <span class="kw">await</span> asyncpg.<span class="func">create_pool</span>(dsn)
+    
+    <span class="kw">yield</span>  <span class="com"># ← La app está viva y sirviendo peticiones</span>
+    
+    <span class="com"># ===== SHUTDOWN: se ejecuta UNA SOLA VEZ al apagar =====</span>
+    <span class="kw">print</span>(<span class="str">"🛑 Apagando..."</span>)
+    <span class="kw">await</span> app.state.db.<span class="func">close</span>()</code></pre>
+
+                <h3>2.3 Línea de tiempo del lifespan</h3>
+                <div class="diagram">
+                    <svg viewBox="0 0 780 280" width="780" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="778" height="278" rx="12" fill="#1A202C" stroke="#4A5568" stroke-width="1.5"/>
+
+                        <!-- Timeline arrow -->
+                        <line x1="40" y1="90" x2="740" y2="90" stroke="#4A5568" stroke-width="2" marker-end="url(#arr)"/>
+                        <text x="750" y="95" fill="#A0AEC0" font-size="11">TIEMPO</text>
+
+                        <!-- STARTUP block -->
+                        <rect x="40" y="110" width="170" height="80" rx="10" fill="#2D3748" stroke="#ED8936" stroke-width="2"/>
+                        <text x="125" y="132" text-anchor="middle" fill="#ED8936" font-size="13" font-weight="700">STARTUP</text>
+                        <text x="125" y="155" text-anchor="middle" fill="#E2E8F0" font-size="11">Crear pool</text>
+                        <text x="125" y="172" text-anchor="middle" fill="#E2E8F0" font-size="11">Conectar DB</text>
+                        <text x="125" y="189" text-anchor="middle" fill="#E2E8F0" font-size="11">Cargar config</text>
+                        <!-- Down arrow -->
+                        <line x1="125" y1="90" x2="125" y2="108" stroke="#ED8936" stroke-width="2"/>
+
+                        <!-- APP VIVA block (middle) -->
+                        <rect x="250" y="110" width="280" height="80" rx="10" fill="#2D3748" stroke="#48BB78" stroke-width="2"/>
+                        <text x="390" y="132" text-anchor="middle" fill="#48BB78" font-size="13" font-weight="700">APP VIVA — Sirviendo peticiones</text>
+                        <!-- Mini request icons -->
+                        <rect x="275" y="148" width="60" height="28" rx="6" fill="#48BB78" fill-opacity="0.15" stroke="#48BB78" stroke-width="1"/>
+                        <text x="305" y="167" text-anchor="middle" fill="#48BB78" font-size="11" class="mono">GET</text>
+                        <rect x="355" y="148" width="60" height="28" rx="6" fill="#48BB78" fill-opacity="0.15" stroke="#48BB78" stroke-width="1"/>
+                        <text x="385" y="167" text-anchor="middle" fill="#48BB78" font-size="11" class="mono">POST</text>
+                        <rect x="435" y="148" width="60" height="28" rx="6" fill="#48BB78" fill-opacity="0.15" stroke="#48BB78" stroke-width="1"/>
+                        <text x="465" y="167" text-anchor="middle" fill="#48BB78" font-size="11" class="mono">GET</text>
+                        <line x1="390" y1="90" x2="390" y2="108" stroke="#48BB78" stroke-width="2"/>
+
+                        <!-- SHUTDOWN block -->
+                        <rect x="570" y="110" width="170" height="80" rx="10" fill="#2D3748" stroke="#FC8181" stroke-width="2"/>
+                        <text x="655" y="132" text-anchor="middle" fill="#FC8181" font-size="13" font-weight="700">SHUTDOWN</text>
+                        <text x="655" y="155" text-anchor="middle" fill="#E2E8F0" font-size="11">Cerrar pool</text>
+                        <text x="655" y="172" text-anchor="middle" fill="#E2E8F0" font-size="11">Liberar RAM</text>
+                        <line x1="655" y1="90" x2="655" y2="108" stroke="#FC8181" stroke-width="2"/>
+
+                        <!-- yield labels at the boundaries -->
+                        <text x="210" y="195" text-anchor="middle" fill="#6C63FF" font-size="18">⟷</text>
+                        <text x="210" y="215" text-anchor="middle" fill="#6C63FF" font-size="11" font-weight="600">yield</text>
+                        <text x="565" y="195" text-anchor="middle" fill="#6C63FF" font-size="18">⟷</text>
+                        <text x="565" y="215" text-anchor="middle" fill="#6C63FF" font-size="11" font-weight="600">yield</text>
+
+                        <!-- Bottom bar -->
+                        <rect x="40" y="230" width="700" height="30" rx="6" fill="#6C63FF" fill-opacity="0.1" stroke="#6C63FF" stroke-width="1"/>
+                        <text x="390" y="250" text-anchor="middle" fill="#6C63FF" font-size="11">yield ← todo lo que ocurre entre startup y shutdown → yield</text>
+                    </svg>
+                </div>
+
+                <h3>2.4 ¿Dónde guardar cosas globales? <code class="inline">app.state</code></h3>
+                <p>FastAPI ofrece <code class="inline">app.state</code>, un objeto tipo bolsa donde podés guardar <strong>cualquier cosa</strong> que necesite toda la aplicación:</p>
+
+<pre data-lang="python"><span class="com"># En el lifespan:</span>
+app.state.pool = <span class="kw">await</span> asyncpg.<span class="func">create_pool</span>(...)
+app.state.config = cargar_configuracion()
+app.state.modelo_ml = cargar_modelo()
+
+<span class="com"># En cualquier ruta o dependencia:</span>
+<span class="kw">async def</span> <span class="func">get_db</span>():
+    <span class="kw">async with</span> request.app.state.pool.<span class="func">acquire</span>() <span class="kw">as</span> conn:
+        <span class="kw">yield</span> conn</code></pre>
+
+                <p><strong>Importante:</strong> Si tu app tiene <em>múltiples workers</em> (gunicorn con varios procesos), cada worker ejecuta su propio lifespan. No compartas estado entre procesos sin usar Redis, BD o similar.</p>
+            </div>
+
+            <!-- ==================== SECCIÓN 3 ==================== -->
+            <div class="card depends" id="depends">
+                <h2><span class="icon">💉</span> 3. Depends — Inyección de dependencias</h2>
+
+                <h3>3.1 ¿Qué significa "inyectar dependencias"?</h3>
+                <p>Es un patrón donde <strong>no creás los objetos que necesitás</strong> dentro de tu función; en cambio, <strong>se los pedís al framework</strong> y él te los entrega listos. Esto hace que tu código sea más testeable y menos acoplado.</p>
+
+                <div class="analogy green">
+                    <strong>🔌 Analogía: El cargador universal</strong>
+                    En vez de que cada dispositivo tenga su propia batería soldada, usás un cargador externo. El dispositivo <strong>depende</strong> del cargador (lo necesita), pero no sabe fabricarlo. <code class="inline">Depends</code> es el enchufe de la pared: vos pedís "necesito una conexión a BD" y FastAPI te la enchufa.
+                </div>
+
+                <h3>3.2 Sintaxis básica</h3>
+
+<pre data-lang="python"><span class="kw">from</span> fastapi <span class="kw">import</span> Depends
+
+<span class="com"># 1. Definís una función que retorna lo que necesitás</span>
+<span class="kw">async def</span> <span class="func">obtener_conexion</span>() -> Connection:
+    <span class="kw">async with</span> pool.<span class="func">acquire</span>() <span class="kw">as</span> conn:
+        <span class="kw">yield</span> conn
+
+<span class="com"># 2. La ruta "declara" su dependencia en los parámetros</span>
+<span class="dec">@app.get</span>(<span class="str">"/usuarios"</span>)
+<span class="kw">async def</span> <span class="func">listar_usuarios</span>(
+    conn: Connection = <span class="func">Depends</span>(obtener_conexion)  <span class="com"># ← ¡inyección!</span>
+):
+    <span class="kw">return await</span> conn.<span class="func">fetch</span>(<span class="str">"SELECT * FROM usuarios"</span>)</code></pre>
+
+                <h3>3.3 ¿Qué pasa por debajo?</h3>
+                <ol class="timeline">
+                    <li>
+                        <strong>Llega un GET a /usuarios</strong>
+                        FastAPI ve que la ruta tiene parámetros con <code class="inline">Depends(...)</code>.
+                    </li>
+                    <li>
+                        <strong>FastAPI llama a cada dependencia</strong>
+                        Antes de ejecutar tu ruta, resuelve todas las dependencias <em>en orden</em>. Si una dependencia depende de otra, la resuelve recursivamente.
+                    </li>
+                    <li>
+                        <strong>FastAPI pasa los resultados</strong>
+                        Una vez resueltas, ejecuta tu función <code class="inline">listar_usuarios</code> con los valores reales.
+                    </li>
+                    <li>
+                        <strong>Si la dependencia usa <code class="inline">yield</code></strong>
+                        La parte después del <code class="inline">yield</code> se ejecuta cuando la respuesta ya fue enviada (para cerrar recursos).
+                    </li>
+                </ol>
+
+                <h3>3.4 Dependencias que dependen de dependencias (¡encadenamiento!)</h3>
+                <p>Esta es la magia real: podés componer dependencias como bloques de LEGO.</p>
+
+<pre data-lang="python"><span class="kw">async def</span> <span class="func">get_db</span>() -> Connection:
+    <span class="kw">async with</span> pool.<span class="func">acquire</span>() <span class="kw">as</span> conn:
+        <span class="kw">yield</span> conn
+
+<span class="kw">class</span> <span class="cls">UsuarioService</span>:
+    <span class="kw">def</span> __init__(self, conn):
+        self.conn = conn
+    <span class="kw">async def</span> <span class="func">crear</span>(self, nombre: str):
+        <span class="kw">return await</span> self.conn.<span class="func">fetchrow</span>(...)
+
+<span class="com"># Esta dependencia "encadena" con la anterior</span>
+<span class="kw">async def</span> <span class="func">get_servicio</span>(conn = <span class="func">Depends</span>(get_db)):
+    <span class="kw">return</span> UsuarioService(conn)
+
+<span class="com"># La ruta solo pide el servicio, no la conexión</span>
+<span class="dec">@app.post</span>(<span class="str">"/usuarios"</span>)
+<span class="kw">async def</span> <span class="func">crear_usuario</span>(
+    nombre: str,
+    servicio: UsuarioService = <span class="func">Depends</span>(get_servicio)
+):
+    <span class="kw">return await</span> servicio.<span class="func">crear</span>(nombre)</code></pre>
+
+                <div class="warning">
+                    FastAPI <strong>cachea</strong> dependencias dentro de una misma petición. Si tres dependencias piden <code class="inline">Depends(get_db)</code>, la llamada a <code class="inline">get_db</code> se ejecuta <strong>una sola vez</strong> para esa petición. Esto evita abrir 3 conexiones para la misma request.
+                </div>
+
+                <h3>3.5 Casos de uso típicos de Depends</h3>
+                <ul>
+                    <li><strong>Conexión a BD</strong> — Pedir una conexión del pool por request.</li>
+                    <li><strong>Autenticación</strong> — Verificar JWT, extraer usuario actual.</li>
+                    <li><strong>Permisos</strong> — Verificar que el usuario tenga rol "admin".</li>
+                    <li><strong>Validación de parámetros complejos</strong> — Por ej, parsear filtros de query string.</li>
+                    <li><strong>Header / Cookie parsing</strong> — Extraer y validar headers personalizados.</li>
+                    <li><strong>Contexto de request</strong> — Request ID, idioma del usuario, timezone.</li>
+                </ul>
+            </div>
+
+            <!-- ==================== SECCIÓN 4 ==================== -->
+            <div class="card asyncpg" id="asyncpg">
+                <h2><span class="icon">⚡</span> 4. asyncpg — El traductor relámpago</h2>
+
+                <h3>4.1 ¿Qué es asyncpg exactamente?</h3>
+                <p>Es una <strong>librería de Python</strong> que implementa el <strong>protocolo de PostgreSQL</strong> de forma nativa (sin envolver libpq en C) y 100% asíncrona. Fue escrita desde cero en Python + Cython para ser la más rápida.</p>
+
+                <h3>4.2 ¿Por qué es tan rápido?</h3>
+                <table class="comparison">
+                    <thead>
+                        <tr><th>Razón</th><th>Explicación</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Protocolo binario</td>
+                            <td>No convierte datos a texto para enviarlos. Habla directamente el lenguaje binario de PostgreSQL, lo que elimina el costo de serializar/deserializar a strings.</td>
+                        </tr>
+                        <tr>
+                            <td>Prepared statements automáticos</td>
+                            <td>La primera vez que ejecutás un query, asyncpg lo prepara en el servidor. Las siguientes llamadas reutilizan el plan de ejecución, evitando re-parseo.</td>
+                        </tr>
+                        <tr>
+                            <td>Escrito en Cython</td>
+                            <td>Las partes críticas (parseo de mensajes del protocolo) están compiladas a C, no interpretadas como Python puro.</td>
+                        </tr>
+                        <tr>
+                            <td>Zero-copy I/O</td>
+                            <td>Cuando recibe datos del socket, no los copia innecesariamente entre buffers.</td>
+                        </tr>
+                        <tr>
+                            <td>Sin GIL en operaciones de red</td>
+                            <td>Las operaciones de I/O liberan el GIL, permitiendo verdadero paralelismo con threads si fuera necesario.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.3 Instalación</h3>
+<pre data-lang="bash">pip install asyncpg</pre>
+
+                <h3>4.4 Métodos principales de una conexión</h3>
+
+                <table class="comparison">
+                    <thead>
+                        <tr><th>Método</th><th>Retorna</th><th>¿Cuándo usarlo?</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="inline">conn.execute(sql, *args)</code></td>
+                            <td><code class="inline">str</code> (ej: <code>"INSERT 0 1"</code>)</td>
+                            <td>INSERT, UPDATE, DELETE, CREATE TABLE (no esperás filas de vuelta, solo confirmación)</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">conn.fetch(sql, *args)</code></td>
+                            <td><code class="inline">list[Record]</code></td>
+                            <td>SELECT que devuelve múltiples filas</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">conn.fetchrow(sql, *args)</code></td>
+                            <td><code class="inline">Record | None</code></td>
+                            <td>SELECT que devuelve una sola fila (o ninguna)</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">conn.fetchval(sql, *args)</code></td>
+                            <td><code class="inline">Any | None</code></td>
+                            <td>SELECT que devuelve un solo valor escalar (COUNT, MAX, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">conn.executemany(sql, items)</code></td>
+                            <td><code class="inline">None</code></td>
+                            <td>Insertar muchos registros a la vez (bulk insert)</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">conn.copy_to_table(...)</code></td>
+                            <td><code class="inline">None</code></td>
+                            <td>Carga masiva ultra-rápida vía protocolo COPY</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.5 Ejemplos de cada método</h3>
+<pre data-lang="python"><span class="com"># ── execute: no retorna filas ──</span>
+status = <span class="kw">await</span> conn.<span class="func">execute</span>(
+    <span class="str">"INSERT INTO alumnos(nombre, nota) VALUES($1, $2)"</span>,
+    <span class="str">"María"</span>, <span class="num">9.5</span>
+)
+<span class="kw">print</span>(status)  <span class="com"># "INSERT 0 1"</span>
+
+<span class="com"># ── fetch: retorna lista de filas ──</span>
+filas = <span class="kw">await</span> conn.<span class="func">fetch</span>(<span class="str">"SELECT id, nombre FROM alumnos WHERE nota > $1"</span>, <span class="num">7</span>)
+<span class="kw">for</span> fila <span class="kw">in</span> filas:
+    <span class="kw">print</span>(fila[<span class="str">'nombre'</span>], fila[<span class="str">'nota'</span>])  <span class="com"># Se accede como dict</span>
+
+<span class="com"># ── fetchrow: retorna una fila o None ──</span>
+fila = <span class="kw">await</span> conn.<span class="func">fetchrow</span>(<span class="str">"SELECT * FROM alumnos WHERE id = $1"</span>, <span class="num">5</span>)
+<span class="kw">if</span> fila:
+    <span class="kw">print</span>(<span class="kw">dict</span>(fila))  <span class="com"># Convertir a dict para JSON</span>
+
+<span class="com"># ── fetchval: retorna un valor escalar ──</span>
+total = <span class="kw">await</span> conn.<span class="func">fetchval</span>(<span class="str">"SELECT COUNT(*) FROM alumnos"</span>)
+<span class="kw">print</span>(<span class="str">f"Hay {total} alumnos"</span>)
+
+<span class="com"># ── executemany: bulk insert ──</span>
+datos = [(<span class="str">"Ana"</span>, <span class="num">8.0</span>), (<span class="str">"Luis"</span>, <span class="num">6.5</span>), (<span class="str">"Sofía"</span>, <span class="num">9.8</span>)]
+<span class="kw">await</span> conn.<span class="func">executemany</span>(
+    <span class="str">"INSERT INTO alumnos(nombre, nota) VALUES($1, $2)"</span>,
+    datos
+)</code></pre>
+
+                <h3>4.6 Placeholders: <code class="inline">$1, $2, $3...</code></h3>
+                <p>asyncpg usa placeholders numéricos con signo <code class="inline">$</code>, muy distinto a otras librerías. Esto es <strong>adrede</strong> y <strong>más seguro</strong>.</p>
+
+                <table class="comparison">
+                    <thead>
+                        <tr><th>Librería</th><th>Sintaxis</th><th>Ejemplo</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>asyncpg</td><td><code>$1, $2</code></td><td><code>WHERE id = $1</code></td></tr>
+                        <tr><td>psycopg2</td><td><code>%s</code></td><td><code>WHERE id = %s</code></td></tr>
+                        <tr><td>sqlite3</td><td><code>?</code></td><td><code>WHERE id = ?</code></td></tr>
+                        <tr><td>SQLAlchemy</td><td><code>:nombre</code></td><td><code>WHERE id = :id</code></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="analogy red">
+                    <strong>NUNCA hagas esto:</strong>
+                    <code class="inline">f"SELECT * FROM users WHERE name = '{nombre}'"</code><br><br>
+                    Esto se llama <strong>SQL Injection</strong> y es la vulnerabilidad #1 en aplicaciones web. Si <code class="inline">nombre</code> contiene <code class="inline">'; DROP TABLE users; --</code>, perdiste toda la base de datos. Usá <strong>siempre</strong> placeholders.
+                </div>
+            </div>
+
+            <!-- ==================== SECCIÓN 5 ==================== -->
+            <div class="card pool" id="pool">
+                <h2><span class="icon">🏊</span> 5. Pool de conexiones</h2>
+
+                <h3>5.1 El problema de las conexiones</h3>
+                <p>Abrir una conexión a PostgreSQL <strong>no es barato</strong>: involucra TCP handshake, autenticación SSL, negociación de parámetros... puede tomar 20-50ms. Si tu API recibe 1000 peticiones por segundo y cada una abre una conexión nueva, tu base de datos <strong>colapsa</strong>.</p>
+
+                <h3>5.2 ¿Cómo funciona un pool?</h3>
+                <p>Un pool mantiene un número fijo de conexiones <strong>ya abiertas y listas para usar</strong>. Cuando tu ruta necesita una, <strong>la toma prestada</strong> del pool. Cuando termina, <strong>la devuelve</strong>. Como alquilar un auto por minuto en vez de fabricar uno cada vez.</p>
+
+                <div class="diagram">
+                    <svg viewBox="0 0 720 340" width="720" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="718" height="338" rx="12" fill="#1A202C" stroke="#4A5568" stroke-width="1.5"/>
+
+                        <!-- Pool title -->
+                        <text x="360" y="30" text-anchor="middle" fill="#A0AEC0" font-size="14" font-weight="600">POOL DE CONEXIONES (tamaño = 10)</text>
+
+                        <!-- Connection slots - Row 1 -->
+                        <rect x="40"  y="50" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="100" y="75" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn1  ✓</text>
+
+                        <rect x="175" y="50" width="120" height="40" rx="8" fill="#742A2A" stroke="#FC8181" stroke-width="1.5"/>
+                        <text x="235" y="75" text-anchor="middle" fill="#FED7D7" font-size="12" class="mono">conn2  🔴</text>
+
+                        <rect x="310" y="50" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="370" y="75" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn3  ✓</text>
+
+                        <rect x="445" y="50" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="505" y="75" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn4  ✓</text>
+
+                        <rect x="580" y="50" width="120" height="40" rx="8" fill="#742A2A" stroke="#FC8181" stroke-width="1.5"/>
+                        <text x="640" y="75" text-anchor="middle" fill="#FED7D7" font-size="12" class="mono">conn5  🔴</text>
+
+                        <!-- Connection slots - Row 2 -->
+                        <rect x="40"  y="100" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="100" y="125" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn6  ✓</text>
+
+                        <rect x="175" y="100" width="120" height="40" rx="8" fill="#742A2A" stroke="#FC8181" stroke-width="1.5"/>
+                        <text x="235" y="125" text-anchor="middle" fill="#FED7D7" font-size="12" class="mono">conn7  🔴</text>
+
+                        <rect x="310" y="100" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="370" y="125" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn8  ✓</text>
+
+                        <rect x="445" y="100" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="505" y="125" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn9  ✓</text>
+
+                        <rect x="580" y="100" width="120" height="40" rx="8" fill="#276749" stroke="#48BB78" stroke-width="1.5"/>
+                        <text x="640" y="125" text-anchor="middle" fill="#C6F6D5" font-size="12" class="mono">conn10 ✓</text>
+
+                        <!-- Acquire arrow going down-left -->
+                        <defs>
+                            <marker id="arr-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                                <path d="M0,0 L8,3 L0,6" fill="#48BB78"/>
+                            </marker>
+                            <marker id="arr-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                                <path d="M0,0 L8,3 L0,6" fill="#FC8181"/>
+                            </marker>
+                        </defs>
+
+                        <!-- acquire label + arrow -->
+                        <text x="80" y="178" fill="#48BB78" font-size="12" font-weight="600">acquire() ↓</text>
+                        <line x1="100" y1="142" x2="100" y2="200" stroke="#48BB78" stroke-width="2" marker-end="url(#arr-g)"/>
+
+                        <!-- Ruta box -->
+                        <rect x="30" y="205" width="160" height="55" rx="10" fill="#2D3748" stroke="#63B3ED" stroke-width="2"/>
+                        <text x="110" y="228" text-anchor="middle" fill="#63B3ED" font-size="13" font-weight="700">Ruta GET</text>
+                        <text x="110" y="248" text-anchor="middle" fill="#E2E8F0" font-size="11" class="mono">/usuarios</text>
+
+                        <!-- "usa conn5" connector -->
+                        <line x1="190" y1="232" x2="580" y2="85" stroke="#FC8181" stroke-width="1.5" stroke-dasharray="5,4"/>
+                        <text x="380" y="148" text-anchor="middle" fill="#FC8181" font-size="11" font-style="italic">usa conn5...</text>
+
+                        <!-- return label + arrow -->
+                        <text x="620" y="178" fill="#FC8181" font-size="12" font-weight="600">release() ↑</text>
+                        <line x1="640" y1="200" x2="640" y2="142" stroke="#FC8181" stroke-width="2" marker-end="url(#arr-r)"/>
+
+                        <!-- Resultado box -->
+                        <rect x="530" y="205" width="160" height="55" rx="10" fill="#2D3748" stroke="#48BB78" stroke-width="2"/>
+                        <text x="610" y="228" text-anchor="middle" fill="#48BB78" font-size="13" font-weight="700">conn5 devuelta</text>
+                        <text x="610" y="248" text-anchor="middle" fill="#E2E8F0" font-size="11">al pool ✓</text>
+
+                        <!-- Legend -->
+                        <rect x="200" y="290" width="14" height="14" rx="3" fill="#276749" stroke="#48BB78" stroke-width="1"/>
+                        <text x="222" y="302" fill="#A0AEC0" font-size="11">Libre</text>
+                        <rect x="290" y="290" width="14" height="14" rx="3" fill="#742A2A" stroke="#FC8181" stroke-width="1"/>
+                        <text x="312" y="302" fill="#A0AEC0" font-size="11">En uso</text>
+                    </svg>
+                </div>
+
+                <h3>5.3 Crear y configurar el pool</h3>
+<pre data-lang="python"><span class="kw">import</span> asyncpg
+
+pool = <span class="kw">await</span> asyncpg.<span class="func">create_pool</span>(
+    dsn=<span class="str">"postgresql://user:password@localhost:5432/basedatos"</span>,
+    min_size=<span class="num">2</span>,      <span class="com"># Mínimo de conexiones siempre vivas</span>
+    max_size=<span class="num">10</span>,     <span class="com"># Máximo de conexiones simultáneas</span>
+    max_queries=<span class="num">50000</span>, <span class="com"># Cerrar conexión tras N queries (evita memory leaks)</span>
+    max_inactive_connection_lifetime=<span class="num">300</span>, <span class="com"># 5 min inactiva → se cierra</span>
+    timeout=<span class="num">30.0</span>,   <span class="com"># Segundos de espera máxima si el pool está lleno</span>
+)</code></pre>
+
+                <h3>5.4 Patrón correcto: tomar y devolver</h3>
+<pre data-lang="python"><span class="kw">async def</span> <span class="func">get_db</span>() -> Connection:
+    <span class="com"># Toma prestada UNA conexión del pool</span>
+    <span class="kw">async with</span> pool.<span class="func">acquire</span>() <span class="kw">as</span> conn:
+        <span class="kw">yield</span> conn  
+    <span class="com"># Al salir del with, conn se devuelve automáticamente al pool</span>
+
+<span class="com"># La ruta usa la dependencia, y al terminar se libera</span>
+<span class="dec">@app.get</span>(<span class="str">"/datos"</span>)
+<span class="kw">async def</span> <span class="func">obtener_datos</span>(conn = <span class="func">Depends</span>(get_db)):
+    <span class="kw">return await</span> conn.<span class="func">fetch</span>(<span class="str">"SELECT * FROM tabla"</span>)</code></pre>
+
+                <div class="warning">
+                    <strong>Error común:</strong> Tomar una conexión del pool y no devolverla. Si las 10 conexiones están "tomadas" sin devolver, la petición #11 se queda esperando hasta que haya timeout. Para evitar esto, usá SIEMPRE <code class="inline">async with pool.acquire() as conn</code> o un <code class="inline">yield</code> en <code class="inline">Depends</code>.
+                </div>
+
+                <h3>5.5 Conexiones y límites de PostgreSQL</h3>
+                <p>PostgreSQL tiene un límite de conexiones simultáneas (por defecto 100). Si tenés 5 instancias de tu app, cada una con <code class="inline">max_size=25</code>, ya son 125 conexiones: te pasaste del límite. La fórmula segura es:</p>
+                <pre style="background:var(--blue-light); color:var(--dark); font-size:1.1rem; text-align:center; padding:1rem;">
+max_connections_postgres >= (instancias_de_app × max_size_del_pool) + 5 (reserva para pgAdmin, migraciones, etc.)</pre>
+            </div>
+
+            <!-- ==================== SECCIÓN 6 ==================== -->
+            <div class="card pool" id="primera-api">
+                <h2><span class="icon">🛠️</span> 6. Tu primera API completa con FastAPI + asyncpg</h2>
+
+                <p>Juntemos todo lo aprendido en un solo archivo funcional. Asumimos que ya existe una tabla <code class="inline">alumnos(id SERIAL PRIMARY KEY, nombre TEXT, nota FLOAT)</code>.</p>
+
+<pre data-lang="python"><span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Depends, HTTPException
+<span class="kw">import</span> asyncpg
+
+<span class="com"># ═══════════════════════════════════════════════════════════
+# LIFESPAN: Inicialización y apagado del pool
+# ═══════════════════════════════════════════════════════════</span>
+<span class="dec">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="func">lifespan</span>(app: FastAPI):
+    app.state.pool = <span class="kw">await</span> asyncpg.<span class="func">create_pool</span>(
+        <span class="str">"postgresql://user:pass@localhost:5432/colegio"</span>,
+        min_size=<span class="num">2</span>,
+        max_size=<span class="num">10</span>
+    )
+    <span class="kw">yield</span>
+    <span class="kw">await</span> app.state.pool.<span class="func">close</span>()
+
+app = FastAPI(lifespan=lifespan, title=<span class="str">"API Colegio"</span>)
+
+<span class="com"># ═══════════════════════════════════════════════════════════
+# DEPENDENCIA: Obtener conexión del pool
+# ═══════════════════════════════════════════════════════════</span>
+<span class="kw">async def</span> <span class="func">get_db</span>() -> asyncpg.Connection:
+    <span class="kw">async with</span> app.state.pool.<span class="func">acquire</span>() <span class="kw">as</span> conn:
+        <span class="kw">yield</span> conn
+
+<span class="com"># ═══════════════════════════════════════════════════════════
+# RUTAS
+# ═══════════════════════════════════════════════════════════</span>
+
+<span class="dec">@app.post</span>(<span class="str">"/alumnos/"</span>, status_code=<span class="num">201</span>)
+<span class="kw">async def</span> <span class="func">crear_alumno</span>(
+    nombre: str,
+    nota: float,
+    conn = <span class="func">Depends</span>(get_db)
+):
+    <span class="kw">await</span> conn.<span class="func">execute</span>(
+        <span class="str">"INSERT INTO alumnos(nombre, nota) VALUES($1, $2)"</span>,
+        nombre, nota
+    )
+    <span class="kw">return</span> {<span class="str">"mensaje"</span>: <span class="str">f"Alumno '{nombre}' creado"</span>}
+
+<span class="dec">@app.get</span>(<span class="str">"/alumnos/"</span>)
+<span class="kw">async def</span> <span class="func">listar_alumnos</span>(
+    nota_minima: float = <span class="num">0.0</span>,
+    conn = <span class="func">Depends</span>(get_db)
+):
+    filas = <span class="kw">await</span> conn.<span class="func">fetch</span>(
+        <span class="str">"SELECT id, nombre, nota FROM alumnos WHERE nota >= $1 ORDER BY nota DESC"</span>,
+        nota_minima
+    )
+    <span class="kw">return</span> [<span class="kw">dict</span>(f) <span class="kw">for</span> f <span class="kw">in</span> filas]
+
+<span class="dec">@app.get</span>(<span class="str">"/alumnos/{alumno_id}"</span>)
+<span class="kw">async def</span> <span class="func">obtener_alumno</span>(
+    alumno_id: int,
+    conn = <span class="func">Depends</span>(get_db)
+):
+    fila = <span class="kw">await</span> conn.<span class="func">fetchrow</span>(
+        <span class="str">"SELECT id, nombre, nota FROM alumnos WHERE id = $1"</span>,
+        alumno_id
+    )
+    <span class="kw">if not</span> fila:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">404</span>, detail=<span class="str">"Alumno no encontrado"</span>)
+    <span class="kw">return</span> <span class="kw">dict</span>(fila)
+
+<span class="dec">@app.put</span>(<span class="str">"/alumnos/{alumno_id}"</span>)
+<span class="kw">async def</span> <span class="func">actualizar_alumno</span>(
+    alumno_id: int,
+    nombre: str = <span class="kw">None</span>,
+    nota: float = <span class="kw">None</span>,
+    conn = <span class="func">Depends</span>(get_db)
+):
+    <span class="com"># Construir update dinámico (solo los campos enviados)</span>
+    sets = []
+    args = []
+    idx = <span class="num">1</span>
+    <span class="kw">if</span> nombre <span class="kw">is not None</span>:
+        sets.append(<span class="str">f"nombre = ${idx}"</span>)
+        args.append(nombre); idx += <span class="num">1</span>
+    <span class="kw">if</span> nota <span class="kw">is not None</span>:
+        sets.append(<span class="str">f"nota = ${idx}"</span>)
+        args.append(nota); idx += <span class="num">1</span>
+
+    <span class="kw">if not</span> sets:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">400</span>, detail=<span class="str">"Nada que actualizar"</span>)
+
+    args.append(alumno_id)
+    sql = <span class="str">f"UPDATE alumnos SET {', '.join(sets)} WHERE id = ${idx}"</span>
+    result = <span class="kw">await</span> conn.<span class="func">execute</span>(sql, *args)
+
+    <span class="kw">if</span> result == <span class="str">"UPDATE 0"</span>:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">404</span>, detail=<span class="str">"Alumno no encontrado"</span>)
+    <span class="kw">return</span> {<span class="str">"mensaje"</span>: <span class="str">"Alumno actualizado"</span>}
+
+<span class="dec">@app.delete</span>(<span class="str">"/alumnos/{alumno_id}"</span>)
+<span class="kw">async def</span> <span class="func">eliminar_alumno</span>(
+    alumno_id: int,
+    conn = <span class="func">Depends</span>(get_db)
+):
+    result = <span class="kw">await</span> conn.<span class="func">execute</span>(
+        <span class="str">"DELETE FROM alumnos WHERE id = $1"</span>, alumno_id
+    )
+    <span class="kw">if</span> result == <span class="str">"DELETE 0"</span>:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">404</span>, detail=<span class="str">"Alumno no encontrado"</span>)
+    <span class="kw">return</span> {<span class="str">"mensaje"</span>: <span class="str">"Alumno eliminado"</span>}</code></pre>
+
+                <h3>Explicación línea por línea del concepto más importante: el flujo</h3>
+                <ol class="timeline">
+                    <li>
+                        <strong>El servidor arranca</strong>
+                        FastAPI ejecuta <code class="inline">lifespan()</code>. Se crea el pool con 2 a 10 conexiones listas. El <code class="inline">yield</code> le dice a FastAPI "ya podés empezar a recibir peticiones".
+                    </li>
+                    <li>
+                        <strong>Llega un POST /alumnos/?nombre=Juan&nota=8.5</strong>
+                        FastAPI parsea los parámetros. Ve el <code class="inline">Depends(get_db)</code> y ejecuta <code class="inline">get_db()</code>, que toma una conexión libre del pool.
+                    </li>
+                    <li>
+                        <strong>Se ejecuta la ruta</strong>
+                        <code class="inline">conn.execute("INSERT INTO alumnos...", "Juan", 8.5)</code>. asyncpg envía el comando en binario, PostgreSQL lo ejecuta, devuelve <code class="inline">"INSERT 0 1"</code>. La ruta retorna el JSON de respuesta.
+                    </li>
+                    <li>
+                        <strong>La conexión se devuelve al pool</strong>
+                        Como <code class="inline">get_db</code> usaba <code class="inline">async with pool.acquire()</code>, al salir del <code class="inline">with</code> la conexión vuelve al pool. Está limpia y lista para la próxima petición.
+                    </li>
+                </ol>
+            </div>
+
+            <!-- ==================== SECCIÓN 7 ==================== -->
+            <div class="card capas" id="capas">
+                <h2><span class="icon">🏗️</span> 7. Arquitectura de 3 capas (Nivel Pro)</h2>
+
+                <h3>7.1 ¿Por qué separar en capas?</h3>
+                <p>Imaginá un archivo de 5000 líneas con 40 endpoints, validaciones, SQL crudo y reglas de negocio mezclados. Bienvenido al <strong>código espagueti</strong>: imposible de testear, mantener o entender.</p>
+
+                <p>Las 3 capas son el estándar de la industria para mantener el código <strong>organizado, testeable y reutilizable</strong>:</p>
+
+                <div class="analogy">
+                    <strong>🏢 Analogía: Una empresa</strong>
+                    <table style="width:100%; margin-top:1rem;">
+                        <tr>
+                            <td style="width:30%; padding:0.5rem;"><strong>1. Recepción</strong><br><small>(Rutas / Presentación)</small></td>
+                            <td>Atiende al cliente, recibe su pedido, le entrega el resultado. <strong>No sabe nada de cómo se hace el trabajo.</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.5rem;"><strong>2. Oficina</strong><br><small>(Servicios / Negocio)</small></td>
+                            <td>Recibe la orden de recepción, aplica las reglas del negocio, coordina quién hace qué. <strong>No sabe nada de HTTP ni bases de datos.</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.5rem;"><strong>3. Depósito</strong><br><small>(Repositorios / Datos)</small></td>
+                            <td>Solo sabe buscar, guardar y modificar cosas en la base de datos. <strong>No sabe para qué se usan esos datos.</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>7.2 La estructura de carpetas profesional</h3>
+<pre data-lang="text">mi_api/
+├── main.py              ← FastAPI app + lifespan + router principal
+├── config.py            ← Variables de entorno, DSN, settings
+├── routers/
+│   └── alumnos.py       ← Endpoints (solo reciben petición, llaman servicio, devuelven respuesta)
+├── services/
+│   └── alumnos.py       ← Lógica de negocio (validaciones, reglas, orquestación)
+├── repositories/
+│   └── alumnos.py       ← Operaciones CRUD contra PostgreSQL (SQL puro)
+├── models/
+│   └── alumnos.py       ← Schemas Pydantic para request/response
+└── requirements.txt</pre>
+
+                <h3>7.3 Implementación completa paso a paso</h3>
+
+                <h4>7.3.1 Modelos (Pydantic)</h4>
+<pre data-lang="python"><span class="com"># models/alumnos.py</span>
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+
+<span class="kw">class</span> <span class="cls">AlumnoCreate</span>(BaseModel):
+    nombre: str
+    nota: float
+
+<span class="kw">class</span> <span class="cls">AlumnoResponse</span>(BaseModel):
+    id: int
+    nombre: str
+    nota: float</code></pre>
+
+                <h4>7.3.2 Repositorio (capa de datos)</h4>
+<pre data-lang="python"><span class="com"># repositories/alumnos.py</span>
+<span class="kw">import</span> asyncpg
+
+<span class="kw">class</span> <span class="cls">AlumnoRepository</span>:
+    <span class="kw">def</span> __init__(self, conn: asyncpg.Connection):
+        self.conn = conn
+
+    <span class="kw">async def</span> <span class="func">crear</span>(self, nombre: str, nota: float) -> int:
+        <span class="kw">return await</span> self.conn.<span class="func">fetchval</span>(
+            <span class="str">"INSERT INTO alumnos(nombre, nota) VALUES($1, $2) RETURNING id"</span>,
+            nombre, nota
+        )
+
+    <span class="kw">async def</span> <span class="func">obtener_por_id</span>(self, id: int) -> dict | None:
+        fila = <span class="kw">await</span> self.conn.<span class="func">fetchrow</span>(
+            <span class="str">"SELECT id, nombre, nota FROM alumnos WHERE id = $1"</span>, id
+        )
+        <span class="kw">return</span> <span class="kw">dict</span>(fila) <span class="kw">if</span> fila <span class="kw">else None</span>
+
+    <span class="kw">async def</span> <span class="func">listar</span>(self, nota_min: float = <span class="num">0</span>) -> list[dict]:
+        filas = <span class="kw">await</span> self.conn.<span class="func">fetch</span>(
+            <span class="str">"SELECT id, nombre, nota FROM alumnos WHERE nota >= $1 ORDER BY nota DESC"</span>,
+            nota_min
+        )
+        <span class="kw">return</span> [<span class="kw">dict</span>(f) <span class="kw">for</span> f <span class="kw">in</span> filas]
+
+    <span class="kw">async def</span> <span class="func">actualizar</span>(self, id: int, nombre: str | None, nota: float | None) -> bool:
+        sets, args, idx = [], [], <span class="num">1</span>
+        <span class="kw">if</span> nombre <span class="kw">is not None</span>:
+            sets.append(<span class="str">f"nombre = ${idx}"</span>); args.append(nombre); idx += <span class="num">1</span>
+        <span class="kw">if</span> nota <span class="kw">is not None</span>:
+            sets.append(<span class="str">f"nota = ${idx}"</span>); args.append(nota); idx += <span class="num">1</span>
+        <span class="kw">if not</span> sets: <span class="kw">return False</span>
+        args.append(id)
+        sql = <span class="str">f"UPDATE alumnos SET {', '.join(sets)} WHERE id = ${idx}"</span>
+        result = <span class="kw">await</span> self.conn.<span class="func">execute</span>(sql, *args)
+        <span class="kw">return</span> result != <span class="str">"UPDATE 0"</span>
+
+    <span class="kw">async def</span> <span class="func">eliminar</span>(self, id: int) -> bool:
+        result = <span class="kw">await</span> self.conn.<span class="func">execute</span>(
+            <span class="str">"DELETE FROM alumnos WHERE id = $1"</span>, id
+        )
+        <span class="kw">return</span> result != <span class="str">"DELETE 0"</span></code></pre>
+
+                <h4>7.3.3 Servicio (capa de negocio)</h4>
+<pre data-lang="python"><span class="com"># services/alumnos.py</span>
+<span class="kw">from</span> repositories.alumnos <span class="kw">import</span> AlumnoRepository
+
+<span class="kw">class</span> <span class="cls">AlumnoService</span>:
+    <span class="kw">def</span> __init__(self, repo: AlumnoRepository):
+        self.repo = repo
+
+    <span class="kw">async def</span> <span class="func">inscribir</span>(self, nombre: str, nota: float) -> dict:
+        <span class="com"># Regla de negocio: validar nota</span>
+        <span class="kw">if</span> nota < <span class="num">1</span> <span class="kw">or</span> nota > <span class="num">10</span>:
+            <span class="kw">raise</span> ValueError(<span class="str">"La nota debe estar entre 1 y 10"</span>)
+        <span class="kw">if</span> <span class="kw">not</span> nombre.strip():
+            <span class="kw">raise</span> ValueError(<span class="str">"El nombre no puede estar vacío"</span>)
+
+        <span class="com"># Podrías agregar más reglas acá: validar duplicados, notificar, logging, etc.</span>
+        id_nuevo = <span class="kw">await</span> self.repo.<span class="func">crear</span>(nombre.strip(), nota)
+        <span class="kw">return</span> {<span class="str">"id"</span>: id_nuevo, <span class="str">"nombre"</span>: nombre, <span class="str">"nota"</span>: nota}
+
+    <span class="kw">async def</span> <span class="func">obtener</span>(self, id: int) -> dict:
+        alumno = <span class="kw">await</span> self.repo.<span class="func">obtener_por_id</span>(id)
+        <span class="kw">if not</span> alumno:
+            <span class="kw">raise</span> ValueError(<span class="str">"Alumno no encontrado"</span>)
+        <span class="kw">return</span> alumno
+
+    <span class="kw">async def</span> <span class="func">listar_aprobados</span>(self, nota_min: float = <span class="num">6</span>) -> list[dict]:
+        <span class="kw">return await</span> self.repo.<span class="func">listar</span>(nota_min)</code></pre>
+
+                <h4>7.3.4 Router (capa de presentación)</h4>
+<pre data-lang="python"><span class="com"># routers/alumnos.py</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> APIRouter, Depends, HTTPException
+<span class="kw">from</span> services.alumnos <span class="kw">import</span> AlumnoService
+<span class="kw">from</span> repositories.alumnos <span class="kw">import</span> AlumnoRepository
+<span class="kw">from</span> models.alumnos <span class="kw">import</span> AlumnoCreate, AlumnoResponse
+
+router = APIRouter(prefix=<span class="str">"/alumnos"</span>, tags=[<span class="str">"Alumnos"</span>])
+
+<span class="kw">async def</span> <span class="func">get_alumno_service</span>(conn = <span class="func">Depends</span>(get_db)):
+    repo = AlumnoRepository(conn)
+    <span class="kw">return</span> AlumnoService(repo)
+
+<span class="dec">@router.post</span>(<span class="str">"/"</span>, response_model=AlumnoResponse, status_code=<span class="num">201</span>)
+<span class="kw">async def</span> <span class="func">crear</span>(
+    datos: AlumnoCreate,
+    servicio: AlumnoService = <span class="func">Depends</span>(get_alumno_service)
+):
+    <span class="kw">try</span>:
+        <span class="kw">return await</span> servicio.<span class="func">inscribir</span>(datos.nombre, datos.nota)
+    <span class="kw">except</span> ValueError <span class="kw">as</span> e:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">400</span>, detail=str(e))
+
+<span class="dec">@router.get</span>(<span class="str">"/"</span>, response_model=list[AlumnoResponse])
+<span class="kw">async def</span> <span class="func">listar</span>(
+    nota_min: float = <span class="num">6</span>,
+    servicio: AlumnoService = <span class="func">Depends</span>(get_alumno_service)
+):
+    <span class="kw">return await</span> servicio.<span class="func">listar_aprobados</span>(nota_min)
+
+<span class="dec">@router.get</span>(<span class="str">"/{id}"</span>, response_model=AlumnoResponse)
+<span class="kw">async def</span> <span class="func">obtener</span>(
+    id: int,
+    servicio: AlumnoService = <span class="func">Depends</span>(get_alumno_service)
+):
+    <span class="kw">try</span>:
+        <span class="kw">return await</span> servicio.<span class="func">obtener</span>(id)
+    <span class="kw">except</span> ValueError <span class="kw">as</span> e:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">404</span>, detail=str(e))</code></pre>
+
+                <h4>7.3.5 Main (punto de entrada)</h4>
+<pre data-lang="python"><span class="com"># main.py</span>
+<span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">import</span> asyncpg
+<span class="kw">from</span> routers <span class="kw">import</span> alumnos
+
+<span class="dec">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="func">lifespan</span>(app: FastAPI):
+    app.state.pool = <span class="kw">await</span> asyncpg.<span class="func">create_pool</span>(
+        <span class="str">"postgresql://user:pass@localhost:5432/colegio"</span>,
+        min_size=<span class="num">2</span>, max_size=<span class="num">10</span>
+    )
+    <span class="kw">yield</span>
+    <span class="kw">await</span> app.state.pool.<span class="func">close</span>()
+
+app = FastAPI(lifespan=lifespan)
+
+<span class="kw">async def</span> <span class="func">get_db</span>():
+    <span class="kw">async with</span> app.state.pool.<span class="func">acquire</span>() <span class="kw">as</span> conn:
+        <span class="kw">yield</span> conn
+
+app.include_router(alumnos.router)</code></pre>
+
+                <h3>7.4 ¿Por qué esto es mejor?</h3>
+                <table class="comparison">
+                    <thead>
+                        <tr><th>Beneficio</th><th>Sin capas (monolito)</th><th>Con 3 capas</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Testear</td><td>Necesitás levantar toda la app</td><td class="win">Testeás cada capa por separado con mocks</td></tr>
+                        <tr><td>Reusar</td><td>Copiar y pegar SQL en cada ruta</td><td class="win">El repositorio lo usan N servicios</td></tr>
+                        <tr><td>Cambiar BD</td><td>Editar todas las rutas una por una</td><td class="win">Solo cambiás la capa de repositorio</td></tr>
+                        <tr><td>Reglas de negocio</td><td>Mezcladas con HTTP y SQL</td><td class="win">Aisladas en servicios, fáciles de leer</td></tr>
+                        <tr><td>Múltiples interfaces</td><td>Imposible sin reescribir todo</td><td class="win">El mismo servicio sirve para API REST, CLI o bot de Discord</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ==================== SECCIÓN 8 ==================== -->
+            <div class="card transacciones" id="transacciones">
+                <h2><span class="icon">🔐</span> 8. Transacciones — Todo o nada</h2>
+
+                <h3>8.1 El problema de las operaciones parciales</h3>
+                <p>Imaginá una transferencia bancaria: restás $100 de la cuenta A, pero justo antes de sumarlos a la cuenta B, el servidor se cae. Resultado: el dinero <strong>desapareció</strong>.</p>
+
+                <p>Una <strong>transacción</strong> garantiza <strong>atomicidad</strong>: si cualquier paso falla, <strong>todo</strong> se deshace automáticamente. Es el principio ACID de las bases de datos relacionales.</p>
+
+                <h3>8.2 Sintaxis en asyncpg</h3>
+<pre data-lang="python"><span class="kw">async with</span> conn.<span class="func">transaction</span>():
+    <span class="com"># Todo lo que pase acá adentro es UNA sola transacción</span>
+    <span class="kw">await</span> conn.<span class="func">execute</span>(<span class="str">"UPDATE cuentas SET saldo = saldo - 100 WHERE id = 1"</span>)
+    <span class="kw">await</span> conn.<span class="func">execute</span>(<span class="str">"UPDATE cuentas SET saldo = saldo + 100 WHERE id = 2"</span>)
+<span class="com"># Si algo lanza excepción → ROLLBACK automático
+# Si todo sale bien          → COMMIT automático</span></code></pre>
+
+                <h3>8.3 Ejemplo completo: Transferencia con validación</h3>
+<pre data-lang="python"><span class="kw">class</span> <span class="cls">TransferenciaService</span>:
+    <span class="kw">def</span> __init__(self, repo: CuentaRepository):
+        self.repo = repo
+
+    <span class="kw">async def</span> <span class="func">transferir</span>(self, origen_id: int, destino_id: int, monto: float):
+        <span class="kw">if</span> monto <= <span class="num">0</span>:
+            <span class="kw">raise</span> ValueError(<span class="str">"El monto debe ser positivo"</span>)
+        <span class="kw">if</span> origen_id == destino_id:
+            <span class="kw">raise</span> ValueError(<span class="str">"Origen y destino no pueden ser iguales"</span>)
+
+        <span class="kw">async with</span> self.repo.conn.<span class="func">transaction</span>():
+            origen = <span class="kw">await</span> self.repo.<span class="func">obtener_por_id</span>(origen_id)
+            <span class="kw">if not</span> origen:
+                <span class="kw">raise</span> ValueError(<span class="str">"Cuenta origen no existe"</span>)
+            <span class="kw">if</span> origen[<span class="str">'saldo'</span>] < monto:
+                <span class="kw">raise</span> ValueError(<span class="str">"Saldo insuficiente"</span>)
+
+            destino = <span class="kw">await</span> self.repo.<span class="func">obtener_por_id</span>(destino_id)
+            <span class="kw">if not</span> destino:
+                <span class="kw">raise</span> ValueError(<span class="str">"Cuenta destino no existe"</span>)
+
+            <span class="com"># Las dos operaciones juntas, si falla una → ROLLBACK</span>
+            <span class="kw">await</span> self.repo.<span class="func">actualizar_saldo</span>(origen_id, -monto)
+            <span class="kw">await</span> self.repo.<span class="func">actualizar_saldo</span>(destino_id, monto)
+
+            <span class="kw">return</span> {<span class="str">"mensaje"</span>: <span class="str">f"Transferidos ${monto} exitosamente"</span>}</code></pre>
+
+                <h3>8.4 Transacciones anidadas (savepoints)</h3>
+                <p>Podés crear "puntos de guardado" dentro de una transacción grande:</p>
+<pre data-lang="python"><span class="kw">async with</span> conn.<span class="func">transaction</span>():
+    <span class="kw">await</span> conn.<span class="func">execute</span>(<span class="str">"INSERT INTO logs(accion) VALUES('inicio')"</span>)
+    
+    <span class="kw">try</span>:
+        <span class="kw">async with</span> conn.<span class="func">transaction</span>():  <span class="com"># savepoint anidado</span>
+            <span class="kw">await</span> conn.<span class="func">execute</span>(<span class="str">"UPDATE productos SET stock = stock - 1 WHERE id = 5"</span>)
+            <span class="kw">raise</span> Exception(<span class="str">"Algo falló!"</span>)
+    <span class="kw">except</span> Exception:
+        <span class="com"># Solo se revierte el UPDATE del producto, el log sobrevive</span>
+        <span class="kw">pass</span>
+    
+    <span class="kw">await</span> conn.<span class="func">execute</span>(<span class="str">"INSERT INTO logs(accion) VALUES('fin')"</span>)</code></pre>
+
+                <h3>8.5 Niveles de aislamiento</h3>
+                <p>asyncpg permite especificar el nivel de aislamiento de la transacción:</p>
+<pre data-lang="python"><span class="kw">async with</span> conn.<span class="func">transaction</span>(isolation=<span class="str">'serializable'</span>):
+    ...  <span class="com"># Máxima seguridad, menor concurrencia</span>
+
+<span class="kw">async with</span> conn.<span class="func">transaction</span>(isolation=<span class="str">'read_committed'</span>):
+    ...  <span class="com"># Por defecto, buen balance</span></code></pre>
+
+                <table class="comparison">
+                    <thead>
+                        <tr><th>Nivel</th><th>Protege contra</th><th>Rendimiento</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>read_uncommitted</code></td><td>Casi nada</td><td>Altísimo</td></tr>
+                        <tr><td><code>read_committed</code> (default)</td><td>Lecturas sucias</td><td>Alto</td></tr>
+                        <tr><td><code>repeatable_read</code></td><td>Lecturas no repetibles</td><td>Medio</td></tr>
+                        <tr><td><code>serializable</code></td><td>Todo (fantasmas incluidos)</td><td>Bajo</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ==================== SECCIÓN 9 ==================== -->
+            <div class="card resumen" id="resumen">
+                <h2><span class="icon">📋</span> 9. Resumen y ejercicios</h2>
+
+                <h3>Lo que aprendiste hoy</h3>
+                <ul>
+                    <li><strong>Lifespan:</strong> startup (crear pool, cargar config) y shutdown (cerrar conexiones) de tu app.</li>
+                    <li><strong>Depends:</strong> inyección de dependencias. Tus rutas piden lo que necesitan y FastAPI se los provee.</li>
+                    <li><strong>asyncpg:</strong> el driver más rápido para PostgreSQL en Python. Protocolo binario, async nativo.</li>
+                    <li><strong>Pool:</strong> recicla conexiones para no saturar PostgreSQL. Siempre usar <code class="inline">acquire()</code> con <code class="inline">with</code>.</li>
+                    <li><strong>3 capas:</strong> rutas (HTTP), servicios (negocio), repositorios (SQL). Cada capa tiene una sola responsabilidad.</li>
+                    <li><strong>Transacciones:</strong> atomicidad garantizada. Si algo falla, todo se revierte.</li>
+                    <li><strong>Placeholders $1, $2:</strong> previenen SQL Injection. Nunca concatenar strings en queries.</li>
+                </ul>
+
+                <h3>🧪 Ejercicios para practicar</h3>
+                <ol>
+                    <li><strong>CRUD completo:</strong> Creá un endpoint <code class="inline">/productos</code> con stock. Implementá todas las operaciones con sus 3 capas.</li>
+                    <li><strong>Compra con transacción:</strong> Al comprar, restar stock y registrar la venta en otra tabla. Si falla el registro, que el stock no se reste (transacción).</li>
+                    <li><strong>Filtros avanzados:</strong> Agregá query parameters para filtrar por precio mínimo/máximo, ordenar por nombre/precio. Usá <code class="inline">Depends</code> para parsear esos filtros.</li>
+                    <li><strong>Autenticación:</strong> Creá un <code class="inline">Depends</code> que lea un header <code class="inline">X-API-Key</code> y valide contra una tabla de <code class="inline">api_keys</code>.</li>
+                    <li><strong>Rate limiting:</strong> Usá <code class="inline">app.state</code> para guardar un contador de requests por IP y bloqueá después de 100/min.</li>
+                    <li><strong>Testeo:</strong> Escribí tests con <code class="inline">pytest-asyncio</code> y una BD de prueba. Mockeá el pool para no depender de PostgreSQL real.</li>
+                    <li><strong>Migración de librería:</strong> Convertí un endpoint que use <code class="inline">psycopg2</code> a <code class="inline">asyncpg</code>. ¿Qué cambió? ¿Qué ganaste?</li>
+                </ol>
+
+                <h3>📚 Para seguir aprendiendo</h3>
+                <ul>
+                    <li><a href="https://fastapi.tiangolo.com/tutorial/dependencies/" target="_blank">FastAPI — Dependencies (documentación oficial)</a></li>
+                    <li><a href="https://magicstack.github.io/asyncpg/current/" target="_blank">asyncpg — Documentación oficial</a></li>
+                    <li><a href="https://fastapi.tiangolo.com/advanced/events/#lifespan" target="_blank">FastAPI — Lifespan Events</a></li>
+                    <li><a href="https://docs.python.org/3/library/asyncio.html" target="_blank">Python — Documentación de asyncio</a></li>
+                </ul>
+
+                <div class="analogy green" style="text-align:center; font-size:1.1rem;">
+                    <strong>🎓 Llegaste al final. Ahora tenés las bases para construir backends profesionales.</strong>
+                    El resto es práctica, práctica y más práctica. ¡Manos al código!
+                </div>
+            </div>
+
+        </div><!-- .container -->
+    </main>
+
+    <script>
+        const nav = document.getElementById('sidebarNav');
+        const btn = document.getElementById('navToggle');
+
+        function toggleNav() {
+            const collapsed = nav.classList.toggle('collapsed');
+            btn.classList.toggle('shifted', !collapsed);
+            btn.textContent = collapsed ? '☰' : '✕';
+            localStorage.setItem('sidebar-collapsed', collapsed);
+        }
+
+        btn.addEventListener('click', toggleNav);
+
+        // Restaurar estado guardado
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            nav.classList.add('collapsed');
+            btn.textContent = '☰';
+        } else {
+            btn.classList.add('shifted');
+            btn.textContent = '✕';
+        }
+    </script>
+
+</body>
+</html>
