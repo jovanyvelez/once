@@ -1,0 +1,2850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritmos con Menús en C# · Clase Interactiva</title>
+<meta name="description" content="Clase interactiva de programación estructurada con menús en C# para adolescentes">
+
+<!-- Fontsource: Inter + JetBrains Mono -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/index.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/800.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.18/index.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.18/500.css">
+
+<!-- Prism.js Theme: One Dark -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-dark.min.css">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-elev: #0f1420;
+    --surface: #131824;
+    --surface-2: #1a2030;
+    --surface-3: #222939;
+    --border: #2a3244;
+    --border-soft: #1e2535;
+    --text: #e4e7eb;
+    --text-muted: #8b92a5;
+    --text-dim: #6b7185;
+    --primary: #6366f1;
+    --primary-glow: #818cf8;
+    --cyan: #06b6d4;
+    --emerald: #10b981;
+    --amber: #f59e0b;
+    --rose: #f43f5e;
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --code-bg: #0d1117;
+    --gradient-1: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    --gradient-2: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+    --gradient-3: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 40px rgba(99,102,241,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 16px;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(99,102,241,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(6,182,212,0.06) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  code, pre, kbd {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.9em;
+  }
+
+  ::selection { background: var(--primary); color: white; }
+
+  /* Progress Bar */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--gradient-1);
+    z-index: 1000;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px var(--primary);
+  }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1600px;
+    margin: 0 auto;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  @media (max-width: 1024px) {
+    .layout { grid-template-columns: 1fr; padding: 1rem; }
+    .sidebar { position: static !important; height: auto !important; }
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+    height: calc(100vh - 4rem);
+    overflow-y: auto;
+    padding-right: 1rem;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .sidebar-logo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--gradient-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+  }
+
+  .sidebar-logo-text {
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .sidebar-logo-text small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .sidebar-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    font-weight: 700;
+    margin: 1rem 0.75rem 0.5rem;
+  }
+
+  .sidebar-nav {
+    list-style: none;
+  }
+
+  .sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+  }
+
+  .sidebar-nav li a:hover {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .sidebar-nav li a.active {
+    background: var(--surface);
+    color: var(--primary-glow);
+    border-left-color: var(--primary);
+  }
+
+  .sidebar-nav .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav li a.active .nav-dot { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+  .sidebar-nav li a:hover .nav-dot { background: var(--text-muted); }
+
+  .sidebar-meta {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.8rem;
+  }
+
+  .sidebar-meta-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    color: var(--text-muted);
+  }
+
+  .sidebar-meta-item strong { color: var(--text); font-weight: 600; }
+
+  /* Main content */
+  .main {
+    min-width: 0;
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+    background: var(--gradient-1);
+    filter: blur(80px);
+  }
+
+  .hero-content {
+    position: relative;
+    padding: 4rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .hero-content { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: var(--primary-glow);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .hero-eyebrow .pulse {
+    width: 8px;
+    height: 8px;
+    background: var(--emerald);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--emerald);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero h1 .gradient-text {
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 2rem;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    padding: 0.4rem 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .hero-visual {
+    width: 280px;
+    height: 200px;
+    border-radius: 16px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .hero-visual-header {
+    height: 28px;
+    background: #1a1f2e;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-visual-header span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .hero-visual-header span:nth-child(1) { background: #ff5f56; }
+  .hero-visual-header span:nth-child(2) { background: #ffbd2e; }
+  .hero-visual-header span:nth-child(3) { background: #27c93f; }
+
+  .hero-visual-body {
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: #a9b4c4;
+  }
+
+  .hero-visual-body .kw { color: #c678dd; }
+  .hero-visual-body .fn { color: #61afef; }
+  .hero-visual-body .str { color: #98c379; }
+  .hero-visual-body .cm { color: #5c6370; font-style: italic; }
+
+  /* Sections */
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-number {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--gradient-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 20px rgba(6,182,212,0.3);
+  }
+
+  .section-title-group h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .section-title-group .section-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .section-meta {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    padding: 0.35rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* Heading levels */
+  h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  h3 .concept-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    color: var(--text);
+  }
+
+  p { margin-bottom: 1rem; color: var(--text); }
+
+  /* Concept cards */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gradient-2);
+  }
+
+  .concept-card.purple::before { background: var(--gradient-1); }
+  .concept-card.green::before { background: var(--gradient-3); }
+
+  /* Flow diagrams */
+  .flow-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+
+  .flow-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .flow-title::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  .flow-steps {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .flow-step:hover {
+    background: var(--surface-3);
+    border-color: var(--primary);
+    transform: translateX(4px);
+  }
+
+  .flow-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--gradient-2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .flow-step-text {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .flow-step-arrow {
+    color: var(--text-dim);
+    font-size: 1.2rem;
+  }
+
+  .flow-branch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+  }
+
+  .flow-branch-item {
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid;
+    font-size: 0.9rem;
+  }
+
+  .flow-branch-yes {
+    background: rgba(16,185,129,0.1);
+    border-color: rgba(16,185,129,0.3);
+    color: var(--emerald);
+  }
+
+  .flow-branch-no {
+    background: rgba(99,102,241,0.1);
+    border-color: rgba(99,102,241,0.3);
+    color: var(--primary-glow);
+  }
+
+  /* Code blocks */
+  .code-wrapper {
+    position: relative;
+    margin: 1.5rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: #161b22;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .code-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+  }
+
+  .code-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .code-dots span {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f56; }
+  .code-dots span:nth-child(2) { background: #ffbd2e; }
+  .code-dots span:nth-child(3) { background: #27c93f; }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .copy-btn:hover {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--primary);
+  }
+
+  .copy-btn.copied {
+    color: var(--emerald);
+    border-color: var(--emerald);
+  }
+
+  pre[class*="language-"] {
+    margin: 0 !important;
+    padding: 1.25rem !important;
+    background: transparent !important;
+    font-size: 0.85rem !important;
+    line-height: 1.6 !important;
+    overflow-x: auto;
+  }
+
+  pre[class*="language-"]::-webkit-scrollbar { height: 8px; }
+  pre[class*="language-"]::-webkit-scrollbar-track { background: var(--surface); }
+  pre[class*="language-"]::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Inline code */
+  p code, li code, td code {
+    background: var(--surface-2);
+    color: var(--primary-glow);
+    padding: 0.15rem 0.45rem;
+    border-radius: 5px;
+    font-size: 0.85em;
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  /* Comparison grid */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+
+  .compare-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid;
+  }
+
+  .compare-card.bad {
+    background: rgba(244,63,94,0.05);
+    border-color: rgba(244,63,94,0.3);
+  }
+
+  .compare-card.good {
+    background: rgba(16,185,129,0.05);
+    border-color: rgba(16,185,129,0.3);
+  }
+
+  .compare-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .compare-card.bad .compare-label { color: var(--rose); }
+  .compare-card.good .compare-label { color: var(--emerald); }
+
+  /* Tables */
+  .table-wrapper {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+
+  th {
+    background: var(--surface-2);
+    padding: 0.9rem 1rem;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface-2); }
+
+  td code {
+    font-size: 0.82rem;
+  }
+
+  /* Callouts */
+  .callout {
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    border: 1px solid;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .callout-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+  }
+
+  .callout-content { flex: 1; }
+  .callout-title {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+  }
+  .callout-body { color: var(--text-muted); font-size: 0.92rem; }
+
+  .callout.tip {
+    background: rgba(99,102,241,0.08);
+    border-color: rgba(99,102,241,0.3);
+  }
+  .callout.tip .callout-icon { background: rgba(99,102,241,0.2); color: var(--primary-glow); }
+  .callout.tip .callout-title { color: var(--primary-glow); }
+
+  .callout.warning {
+    background: rgba(245,158,11,0.08);
+    border-color: rgba(245,158,11,0.3);
+  }
+  .callout.warning .callout-icon { background: rgba(245,158,11,0.2); color: var(--amber); }
+  .callout.warning .callout-title { color: var(--amber); }
+
+  .callout.success {
+    background: rgba(16,185,129,0.08);
+    border-color: rgba(16,185,129,0.3);
+  }
+  .callout.success .callout-icon { background: rgba(16,185,129,0.2); color: var(--emerald); }
+  .callout.success .callout-title { color: var(--emerald); }
+
+  .callout.question {
+    background: rgba(168,85,247,0.08);
+    border-color: rgba(168,85,247,0.3);
+  }
+  .callout.question .callout-icon { background: rgba(168,85,247,0.2); color: var(--purple); }
+  .callout.question .callout-title { color: var(--purple); }
+
+  /* Exercises */
+  .exercise {
+    background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.08) 100%);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .exercise::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -50%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .exercise-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    background: var(--gradient-1);
+    color: white;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+  }
+
+  .exercise-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+
+  .exercise-body {
+    color: var(--text);
+    position: relative;
+  }
+
+  .exercise-body ul {
+    margin: 0.75rem 0 0.75rem 1.5rem;
+  }
+
+  .exercise-body li {
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+  }
+
+  /* Accordion (hints) */
+  .hint {
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .hint summary {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .hint summary:hover { background: var(--surface-2); }
+
+  .hint summary::-webkit-details-marker { display: none; }
+
+  .hint summary::before {
+    content: '💡';
+    font-size: 1.2rem;
+  }
+
+  .hint summary::after {
+    content: '＋';
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    transition: transform 0.3s;
+  }
+
+  .hint[open] summary::after {
+    content: '−';
+  }
+
+  .hint-body {
+    padding: 0 1.25rem 1.25rem;
+    color: var(--text-muted);
+  }
+
+  /* ASCII art blocks */
+  .ascii-art {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    color: var(--text);
+    white-space: pre;
+    margin: 1.5rem 0;
+  }
+
+  .ascii-art .hl { color: var(--primary-glow); font-weight: 700; }
+
+  /* Challenge final */
+  .challenge-card {
+    background: linear-gradient(135deg, #1a0e2e 0%, #2d1b4e 100%);
+    border: 1px solid rgba(168,85,247,0.4);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(168,85,247,0.2);
+  }
+
+  .challenge-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gradient-1);
+  }
+
+  .challenge-card h3 {
+    margin-top: 0;
+  }
+
+  /* Lists */
+  ul, ol {
+    margin: 0.75rem 0 0.75rem 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+  }
+
+  li::marker {
+    color: var(--primary);
+  }
+
+  /* Level progress */
+  .levels {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .level {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .level:hover { border-color: var(--primary); transform: translateX(4px); }
+
+  .level-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: 90px;
+    text-align: center;
+  }
+
+  .level.basic .level-badge { background: rgba(16,185,129,0.2); color: var(--emerald); }
+  .level.inter .level-badge { background: rgba(6,182,212,0.2); color: var(--cyan); }
+  .level.advanced .level-badge { background: rgba(168,85,247,0.2); color: var(--purple); }
+
+  .level-text { flex: 1; font-size: 0.9rem; }
+  .level-points { font-weight: 700; color: var(--text-muted); font-size: 0.85rem; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+    font-size: 0.85rem;
+  }
+
+  footer .footer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Animations */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .section-meta { margin-left: 0; margin-top: 0.5rem; }
+    .section-header { flex-wrap: wrap; }
+    .hero-visual { display: none; }
+    .flow-branch { grid-template-columns: 1fr; }
+    body { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">C#</div>
+      <div class="sidebar-logo-text">
+        Menús en C#
+        <small>Clase Interactiva</small>
+      </div>
+    </div>
+
+    <div class="sidebar-section-title">Contenido</div>
+    <ul class="sidebar-nav" id="sidebarNav">
+      <li><a href="#intro"><span class="nav-dot"></span>Introducción</a></li>
+      <li><a href="#bloque1"><span class="nav-dot"></span>Bloque 1 · Fundamentos</a></li>
+      <li><a href="#bloque2"><span class="nav-dot"></span>Bloque 2 · Funciones Avanzadas</a></li>
+      <li><a href="#bloque3"><span class="nav-dot"></span>Bloque 3 · Ciclos y Validación</a></li>
+      <li><a href="#bloque4"><span class="nav-dot"></span>Bloque 4 · Proyecto Integrador</a></li>
+      <li><a href="#reto"><span class="nav-dot"></span>🏆 Reto Final</a></li>
+      <li><a href="#referencia"><span class="nav-dot"></span>Referencia Rápida</a></li>
+    </ul>
+
+    <div class="sidebar-meta">
+      <div class="sidebar-meta-item"><span>Duración</span><strong>3.5 h</strong></div>
+      <div class="sidebar-meta-item"><span>Nivel</span><strong>Intermedio</strong></div>
+      <div class="sidebar-meta-item"><span>Lenguaje</span><strong>C#</strong></div>
+      <div class="sidebar-meta-item"><span>Ejercicios</span><strong>4 retos</strong></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div>
+          <div class="hero-eyebrow"><span class="pulse"></span> Programación Estructurada</div>
+          <h1>
+            Algoritmos con<br>
+            <span class="gradient-text">Menús en C#</span>
+          </h1>
+          <p class="hero-subtitle">
+            Aprende a construir programas interactivos organizando opciones con claridad, separando responsabilidades y validando entradas como un programador profesional.
+          </p>
+          <div class="hero-badges">
+            <span class="badge">🕒 3.5 horas</span>
+            <span class="badge">🎯 Nivel intermedio</span>
+            <span class="badge">💻 Con ejemplos completos</span>
+            <span class="badge">🏆 Reto final</span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-visual-header">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="hero-visual-body">
+<span class="cm">// Mi primer menú</span>
+<span class="kw">do</span> {
+  <span class="fn">MostrarMenu</span>();
+  opcion = <span class="fn">Console</span>.<span class="fn">ReadLine</span>();
+  <span class="kw">switch</span>(opcion) {
+    <span class="kw">case</span> <span class="str">"1"</span>: <span class="fn">Saludar</span>(); <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="str">"0"</span>: <span class="fn">Salir</span>();  <span class="kw">break</span>;
+  }
+} <span class="kw">while</span>(opcion != <span class="str">"0"</span>);
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTRODUCCIÓN -->
+    <section id="intro" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">📘</div>
+        <div class="section-title-group">
+          <h2>Introducción</h2>
+          <div class="section-subtitle">¿Qué es un menú en programación?</div>
+        </div>
+      </div>
+
+      <p>
+        Un <strong>menú funcional</strong> es una herramienta que organiza las opciones de un programa de forma clara, permitiendo que el usuario elija qué hacer en cada momento. Es como el menú de una aplicación, pero construido con código.
+      </p>
+
+      <div class="ascii-art">
+<span class="hl">╔══════════════════════════╗</span>
+<span class="hl">║</span>     MENÚ PRINCIPAL       <span class="hl">║</span>
+<span class="hl">╠══════════════════════════╣</span>
+<span class="hl">║</span>  1. Opción A             <span class="hl">║</span>
+<span class="hl">║</span>  2. Opción B             <span class="hl">║</span>
+<span class="hl">║</span>  3. Opción C             <span class="hl">║</span>
+<span class="hl">║</span>  0. Salir                <span class="hl">║</span>
+<span class="hl">╚══════════════════════════╝</span></div>
+
+      <h3><span class="concept-icon">🧩</span> Las tres partes de todo menú</h3>
+      <p>Todo menú bien construido sigue la misma estructura interna:</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Parte</th>
+              <th>¿Qué hace?</th>
+              <th>¿Cómo se construye?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Mostrar</strong></td>
+              <td>Imprime las opciones en pantalla</td>
+              <td><code>Console.WriteLine</code></td>
+            </tr>
+            <tr>
+              <td><strong>2. Capturar</strong></td>
+              <td>Lee la elección del usuario</td>
+              <td><code>Console.ReadLine</code></td>
+            </tr>
+            <tr>
+              <td><strong>3. Ejecutar</strong></td>
+              <td>Llama a la función correcta según la opción</td>
+              <td><code>switch</code> o <code>if/else</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOQUE 1 -->
+    <section id="bloque1" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">🟢</div>
+        <div class="section-title-group">
+          <h2>Bloque 1 — Fundamentos del Menú</h2>
+          <div class="section-subtitle">Tu primer programa interactivo</div>
+        </div>
+        <div class="section-meta">
+          <span class="meta-pill">⏱️ 45 min</span>
+          <span class="meta-pill">📚 2 conceptos</span>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">🔄</span> Concepto 1.1 — El <code>do...while</code> como motor del menú</h3>
+      <p>El ciclo <code>do...while</code> es ideal para menús porque ejecuta el menú <strong>al menos una vez</strong> antes de preguntar si debe repetirse.</p>
+
+      <div class="flow-diagram">
+        <div class="flow-title">Flujo do...while</div>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-text">Mostrar el menú en pantalla</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-text">Leer la opción elegida por el usuario</div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-text">Ejecutar la acción correspondiente</div>
+          </div>
+        </div>
+        <div class="flow-branch">
+          <div class="flow-branch-item flow-branch-no">
+            <strong>¿Opción ≠ salir?</strong><br>
+            🔁 Volver al paso 1
+          </div>
+          <div class="flow-branch-item flow-branch-yes">
+            <strong>¿Opción = salir?</strong><br>
+            ✅ Terminar el programa
+          </div>
+        </div>
+      </div>
+
+      <h4>📝 Ejemplo 1 — El menú más simple</h4>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>MenuSimple.cs</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>using System;
+
+class MenuSimple
+{
+    static void Main()
+    {
+        string opcion;
+
+        do
+        {
+            // ── MOSTRAR ──────────────────────────────
+            Console.Clear();
+            Console.WriteLine("╔══════════════════════╗");
+            Console.WriteLine("║    MI PRIMER MENÚ    ║");
+            Console.WriteLine("╠══════════════════════╣");
+            Console.WriteLine("║  1. Saludar          ║");
+            Console.WriteLine("║  2. Despedirse       ║");
+            Console.WriteLine("║  0. Salir            ║");
+            Console.WriteLine("╚══════════════════════╝");
+            Console.Write("Elige una opción: ");
+
+            // ── CAPTURAR ─────────────────────────────
+            opcion = Console.ReadLine();
+
+            // ── EJECUTAR ─────────────────────────────
+            switch (opcion)
+            {
+                case "1":
+                    Console.WriteLine("\n👋 ¡Hola, mundo!");
+                    break;
+                case "2":
+                    Console.WriteLine("\n👋 ¡Hasta luego!");
+                    break;
+                case "0":
+                    Console.WriteLine("\n🚪 Cerrando programa...");
+                    break;
+                default:
+                    Console.WriteLine("\n⚠️  Opción no válida.");
+                    break;
+            }
+
+            if (opcion != "0")
+            {
+                Console.Write("\nPresiona ENTER para continuar...");
+                Console.ReadLine();
+            }
+
+        } while (opcion != "0");
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout question">
+        <div class="callout-icon">🧠</div>
+        <div class="callout-content">
+          <div class="callout-title">Preguntas de reflexión</div>
+          <div class="callout-body">
+            <ul>
+              <li>¿Por qué se usa <code>Console.Clear()</code> al inicio del ciclo?</li>
+              <li>¿Qué pasa si el usuario escribe una letra en lugar de un número?</li>
+              <li>¿Por qué el ciclo se repite mientras <code>opcion != "0"</code>?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">🧱</span> Concepto 1.2 — Separar responsabilidades con funciones</h3>
+      <p>
+        Un error muy común es poner todo el código dentro del <code>Main</code>. Esto hace el programa difícil de leer y de corregir. La solución es usar <strong>funciones</strong>.
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card bad">
+          <div class="compare-label">❌ Sin funciones</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
+            Main()<br>
+            &nbsp;&nbsp;mostrar menú...<br>
+            &nbsp;&nbsp;leer opción...<br>
+            &nbsp;&nbsp;if opcion == 1<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Console.Write...<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Console.Write...<br>
+            &nbsp;&nbsp;if opcion == 2<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;...cien líneas...
+          </div>
+        </div>
+        <div class="compare-card good">
+          <div class="compare-label">✅ Con funciones</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
+            Main()<br>
+            &nbsp;&nbsp;MostrarMenu()<br>
+            &nbsp;&nbsp;LeerOpcion()<br>
+            &nbsp;&nbsp;EjecutarOpcion()<br>
+            <br>
+            &nbsp;&nbsp;Funcion1()<br>
+            &nbsp;&nbsp;Funcion2()<br>
+            &nbsp;&nbsp;Funcion3()
+          </div>
+        </div>
+      </div>
+
+      <h4>📝 Ejemplo 2 — Menú con funciones separadas</h4>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>MenuConFunciones.cs</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>using System;
+
+class MenuConFunciones
+{
+    // ════════════════════════════════════════════
+    //  SECCIÓN 1: FUNCIÓN PRINCIPAL
+    // ════════════════════════════════════════════
+    static void Main()
+    {
+        string opcion;
+
+        do
+        {
+            MostrarMenu();
+            opcion = Console.ReadLine();
+            EjecutarOpcion(opcion);
+        } while (opcion != "0");
+    }
+
+    // ════════════════════════════════════════════
+    //  SECCIÓN 2: FUNCIONES DE MENÚ
+    // ════════════════════════════════════════════
+    static void MostrarMenu()
+    {
+        Console.Clear();
+        Console.WriteLine("══════════════════════════");
+        Console.WriteLine("       CALCULADORA        ");
+        Console.WriteLine("══════════════════════════");
+        Console.WriteLine("  1. Sumar dos números");
+        Console.WriteLine("  2. Restar dos números");
+        Console.WriteLine("  3. Multiplicar");
+        Console.WriteLine("  0. Salir");
+        Console.WriteLine("══════════════════════════");
+        Console.Write("  Opción: ");
+    }
+
+    static void EjecutarOpcion(string opcion)
+    {
+        switch (opcion)
+        {
+            case "1": Sumar();       break;
+            case "2": Restar();      break;
+            case "3": Multiplicar(); break;
+            case "0": MensajeSalida(); break;
+            default:  MensajeError();  break;
+        }
+        if (opcion != "0") Pausa();
+    }
+
+    // ════════════════════════════════════════════
+    //  SECCIÓN 3: FUNCIONES DE LÓGICA
+    // ════════════════════════════════════════════
+    static void Sumar()
+    {
+        Console.Write("\nIngresa el primer número: ");
+        double a = double.Parse(Console.ReadLine());
+
+        Console.Write("Ingresa el segundo número: ");
+        double b = double.Parse(Console.ReadLine());
+
+        Console.WriteLine($"\n✅ Resultado: {a} + {b} = {a + b}");
+    }
+
+    static void Restar()
+    {
+        Console.Write("\nIngresa el primer número: ");
+        double a = double.Parse(Console.ReadLine());
+
+        Console.Write("Ingresa el segundo número: ");
+        double b = double.Parse(Console.ReadLine());
+
+        Console.WriteLine($"\n✅ Resultado: {a} - {b} = {a - b}");
+    }
+
+    static void Multiplicar()
+    {
+        Console.Write("\nIngresa el primer número: ");
+        double a = double.Parse(Console.ReadLine());
+
+        Console.Write("Ingresa el segundo número: ");
+        double b = double.Parse(Console.ReadLine());
+
+        Console.WriteLine($"\n✅ Resultado: {a} × {b} = {a * b}");
+    }
+
+    // ════════════════════════════════════════════
+    //  SECCIÓN 4: FUNCIONES DE UTILIDAD
+    // ════════════════════════════════════════════
+    static void Pausa()
+    {
+        Console.Write("\nPresiona ENTER para continuar...");
+        Console.ReadLine();
+    }
+
+    static void MensajeSalida()
+    {
+        Console.WriteLine("\n👋 ¡Hasta pronto!");
+    }
+
+    static void MensajeError()
+    {
+        Console.WriteLine("\n⚠️  Opción no válida. Intenta de nuevo.");
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout question">
+        <div class="callout-icon">🧠</div>
+        <div class="callout-content">
+          <div class="callout-title">Pregunta de reflexión</div>
+          <div class="callout-body">
+            ¿Qué pasaría si el usuario escribe "abc" cuando se espera un número? ¿Cómo mejorarías la función <code>Sumar()</code> para evitar un error de programa?
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-badge">💪 Ejercicio 1.1 · Tu turno</div>
+        <div class="exercise-title">Agrega la división a la calculadora</div>
+        <div class="exercise-body">
+          Extiende el Ejemplo 2 con una nueva opción:
+          <ul>
+            <li>Aparecerá en el menú como opción <code>4</code>.</li>
+            <li>Debes crear una función <code>Dividir()</code>.</li>
+            <li>Si el segundo número es <code>0</code>, muestra un mensaje de error en lugar de dividir.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOQUE 2 -->
+    <section id="bloque2" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">🔵</div>
+        <div class="section-title-group">
+          <h2>Bloque 2 — Menús con Funciones Avanzadas</h2>
+          <div class="section-subtitle">Retornos, parámetros y submenús</div>
+        </div>
+        <div class="section-meta">
+          <span class="meta-pill">⏱️ 60 min</span>
+          <span class="meta-pill">📚 3 conceptos</span>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">↩️</span> Concepto 2.1 — Funciones que retornan valores</h3>
+      <p>Hasta ahora, nuestras funciones hacen cosas pero no devuelven resultados. Las funciones con <code>return</code> son más poderosas porque pueden usarse dentro de cálculos o para tomar decisiones.</p>
+
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Void vs Return</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>// Función que NO retorna (void) — solo hace algo
+static void Saludar()
+{
+    Console.WriteLine("Hola");
+}
+
+// Función que SÍ retorna — produce un resultado
+static double Calcular(double a, double b)
+{
+    return a + b;   // ← devuelve el valor
+}</code></pre>
+      </div>
+
+      <h3><span class="concept-icon">📥</span> Concepto 2.2 — Funciones con parámetros</h3>
+      <p>Los <strong>parámetros</strong> son los datos que le enviamos a una función para que trabaje con ellos.</p>
+
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Parámetros y argumentos</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>//          parámetros (declaración)
+//          ↓       ↓
+static double Sumar(double a, double b)
+{
+    return a + b;    // ← retorno
+}
+
+// Forma de llamarla:
+double resultado = Sumar(5.0, 3.0);
+//                       ↑     ↑
+//               argumentos (valores reales)</code></pre>
+      </div>
+
+      <h4>📝 Ejemplo 3 — Sistema de notas con funciones que retornan</h4>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>SistemaNotas.cs</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>using System;
+
+class SistemaNotas
+{
+    static void Main()
+    {
+        string opcion;
+
+        do
+        {
+            MostrarMenu();
+            opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1": FlujoCalcularPromedio(); break;
+                case "2": FlujoClasificarNota();   break;
+                case "3": FlujoEstaAprobado();     break;
+                case "0": Console.WriteLine("\n👋 ¡Adiós!"); break;
+                default:  Console.WriteLine("\n⚠️  Opción inválida."); break;
+            }
+
+            if (opcion != "0") Pausa();
+
+        } while (opcion != "0");
+    }
+
+    // ─── MENÚ ─────────────────────────────────────────
+    static void MostrarMenu()
+    {
+        Console.Clear();
+        Console.WriteLine("┌────────────────────────────┐");
+        Console.WriteLine("│     SISTEMA DE NOTAS       │");
+        Console.WriteLine("├────────────────────────────┤");
+        Console.WriteLine("│  1. Calcular promedio      │");
+        Console.WriteLine("│  2. Clasificar una nota    │");
+        Console.WriteLine("│  3. ¿Está aprobado?        │");
+        Console.WriteLine("│  0. Salir                  │");
+        Console.WriteLine("└────────────────────────────┘");
+        Console.Write("  Opción: ");
+    }
+
+    // ─── FLUJOS (conectan menú con funciones lógicas) ─
+    static void FlujoCalcularPromedio()
+    {
+        Console.Write("\n¿Cuántas notas vas a ingresar? ");
+        int cantidad = int.Parse(Console.ReadLine());
+        double[] notas = new double[cantidad];
+
+        for (int i = 0; i < cantidad; i++)
+        {
+            Console.Write($"  Nota {i + 1}: ");
+            notas[i] = double.Parse(Console.ReadLine());
+        }
+
+        double promedio = CalcularPromedio(notas);
+        Console.WriteLine($"\n📊 El promedio es: {promedio:F2}");
+    }
+
+    static void FlujoClasificarNota()
+    {
+        Console.Write("\nIngresa una nota (0-100): ");
+        double nota = double.Parse(Console.ReadLine());
+        string clasificacion = ClasificarNota(nota);
+        Console.WriteLine($"\n🏅 Clasificación: {clasificacion}");
+    }
+
+    static void FlujoEstaAprobado()
+    {
+        Console.Write("\nIngresa la nota final: ");
+        double nota = double.Parse(Console.ReadLine());
+        bool aprobado = EstaAprobado(nota);
+        string mensaje = aprobado ? "✅ APROBADO" : "❌ REPROBADO";
+        Console.WriteLine($"\nEstado: {mensaje}");
+    }
+
+    // ─── FUNCIONES LÓGICAS (retornan valores) ────────
+    static double CalcularPromedio(double[] notas)
+    {
+        double suma = 0;
+        foreach (double nota in notas) suma += nota;
+        return suma / notas.Length;
+    }
+
+    static string ClasificarNota(double nota)
+    {
+        if      (nota >= 90) return "⭐ Excelente";
+        else if (nota >= 75) return "👍 Bueno";
+        else if (nota >= 60) return "😐 Regular";
+        else                 return "😟 Insuficiente";
+    }
+
+    static bool EstaAprobado(double nota)
+    {
+        return nota >= 60;
+    }
+
+    static void Pausa()
+    {
+        Console.Write("\nPresiona ENTER para continuar...");
+        Console.ReadLine();
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <div class="callout-title">Observa los tres tipos de retorno</div>
+          <div class="callout-body">
+            <ul>
+              <li><code>CalcularPromedio</code> recibe un arreglo y devuelve un <code>double</code>.</li>
+              <li><code>ClasificarNota</code> recibe un <code>double</code> y devuelve un <code>string</code>.</li>
+              <li><code>EstaAprobado</code> recibe un <code>double</code> y devuelve un <code>bool</code>.</li>
+              <li>Los flujos son funciones intermedias que leen datos y luego llaman a las funciones lógicas.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">📂</span> Concepto 2.3 — Menús con submenús</h3>
+      <p>Un programa complejo puede tener <strong>menús dentro de menús</strong>. La clave es que cada submenú sea también una función.</p>
+
+      <div class="flow-diagram">
+        <div class="flow-title">Árbol de menús</div>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">🏠</div>
+            <div class="flow-step-text"><strong>MenúPrincipal</strong></div>
+          </div>
+          <div class="flow-step" style="margin-left: 2rem;">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-text">SubmenúEstudiantes → Agregar, Buscar, Volver</div>
+          </div>
+          <div class="flow-step" style="margin-left: 2rem;">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-text">SubmenúMaterias → Ver lista, Volver</div>
+          </div>
+          <div class="flow-step" style="margin-left: 2rem;">
+            <div class="flow-step-num">0</div>
+            <div class="flow-step-text">Salir del programa</div>
+          </div>
+        </div>
+      </div>
+
+      <h4>📝 Ejemplo 4 — Menú con submenú</h4>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>MenuConSubmenu.cs</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>using System;
+
+class MenuConSubmenu
+{
+    static void Main()
+    {
+        string opcion;
+
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("═══════════════════════════════");
+            Console.WriteLine("       MENÚ PRINCIPAL          ");
+            Console.WriteLine("═══════════════════════════════");
+            Console.WriteLine("  1. Módulo de Matemáticas");
+            Console.WriteLine("  2. Módulo de Texto");
+            Console.WriteLine("  0. Salir");
+            Console.WriteLine("═══════════════════════════════");
+            Console.Write("  Opción: ");
+            opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1": MenuMatematicas(); break;
+                case "2": MenuTexto();       break;
+                case "0": Console.WriteLine("\n👋 ¡Hasta luego!"); break;
+                default:  Console.WriteLine("⚠️ Opción inválida."); Pausa(); break;
+            }
+
+        } while (opcion != "0");
+    }
+
+    // ─── SUBMENÚ 1: Matemáticas ───────────────────
+    static void MenuMatematicas()
+    {
+        string opcion;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("  ┌─────────────────────────┐");
+            Console.WriteLine("  │   MÓDULO MATEMÁTICAS    │");
+            Console.WriteLine("  ├─────────────────────────┤");
+            Console.WriteLine("  │  1. Números pares/impares│");
+            Console.WriteLine("  │  2. Tabla de multiplicar │");
+            Console.WriteLine("  │  3. Factorial            │");
+            Console.WriteLine("  │  0. ← Volver             │");
+            Console.WriteLine("  └─────────────────────────┘");
+            Console.Write("  Opción: ");
+            opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1": MostrarParesImpares(); break;
+                case "2": MostrarTabla();        break;
+                case "3": MostrarFactorial();    break;
+                case "0": break;
+                default:  Console.WriteLine("⚠️ Inválido."); break;
+            }
+            if (opcion != "0") Pausa();
+        } while (opcion != "0");
+    }
+
+    // ─── SUBMENÚ 2: Texto ─────────────────────────
+    static void MenuTexto()
+    {
+        string opcion;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("  ┌─────────────────────────┐");
+            Console.WriteLine("  │      MÓDULO TEXTO       │");
+            Console.WriteLine("  ├─────────────────────────┤");
+            Console.WriteLine("  │  1. Mayúsculas/Minúsculas│");
+            Console.WriteLine("  │  2. Contar caracteres   │");
+            Console.WriteLine("  │  3. Invertir texto      │");
+            Console.WriteLine("  │  0. ← Volver            │");
+            Console.WriteLine("  └─────────────────────────┘");
+            Console.Write("  Opción: ");
+            opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1": CambiarMayusculas();  break;
+                case "2": ContarCaracteres();   break;
+                case "3": InvertirTexto();      break;
+                case "0": break;
+                default:  Console.WriteLine("⚠️ Inválido."); break;
+            }
+            if (opcion != "0") Pausa();
+        } while (opcion != "0");
+    }
+
+    // ─── FUNCIONES DE MATEMÁTICAS ─────────────────
+    static void MostrarParesImpares()
+    {
+        Console.Write("\nHasta qué número? ");
+        int n = int.Parse(Console.ReadLine());
+
+        Console.WriteLine("\nPares:");
+        for (int i = 2; i <= n; i += 2) Console.Write(i + " ");
+
+        Console.WriteLine("\nImpares:");
+        for (int i = 1; i <= n; i += 2) Console.Write(i + " ");
+        Console.WriteLine();
+    }
+
+    static void MostrarTabla()
+    {
+        Console.Write("\n¿Tabla del número? ");
+        int n = int.Parse(Console.ReadLine());
+        Console.WriteLine($"\n── Tabla del {n} ──");
+        for (int i = 1; i <= 10; i++)
+            Console.WriteLine($"  {n} × {i,2} = {n * i,3}");
+    }
+
+    static void MostrarFactorial()
+    {
+        Console.Write("\n¿Factorial de qué número? ");
+        int n = int.Parse(Console.ReadLine());
+        long resultado = Factorial(n);
+        Console.WriteLine($"\n  {n}! = {resultado}");
+    }
+
+    static long Factorial(int n)
+    {
+        if (n <= 1) return 1;
+        return n * Factorial(n - 1);   // función recursiva
+    }
+
+    // ─── FUNCIONES DE TEXTO ───────────────────────
+    static void CambiarMayusculas()
+    {
+        Console.Write("\nEscribe un texto: ");
+        string texto = Console.ReadLine();
+        Console.WriteLine($"\nMayúsculas: {texto.ToUpper()}");
+        Console.WriteLine($"Minúsculas: {texto.ToLower()}");
+    }
+
+    static void ContarCaracteres()
+    {
+        Console.Write("\nEscribe un texto: ");
+        string texto = Console.ReadLine();
+        Console.WriteLine($"\nTotal de caracteres (con espacios): {texto.Length}");
+        Console.WriteLine($"Total sin espacios: {texto.Replace(" ", "").Length}");
+    }
+
+    static void InvertirTexto()
+    {
+        Console.Write("\nEscribe un texto: ");
+        string texto = Console.ReadLine();
+        char[] caracteres = texto.ToCharArray();
+        Array.Reverse(caracteres);
+        string invertido = new string(caracteres);
+        Console.WriteLine($"\nTexto invertido: {invertido}");
+    }
+
+    static void Pausa()
+    {
+        Console.Write("\nPresiona ENTER para continuar...");
+        Console.ReadLine();
+    }
+}</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-badge">💪 Ejercicio 2.1 · Amplía el programa</div>
+        <div class="exercise-title">Detecta números primos</div>
+        <div class="exercise-body">
+          Agrega al Módulo de Matemáticas una opción <code>4</code> que calcule si un número es primo. La función <code>EsPrimo(int n)</code> debe retornar <code>bool</code>.
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOQUE 3 -->
+    <section id="bloque3" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">🟠</div>
+        <div class="section-title-group">
+          <h2>Bloque 3 — Ciclos, Condiciones y Menús</h2>
+          <div class="section-subtitle">Programas robustos que no se rompen</div>
+        </div>
+        <div class="section-meta">
+          <span class="meta-pill">⏱️ 50 min</span>
+          <span class="meta-pill">📚 2 conceptos</span>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">🛡️</span> Concepto 3.1 — Validación de entradas con ciclos</h3>
+      <p>Un programa robusto <strong>no debe caerse</strong> si el usuario escribe algo inesperado. Usa ciclos <code>while</code> para obligar al usuario a ingresar datos válidos.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card bad">
+          <div class="compare-label">❌ Sin validación</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.6; color: var(--text-muted);">
+            Console.Write("Número: ");<br>
+            int n = int.Parse(<br>
+            &nbsp;&nbsp;Console.ReadLine());<br>
+            <span style="color: var(--rose);">// 💥 Se rompe con "abc"</span>
+          </div>
+        </div>
+        <div class="compare-card good">
+          <div class="compare-label">✅ Con validación</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.6; color: var(--text-muted);">
+            int n;<br>
+            <span style="color: var(--cyan);">while</span>(!int.TryParse(<br>
+            &nbsp;&nbsp;Console.ReadLine(),<br>
+            &nbsp;&nbsp;<span style="color: var(--cyan);">out</span> n)) {<br>
+            &nbsp;&nbsp;<span style="color: var(--emerald);">// Sigue pidiendo</span><br>
+            }
+          </div>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">🎯</span> Concepto 3.2 — Validación con rango</h3>
+
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Validaciones reutilizables</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>// Lee un entero cualquiera, con reintentos
+static int LeerEntero(string mensaje)
+{
+    int numero;
+    bool valido;
+
+    do
+    {
+        Console.Write(mensaje);
+        valido = int.TryParse(Console.ReadLine(), out numero);
+        if (!valido)
+            Console.WriteLine("⚠️  Por favor, ingresa solo números enteros.");
+    } while (!valido);
+
+    return numero;
+}
+
+// Lee un entero dentro de un rango [minimo, maximo]
+static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
+{
+    int numero;
+    bool valido;
+
+    do
+    {
+        Console.Write(mensaje);
+        valido = int.TryParse(Console.ReadLine(), out numero);
+
+        if (!valido)
+            Console.WriteLine("⚠️  Debe ser un número.");
+        else if (numero < minimo || numero > maximo)
+        {
+            Console.WriteLine($"⚠️  Debe estar entre {minimo} y {maximo}.");
+            valido = false;
+        }
+    } while (!valido);
+
+    return numero;
+}</code></pre>
+      </div>
+
+      <h4>📝 Ejemplo 5 — Programa completo con validaciones</h4>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>ProgramaConValidaciones.cs</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>using System;
+
+class ProgramaConValidaciones
+{
+    static void Main()
+    {
+        int opcion;
+        do
+        {
+            MostrarMenu();
+            opcion = LeerEnteroEnRango("  Opción: ", 0, 3);
+
+            switch (opcion)
+            {
+                case 1: JuegoAdivinanza();       break;
+                case 2: ContadorPersonalizado(); break;
+                case 3: AnalisisNumeros();       break;
+                case 0: Console.WriteLine("\n👋 ¡Hasta luego!"); break;
+            }
+            if (opcion != 0) Pausa();
+        } while (opcion != 0);
+    }
+
+    static void MostrarMenu()
+    {
+        Console.Clear();
+        Console.WriteLine("╔══════════════════════════════╗");
+        Console.WriteLine("║    JUEGOS Y HERRAMIENTAS     ║");
+        Console.WriteLine("╠══════════════════════════════╣");
+        Console.WriteLine("║  1. Juego: Adivina el número ║");
+        Console.WriteLine("║  2. Contador personalizado   ║");
+        Console.WriteLine("║  3. Análisis de números      ║");
+        Console.WriteLine("║  0. Salir                    ║");
+        Console.WriteLine("╚══════════════════════════════╝");
+    }
+
+    static void JuegoAdivinanza()
+    {
+        Random rnd = new Random();
+        int secreto = rnd.Next(1, 101);
+        int intentos = 0, maximo = 7, intento;
+
+        Console.WriteLine($"\n🎮 Adivina el número (1-100). Tienes {maximo} intentos.");
+
+        do
+        {
+            intento = LeerEnteroEnRango($"\n  Intento {intentos + 1}/{maximo}: ", 1, 100);
+            intentos++;
+
+            if      (intento < secreto) Console.WriteLine("  📈 Más alto");
+            else if (intento > secreto) Console.WriteLine("  📉 Más bajo");
+            else                        Console.WriteLine($"\n  🎉 ¡Correcto en {intentos} intento(s)!");
+        } while (intento != secreto && intentos < maximo);
+
+        if (intento != secreto)
+            Console.WriteLine($"\n  😢 Se acabaron los intentos. Era el {secreto}.");
+    }
+
+    static void ContadorPersonalizado()
+    {
+        Console.WriteLine("\n📟 CONTADOR PERSONALIZADO");
+        int inicio = LeerEntero("\n  Número de inicio: ");
+        int fin    = LeerEntero("  Número de fin:     ");
+        int paso   = LeerEntero("  Paso (incremento): ");
+
+        if (paso == 0)
+        {
+            Console.WriteLine("⚠️  El paso no puede ser cero.");
+            return;
+        }
+
+        Console.WriteLine("\n  Contando:");
+        Console.Write("   ");
+        if (paso > 0) {
+            for (int i = inicio; i <= fin; i += paso) Console.Write(i + " ");
+        } else {
+            for (int i = inicio; i >= fin; i += paso) Console.Write(i + " ");
+        }
+        Console.WriteLine();
+    }
+
+    static void AnalisisNumeros()
+    {
+        int cantidad = LeerEnteroEnRango("\n¿Cuántos números analizarás? (1-20): ", 1, 20);
+        int suma = 0, mayor = int.MinValue, menor = int.MaxValue, pares = 0, impares = 0;
+
+        for (int i = 1; i <= cantidad; i++)
+        {
+            int num = LeerEntero($"  Número {i}: ");
+            suma += num;
+            if (num > mayor) mayor = num;
+            if (num < menor) menor = num;
+            if (num % 2 == 0) pares++; else impares++;
+        }
+
+        Console.WriteLine("\n  ── RESULTADOS ──────────────");
+        Console.WriteLine($"  Suma:     {suma}");
+        Console.WriteLine($"  Promedio: {(double)suma / cantidad:F2}");
+        Console.WriteLine($"  Mayor:    {mayor}");
+        Console.WriteLine($"  Menor:    {menor}");
+        Console.WriteLine($"  Pares:    {pares}");
+        Console.WriteLine($"  Impares:  {impares}");
+    }
+
+    static int LeerEntero(string mensaje)
+    {
+        int numero;
+        while (true)
+        {
+            Console.Write(mensaje);
+            if (int.TryParse(Console.ReadLine(), out numero))
+                return numero;
+            Console.WriteLine("  ⚠️  Solo números enteros.");
+        }
+    }
+
+    static int LeerEnteroEnRango(string mensaje, int minimo, int maximo)
+    {
+        int numero;
+        while (true)
+        {
+            Console.Write(mensaje);
+            if (int.TryParse(Console.ReadLine(), out numero) &&
+                numero >= minimo && numero <= maximo)
+                return numero;
+            Console.WriteLine($"  ⚠️  Ingresa un número entre {minimo} y {maximo}.");
+        }
+    }
+
+    static void Pausa()
+    {
+        Console.Write("\nPresiona ENTER para continuar...");
+        Console.ReadLine();
+    }
+}</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="exercise-badge">💪 Ejercicio 3.1 · Integra todo</div>
+        <div class="exercise-title">Serie Fibonacci</div>
+        <div class="exercise-body">
+          Agrega al Ejemplo 5 una opción <code>4</code> llamada "Serie Fibonacci" que:
+          <ul>
+            <li>Pida al usuario cuántos términos quiere ver (entre 1 y 30).</li>
+            <li>Muestre la serie: <code>1, 1, 2, 3, 5, 8, 13, ...</code></li>
+            <li>Use una función <code>long Fibonacci(int posicion)</code> con recursión o con ciclo.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOQUE 4 -->
+    <section id="bloque4" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">🟣</div>
+        <div class="section-title-group">
+          <h2>Bloque 4 — Proyecto Integrador</h2>
+          <div class="section-subtitle">Sistema de Registro de Estudiantes</div>
+        </div>
+        <div class="section-meta">
+          <span class="meta-pill">⏱️ 40 min</span>
+          <span class="meta-pill">🎯 Proyecto completo</span>
+        </div>
+      </div>
+
+      <p>Este proyecto integra <strong>todo lo aprendido</strong>: menú principal, submenús, funciones, validaciones, ciclos y condiciones.</p>
+
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>SistemaEstudiantes.cs</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>using System;
+
+class SistemaEstudiantes
+{
+    // ════════════════════════════════════════════
+    //  DATOS GLOBALES (arreglos paralelos)
+    // ════════════════════════════════════════════
+    const int MAX = 20;
+    static string[] nombres   = new string[MAX];
+    static double[] promedios = new double[MAX];
+    static int totalEstudiantes = 0;
+
+    static void Main()
+    {
+        int opcion;
+        do
+        {
+            MostrarMenuPrincipal();
+            opcion = LeerEnteroEnRango("  Opción: ", 0, 4);
+
+            switch (opcion)
+            {
+                case 1: AgregarEstudiante();   break;
+                case 2: MostrarEstudiantes();  break;
+                case 3: MenuBusqueda();        break;
+                case 4: MostrarEstadisticas(); break;
+                case 0: Console.WriteLine("\n👋 Sistema cerrado."); break;
+            }
+            if (opcion != 0) Pausa();
+        } while (opcion != 0);
+    }
+
+    static void MostrarMenuPrincipal()
+    {
+        Console.Clear();
+        Console.WriteLine("╔═══════════════════════════════════╗");
+        Console.WriteLine("║    REGISTRO DE ESTUDIANTES v1.0   ║");
+        Console.WriteLine($"║         Registros: {totalEstudiantes,3}/{MAX}            ║");
+        Console.WriteLine("╠═══════════════════════════════════╣");
+        Console.WriteLine("║  1. Agregar estudiante            ║");
+        Console.WriteLine("║  2. Ver todos los estudiantes     ║");
+        Console.WriteLine("║  3. Buscar estudiante             ║");
+        Console.WriteLine("║  4. Ver estadísticas              ║");
+        Console.WriteLine("║  0. Salir                         ║");
+        Console.WriteLine("╚═══════════════════════════════════╝");
+    }
+
+    static void MenuBusqueda()
+    {
+        if (totalEstudiantes == 0)
+        {
+            Console.WriteLine("\n⚠️  No hay estudiantes registrados.");
+            return;
+        }
+
+        string opcion;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("  ┌────────────────────────┐");
+            Console.WriteLine("  │      BÚSQUEDA          │");
+            Console.WriteLine("  ├────────────────────────┤");
+            Console.WriteLine("  │  1. Por nombre         │");
+            Console.WriteLine("  │  2. Mejor promedio     │");
+            Console.WriteLine("  │  3. Por estado         │");
+            Console.WriteLine("  │  0. Volver             │");
+            Console.WriteLine("  └────────────────────────┘");
+            Console.Write("  Opción: ");
+            opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1": BuscarPorNombre();     break;
+                case "2": MostrarMejorPromedio(); break;
+                case "3": BuscarPorEstado();     break;
+                case "0": break;
+                default: Console.WriteLine("⚠️ Inválido."); break;
+            }
+            if (opcion != "0") Pausa();
+        } while (opcion != "0");
+    }
+
+    static void AgregarEstudiante()
+    {
+        if (totalEstudiantes >= MAX)
+        {
+            Console.WriteLine("\n⚠️  El sistema está lleno.");
+            return;
+        }
+
+        Console.WriteLine("\n── Agregar Estudiante ──────────────");
+        Console.Write("Nombre: ");
+        string nombre = Console.ReadLine().Trim();
+
+        if (string.IsNullOrEmpty(nombre))
+        {
+            Console.WriteLine("⚠️  El nombre no puede estar vacío.");
+            return;
+        }
+
+        double promedio = LeerDecimalEnRango("Promedio (0.0 - 100.0): ", 0.0, 100.0);
+        nombres[totalEstudiantes]   = nombre;
+        promedios[totalEstudiantes] = promedio;
+        totalEstudiantes++;
+        Console.WriteLine($"\n✅ '{nombre}' registrado con promedio {promedio:F1}");
+    }
+
+    static void MostrarEstudiantes()
+    {
+        Console.WriteLine("\n── Lista de Estudiantes ────────────");
+        if (totalEstudiantes == 0) { Console.WriteLine("  (Sin registros)"); return; }
+
+        Console.WriteLine($"  {"#",-4} {"Nombre",-20} {"Promedio",8}  Estado");
+        Console.WriteLine("   " + new string('─', 45));
+        for (int i = 0; i < totalEstudiantes; i++)
+        {
+            string estado = ObtenerEstado(promedios[i]);
+            Console.WriteLine($"  {i + 1,-4} {nombres[i],-20} {promedios[i],8:F1}  {estado}");
+        }
+    }
+
+    static void BuscarPorNombre()
+    {
+        Console.Write("\nNombre a buscar: ");
+        string busqueda = Console.ReadLine().ToLower();
+        bool encontrado = false;
+
+        for (int i = 0; i < totalEstudiantes; i++)
+        {
+            if (nombres[i].ToLower().Contains(busqueda))
+            {
+                Console.WriteLine($"\n  → {nombres[i]}: {promedios[i]:F1} ({ObtenerEstado(promedios[i])})");
+                encontrado = true;
+            }
+        }
+        if (!encontrado) Console.WriteLine("\n  No se encontraron coincidencias.");
+    }
+
+    static void MostrarMejorPromedio()
+    {
+        int indiceMejor = 0;
+        for (int i = 1; i < totalEstudiantes; i++)
+            if (promedios[i] > promedios[indiceMejor]) indiceMejor = i;
+        Console.WriteLine($"\n🏆 Mejor promedio: {nombres[indiceMejor]} con {promedios[indiceMejor]:F1}");
+    }
+
+    static void BuscarPorEstado()
+    {
+        Console.WriteLine("\n  Estados: 1=Excelente  2=Bueno  3=Regular  4=Insuficiente");
+        Console.Write("  ¿Qué estado buscar? ");
+        string estadoBuscar = ObtenerEstadoPorOpcion(Console.ReadLine());
+        bool encontrado = false;
+        Console.WriteLine($"\n  Estudiantes en estado '{estadoBuscar}':");
+
+        for (int i = 0; i < totalEstudiantes; i++)
+        {
+            if (ObtenerEstado(promedios[i]) == estadoBuscar)
+            {
+                Console.WriteLine($"  → {nombres[i]}: {promedios[i]:F1}");
+                encontrado = true;
+            }
+        }
+        if (!encontrado) Console.WriteLine("  (Ninguno)");
+    }
+
+    static void MostrarEstadisticas()
+    {
+        if (totalEstudiantes == 0) { Console.WriteLine("\n⚠️  No hay datos."); return; }
+
+        double suma = 0, mayor = promedios[0], menor = promedios[0];
+        int aprobados = 0;
+
+        for (int i = 0; i < totalEstudiantes; i++)
+        {
+            suma += promedios[i];
+            if (promedios[i] > mayor) mayor = promedios[i];
+            if (promedios[i] < menor) menor = promedios[i];
+            if (promedios[i] >= 60) aprobados++;
+        }
+
+        double promGeneral = suma / totalEstudiantes;
+        Console.WriteLine("\n── Estadísticas del Grupo ──────────");
+        Console.WriteLine($"  Total estudiantes:  {totalEstudiantes}");
+        Console.WriteLine($"  Promedio general:   {promGeneral:F2}");
+        Console.WriteLine($"  Mayor promedio:     {mayor:F1}");
+        Console.WriteLine($"  Menor promedio:     {menor:F1}");
+        Console.WriteLine($"  Aprobados:          {aprobados} ({(double)aprobados / totalEstudiantes * 100:F0}%)");
+        Console.WriteLine($"  Reprobados:         {totalEstudiantes - aprobados}");
+    }
+
+    // ════════════════════════════════════════════
+    //  FUNCIONES DE APOYO
+    // ════════════════════════════════════════════
+    static string ObtenerEstado(double promedio)
+    {
+        if      (promedio >= 90) return "Excelente";
+        else if (promedio >= 75) return "Bueno";
+        else if (promedio >= 60) return "Regular";
+        else                     return "Insuficiente";
+    }
+
+    static string ObtenerEstadoPorOpcion(string op)
+    {
+        switch (op)
+        {
+            case "1": return "Excelente";
+            case "2": return "Bueno";
+            case "3": return "Regular";
+            case "4": return "Insuficiente";
+            default:  return "Desconocido";
+        }
+    }
+
+    static int LeerEnteroEnRango(string msg, int min, int max)
+    {
+        int n;
+        while (true)
+        {
+            Console.Write(msg);
+            if (int.TryParse(Console.ReadLine(), out n) && n >= min && n <= max)
+                return n;
+            Console.WriteLine($"  ⚠️  Ingresa un número entre {min} y {max}.");
+        }
+    }
+
+    static double LeerDecimalEnRango(string msg, double min, double max)
+    {
+        double n;
+        while (true)
+        {
+            Console.Write(msg);
+            if (double.TryParse(Console.ReadLine(), out n) && n >= min && n <= max)
+                return n;
+            Console.WriteLine($"  ⚠️  Ingresa un número entre {min} y {max}.");
+        }
+    }
+
+    static void Pausa()
+    {
+        Console.Write("\nPresiona ENTER para continuar...");
+        Console.ReadLine();
+    }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- RETO FINAL -->
+    <section id="reto" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">🏆</div>
+        <div class="section-title-group">
+          <h2>Reto Final — Evaluación Diagnóstica</h2>
+          <div class="section-subtitle">35 minutos · Sin ayuda del profesor</div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">📌</div>
+        <div class="callout-content">
+          <div class="callout-title">Instrucciones generales</div>
+          <div class="callout-body">
+            Construye un programa <strong>completo y funcional desde cero</strong>. Lee todo el reto antes de comenzar.
+          </div>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">🎬</span> El Reto: Sistema de Cine</h3>
+      <p>Construye un sistema de venta de entradas para un cine con las siguientes opciones:</p>
+
+      <div class="ascii-art">
+<span class="hl">╔══════════════════════════════╗</span>
+<span class="hl">║</span>     CINEMAX - SISTEMA        <span class="hl">║</span>
+<span class="hl">╠══════════════════════════════╣</span>
+<span class="hl">║</span>  1. Ver películas            <span class="hl">║</span>
+<span class="hl">║</span>  2. Comprar entrada          <span class="hl">║</span>
+<span class="hl">║</span>  3. Calcular descuentos      <span class="hl">║</span>
+<span class="hl">║</span>  4. Estadísticas del día     <span class="hl">║</span>
+<span class="hl">║</span>  0. Salir                    <span class="hl">║</span>
+<span class="hl">╚══════════════════════════════╝</span></div>
+
+      <h4>Descripción de cada opción</h4>
+
+      <div class="concept-card">
+        <h4 style="margin-top:0;">Opción 1 — Ver películas</h4>
+        <p>Muestra una lista fija de al menos 4 películas con su sala, horario y precio.</p>
+        <div class="table-wrapper" style="margin-bottom:0;">
+          <table>
+            <thead><tr><th>#</th><th>Película</th><th>Sala</th><th>Horario</th><th>Precio</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>El Gran Viaje</td><td>A</td><td>14:00</td><td>$15.000</td></tr>
+              <tr><td>2</td><td>Aventura Espacial</td><td>B</td><td>16:30</td><td>$18.000</td></tr>
+              <tr><td>3</td><td>Misterio en la Ciudad</td><td>C</td><td>19:00</td><td>$20.000</td></tr>
+              <tr><td>4</td><td>La Última Batalla</td><td>A</td><td>21:30</td><td>$22.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="concept-card purple">
+        <h4 style="margin-top:0;">Opción 2 — Comprar entrada</h4>
+        <ul>
+          <li>Pide el número de película (validado entre 1 y 4).</li>
+          <li>Pide la cantidad de entradas (validado entre 1 y 10).</li>
+          <li>Muestra el subtotal y el total.</li>
+          <li>Acumula las ventas del día (guarda cuántas entradas se han vendido de cada película).</li>
+        </ul>
+      </div>
+
+      <div class="concept-card green">
+        <h4 style="margin-top:0;">Opción 3 — Calcular descuentos</h4>
+        <ul>
+          <li>Pide la edad del cliente.</li>
+          <li>Aplica descuentos según estas reglas:</li>
+        </ul>
+        <div class="table-wrapper" style="margin-bottom:0;">
+          <table>
+            <thead><tr><th>Edad</th><th>Descuento</th></tr></thead>
+            <tbody>
+              <tr><td>Menores de 12 años</td><td>30%</td></tr>
+              <tr><td>Entre 12 y 17 años</td><td>15%</td></tr>
+              <tr><td>Entre 60 y 100 años</td><td>25%</td></tr>
+              <tr><td>Otros</td><td>Sin descuento</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <h4 style="margin-top:0;">Opción 4 — Estadísticas del día</h4>
+        <ul>
+          <li>Muestra cuántas entradas se han vendido de cada película.</li>
+          <li>Muestra cuál película ha vendido más entradas.</li>
+          <li>Muestra el total recaudado en el día.</li>
+        </ul>
+      </div>
+
+      <h3><span class="concept-icon">🗂️</span> Estructura recomendada del código</h3>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Plantilla sugerida</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>// Datos globales (arreglos)
+//   - nombres de películas
+//   - precios
+//   - entradas vendidas (inicia en 0)
+//   - total recaudado
+
+// Main()
+//   - ciclo do...while con el menú principal
+
+// MostrarMenu()
+
+// EjecutarOpcion(opcion)
+
+// VerPeliculas()
+
+// ComprarEntrada()
+//   - usa LeerEnteroEnRango()
+//   - actualiza datos de ventas
+
+// CalcularDescuento()
+//   - usa ObtenerDescuento(int edad) que retorna double
+//   - imprime precio original y precio final
+
+// MostrarEstadisticas()
+//   - busca la película más vendida con un ciclo
+
+// ObtenerDescuento(int edad) → double
+// LeerEnteroEnRango(string, int, int) → int
+// Pausa()</code></pre>
+      </div>
+
+      <h3><span class="concept-icon">⚡</span> Niveles de dificultad</h3>
+      <p>Completa en orden. Cada nivel agrega funcionalidad:</p>
+
+      <div class="levels">
+        <div class="level basic">
+          <div class="level-badge">Básico</div>
+          <div class="level-text">Menú, Ver películas, Comprar (sin acumulación)</div>
+          <div class="level-points">60 pts</div>
+        </div>
+        <div class="level inter">
+          <div class="level-badge">Intermedio</div>
+          <div class="level-text">Todo lo anterior + Descuentos + validaciones</div>
+          <div class="level-points">80 pts</div>
+        </div>
+        <div class="level advanced">
+          <div class="level-badge">Avanzado</div>
+          <div class="level-text">Todo completo + Estadísticas + código organizado</div>
+          <div class="level-points">100 pts</div>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">📊</span> Criterios de evaluación</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Criterio</th><th>Puntos</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>El programa compila sin errores</td><td><strong>20</strong></td></tr>
+            <tr><td>El menú funciona correctamente con <code>do...while</code></td><td><strong>20</strong></td></tr>
+            <tr><td>Las funciones están separadas y correctamente nombradas</td><td><strong>20</strong></td></tr>
+            <tr><td>Las validaciones funcionan (entradas inválidas no rompen el programa)</td><td><strong>20</strong></td></tr>
+            <tr><td>El código está bien organizado y tiene comentarios claros</td><td><strong>20</strong></td></tr>
+            <tr style="background: var(--surface-2);"><td><strong>Total</strong></td><td><strong>100</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="concept-icon">💡</span> Pistas (úsalas solo si es necesario)</h3>
+
+      <details class="hint">
+        <summary>Pista 1 — Datos globales de películas</summary>
+        <div class="hint-body">
+          <div class="code-wrapper">
+            <div class="code-header">
+              <div class="code-header-left">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span>Datos iniciales</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+            </div>
+<pre class="language-csharp"><code>static string[] titulos = { "El Gran Viaje", "Aventura Espacial",
+                            "Misterio en la Ciudad", "La Última Batalla" };
+static double[] precios = { 15000, 18000, 20000, 22000 };
+static int[]    ventas  = { 0, 0, 0, 0 };
+static double   totalRecaudado = 0;</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="hint">
+        <summary>Pista 2 — Función ObtenerDescuento</summary>
+        <div class="hint-body">
+          <div class="code-wrapper">
+            <div class="code-header">
+              <div class="code-header-left">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span>ObtenerDescuento</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+            </div>
+<pre class="language-csharp"><code>static double ObtenerDescuento(int edad)
+{
+    if      (edad < 12)                 return 0.30;
+    else if (edad >= 12 && edad <= 17)  return 0.15;
+    else if (edad >= 60 && edad <= 100) return 0.25;
+    else                                return 0.0;
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="hint">
+        <summary>Pista 3 — Acumular ventas en ComprarEntrada</summary>
+        <div class="hint-body">
+          <div class="code-wrapper">
+            <div class="code-header">
+              <div class="code-header-left">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span>Acumulación</span>
+              </div>
+              <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+            </div>
+<pre class="language-csharp"><code>// Después de confirmar la compra:
+ventas[indicePelicula] += cantidad;
+totalRecaudado += subtotal;</code></pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- REFERENCIA -->
+    <section id="referencia" class="fade-in">
+      <div class="section-header">
+        <div class="section-number">📘</div>
+        <div class="section-title-group">
+          <h2>Referencia Rápida</h2>
+          <div class="section-subtitle">Tu cheatsheet de bolsillo</div>
+        </div>
+      </div>
+
+      <h3><span class="concept-icon">🔢</span> Tipos de datos más usados</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Tipo</th><th>Qué guarda</th><th>Ejemplo</th></tr></thead>
+          <tbody>
+            <tr><td><code>int</code></td><td>Números enteros</td><td><code>42</code>, <code>-5</code></td></tr>
+            <tr><td><code>double</code></td><td>Números decimales</td><td><code>3.14</code>, <code>100.0</code></td></tr>
+            <tr><td><code>string</code></td><td>Texto</td><td><code>"Hola"</code></td></tr>
+            <tr><td><code>bool</code></td><td>Verdadero/Falso</td><td><code>true</code>, <code>false</code></td></tr>
+            <tr><td><code>char</code></td><td>Un carácter</td><td><code>'A'</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="concept-icon">⚙️</span> Estructura de función en C#</h3>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Funciones</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>// Función que no retorna nada
+static void NombreFuncion(tipo parametro1, tipo parametro2)
+{
+    // cuerpo
+}
+
+// Función que retorna un valor
+static tipoRetorno NombreFuncion(tipo parametro)
+{
+    // cuerpo
+    return valor;
+}</code></pre>
+      </div>
+
+      <h3><span class="concept-icon">🔁</span> Ciclos de un vistazo</h3>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Ciclos</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>// FOR: cuando sabes cuántas veces
+for (int i = 0; i < 10; i++) { }
+
+// WHILE: mientras una condición sea verdadera
+while (condicion) { }
+
+// DO...WHILE: ejecuta al menos una vez
+do { } while (condicion);
+
+// FOREACH: recorre colecciones
+foreach (var elemento in coleccion) { }</code></pre>
+      </div>
+
+      <h3><span class="concept-icon">🛡️</span> Lectura segura de números</h3>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>TryParse</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>// Entero
+int n;
+int.TryParse(Console.ReadLine(), out n);
+
+// Decimal
+double d;
+double.TryParse(Console.ReadLine(), out d);</code></pre>
+      </div>
+
+      <h3><span class="concept-icon">🧩</span> Patrón del menú (plantilla base)</h3>
+      <div class="code-wrapper">
+        <div class="code-header">
+          <div class="code-header-left">
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <span>Plantilla de menú</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this)">📋 Copiar</button>
+        </div>
+<pre class="language-csharp"><code>string opcion;
+
+do
+{
+    Console.Clear();
+    // imprimir opciones...
+    Console.Write("Opción: ");
+    opcion = Console.ReadLine();
+
+    switch (opcion)
+    {
+        case "1": Funcion1(); break;
+        case "2": Funcion2(); break;
+        case "0":             break;
+        default: Console.WriteLine("Inválido."); break;
+    }
+
+    if (opcion != "0") { Console.ReadLine(); }
+
+} while (opcion != "0");</code></pre>
+      </div>
+
+      <div class="callout success">
+        <div class="callout-icon">🎉</div>
+        <div class="callout-content">
+          <div class="callout-title">¡Clase completada!</div>
+          <div class="callout-body">
+            Has recorrido todos los conceptos: ciclos <code>do...while</code>, funciones, parámetros, retornos, submenús, validaciones y un proyecto integrador. Ahora estás listo para construir tus propios programas interactivos profesionales.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-badge">
+        🎓 Clase diseñada para estudiantes de secundaria
+      </div>
+      <div>Fundamentos de Programación en C# · 3.5 horas · Nivel Intermedio</div>
+    </footer>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+  // Progress bar
+  const progressBar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    progressBar.style.width = progress + '%';
+  });
+
+  // Sidebar active link based on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  const observerOptions = {
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`.sidebar-nav a[href="#${entry.target.id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(section => observer.observe(section));
+
+  // Fade-in animations
+  const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
+
+  // Copy code
+  function copyCode(button) {
+    const wrapper = button.closest('.code-wrapper');
+    const code = wrapper.querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      const originalText = button.innerText;
+      button.innerText = '✅ Copiado';
+      button.classList.add('copied');
+      setTimeout(() => {
+        button.innerText = originalText;
+        button.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Prism autoloader path
+  if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+    Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/';
+  }
+</script>
+
+</body>
+</html>
+
