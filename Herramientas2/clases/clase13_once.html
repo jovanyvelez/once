@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏗️ Data Architect · Arreglos Unidimensionales en C#</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.18/index.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.18/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.18/index.min.css">
+<style>
+:root{
+  --bg-0:#030812;--bg-1:#061021;--bg-2:#0a1931;--bg-3:#102447;
+  --border:#1e3a6b;--border-dim:#142a52;
+  --grid:rgba(0,200,255,0.06);
+  --cyan:#00d9ff;--cyan-dim:#0097b3;--blue:#2b7fff;--teal:#14f1d4;
+  --magenta:#ff3ea5;--yellow:#ffd93d;--green:#3dffa0;--red:#ff4d6d;
+  --text:#d8e6f5;--text-dim:#7b93b8;--text-bright:#f0f7ff;
+  --grad-blue:linear-gradient(135deg,#00d9ff,#2b7fff);
+  --grad-teal:linear-gradient(135deg,#14f1d4,#00d9ff);
+  --grad-mag:linear-gradient(135deg,#ff3ea5,#2b7fff);
+  --shadow-cyan:0 0 20px rgba(0,217,255,.35);
+  --shadow-blue:0 0 20px rgba(43,127,255,.35);
+  --shadow-red:0 0 20px rgba(255,77,109,.45);
+  --shadow-green:0 0 20px rgba(61,255,160,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  background:var(--bg-0);color:var(--text);line-height:1.65;
+  overflow-x:hidden;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+    radial-gradient(ellipse at top left,rgba(0,217,255,.08),transparent 50%),
+    radial-gradient(ellipse at bottom right,rgba(43,127,255,.08),transparent 50%);
+  background-size:50px 50px,50px 50px,100% 100%,100% 100%;
+  background-attachment:fixed;
+}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+::selection{background:var(--cyan);color:#000}
+#progressBar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--grad-blue);z-index:10000;box-shadow:var(--shadow-cyan);transition:width .15s linear}
+.layout{display:grid;grid-template-columns:290px 1fr;gap:2rem;padding:2rem;max-width:1650px;margin:0 auto}
+@media(max-width:1024px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{position:static!important;height:auto!important}}
+.sidebar{position:sticky;top:2rem;height:calc(100vh - 4rem);overflow-y:auto;padding-right:.5rem}
+.sidebar::-webkit-scrollbar{width:6px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.logo{display:flex;align-items:center;gap:.75rem;padding:1rem;background:linear-gradient(135deg,rgba(0,217,255,.08),rgba(43,127,255,.05));border:1px solid var(--border);border-radius:12px;margin-bottom:1rem;position:relative;overflow:hidden}
+.logo::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,217,255,.1),transparent);animation:sweep 4s infinite}
+@keyframes sweep{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.logo-ic{width:44px;height:44px;border-radius:10px;background:var(--grad-blue);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;font-size:1.2rem;flex-shrink:0;box-shadow:var(--shadow-cyan);position:relative;z-index:1}
+.logo-txt{position:relative;z-index:1}
+.logo-txt strong{display:block;font-size:.95rem;letter-spacing:.03em;color:var(--text-bright)}
+.logo-txt small{color:var(--text-dim);font-size:.7rem;font-family:'JetBrains Mono',monospace}
+.sb-sec{font-family:'JetBrains Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan-dim);margin:1.1rem .75rem .5rem;font-weight:700}
+.sb-nav{list-style:none}
+.sb-nav a{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:6px;color:var(--text-dim);text-decoration:none;font-size:.85rem;transition:all .2s;border-left:2px solid transparent;font-weight:500}
+.sb-nav a:hover{background:rgba(0,217,255,.05);color:var(--text)}
+.sb-nav a.active{background:linear-gradient(90deg,rgba(0,217,255,.15),transparent);color:var(--cyan);border-left-color:var(--cyan)}
+.sb-nav .idx{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:var(--text-dim);min-width:22px}
+.sb-nav a.active .idx{color:var(--cyan)}
+.sb-stats{margin-top:1rem;padding:1rem;background:var(--bg-1);border:1px solid var(--border);border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.sb-stats-row{display:flex;justify-content:space-between;padding:.25rem 0;color:var(--text-dim)}
+.sb-stats-row strong{color:var(--cyan);font-weight:700}
+.sb-bar{height:6px;background:var(--bg-3);border-radius:3px;overflow:hidden;margin-top:.5rem}
+.sb-fill{height:100%;background:var(--grad-blue);width:0%;transition:width .3s;box-shadow:var(--shadow-cyan)}
+.badges{margin-top:1rem;padding:.85rem;background:var(--bg-1);border:1px solid var(--border);border-radius:10px}
+.badges-t{font-family:'JetBrains Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan-dim);margin-bottom:.5rem;font-weight:700}
+.badges-g{display:flex;flex-wrap:wrap;gap:.35rem}
+.bdg{width:32px;height:32px;border-radius:6px;background:var(--bg-2);border:1px solid var(--border-dim);display:flex;align-items:center;justify-content:center;font-size:.95rem;filter:grayscale(1) brightness(.4);transition:all .3s}
+.bdg.on{filter:none;border-color:var(--cyan);box-shadow:var(--shadow-cyan);animation:badgePop .5s}
+@keyframes badgePop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+.main{min-width:0}
+section{margin-bottom:4rem;scroll-margin-top:2rem}
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:3rem;background:var(--bg-1);border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.hero-bg{position:absolute;inset:0;background:var(--grad-blue);filter:blur(120px);opacity:.25}
+.hero-content{position:relative;padding:3rem;z-index:1}
+@media(max-width:700px){.hero-content{padding:2rem 1.5rem}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem .9rem;background:rgba(0,217,255,.1);border:1px solid var(--cyan);color:var(--cyan);border-radius:100px;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;font-family:'JetBrains Mono',monospace}
+.hero-eyebrow .dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 10px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,5vw,3.5rem);font-weight:700;line-height:1.05;margin-bottom:1rem;letter-spacing:-.02em}
+.hero h1 .grad{background:var(--grad-blue);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1 .cursor{display:inline-block;width:3px;height:.9em;background:var(--cyan);vertical-align:middle;margin-left:4px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+.hero-sub{font-size:1.05rem;color:var(--text);max-width:700px;margin-bottom:2rem;line-height:1.7}
+.brief{background:var(--bg-0);border:1px solid var(--cyan);border-radius:8px;padding:1rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;line-height:1.7;margin-bottom:2rem;position:relative}
+.brief::before{content:'MISSION >';position:absolute;top:-.6rem;left:1rem;background:var(--bg-0);padding:0 .5rem;color:var(--cyan);font-size:.68rem;font-weight:700;letter-spacing:.15em}
+.brief .ln{color:var(--text-dim)}
+.brief .key{color:var(--cyan);font-weight:700}
+.badges-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.badge{padding:.4rem .8rem;background:var(--bg-2);border:1px solid var(--border);border-radius:6px;font-size:.78rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem;font-family:'JetBrains Mono',monospace}
+.badge.hl{background:rgba(0,217,255,.1);border-color:var(--cyan);color:var(--cyan)}
+.sec-head{display:flex;align-items:center;gap:1rem;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px dashed var(--border)}
+.sec-num{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:900;color:#000;flex-shrink:0}
+.sec-num.m1{background:var(--grad-blue);box-shadow:var(--shadow-cyan)}
+.sec-num.m2{background:var(--grad-teal);box-shadow:var(--shadow-cyan)}
+.sec-num.m3{background:linear-gradient(135deg,#2b7fff,#a855f7);box-shadow:var(--shadow-blue)}
+.sec-num.m4{background:linear-gradient(135deg,#14f1d4,#3dffa0);box-shadow:var(--shadow-green)}
+.sec-num.m5{background:var(--grad-mag);box-shadow:0 0 20px rgba(255,62,165,.35)}
+.sec-title-group h2{font-size:1.7rem;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--text-bright)}
+.sec-sub{color:var(--text-dim);font-size:.9rem;margin-top:.25rem;font-family:'JetBrains Mono',monospace}
+.sec-meta{margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap}
+.meta-pill{padding:.3rem .7rem;background:var(--bg-2);border:1px solid var(--border);border-radius:4px;font-size:.72rem;font-weight:700;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+h3{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin:2.5rem 0 1rem;color:var(--text-bright);display:flex;align-items:center;gap:.7rem;letter-spacing:-.01em}
+h3::before{content:'>';color:var(--cyan);font-weight:900;font-family:'JetBrains Mono',monospace}
+h4{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;margin:1.5rem 0 .6rem;color:var(--cyan)}
+p{margin-bottom:1rem}
+.lead{font-size:1.05rem;color:var(--text);line-height:1.75;margin-bottom:1.5rem;padding-left:1rem;border-left:3px solid var(--cyan);background:rgba(0,217,255,.04);padding:1rem;border-radius:0 6px 6px 0}
+.card{background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:1.75rem;margin:1.5rem 0;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--grad-blue)}
+.syntax-cmp{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+@media(max-width:700px){.syntax-cmp{grid-template-columns:1fr}}
+.syntax-box{padding:1.25rem;border-radius:10px;border:1px solid;background:var(--bg-1);position:relative;overflow:hidden}
+.syntax-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.syntax-box.bad{border-color:rgba(255,77,109,.4)}.syntax-box.bad::before{background:var(--red)}
+.syntax-box.good{border-color:rgba(61,255,160,.4)}.syntax-box.good::before{background:var(--green)}
+.syntax-box.cyan{border-color:rgba(0,217,255,.4)}.syntax-box.cyan::before{background:var(--cyan)}
+.syntax-box.blue{border-color:rgba(43,127,255,.4)}.syntax-box.blue::before{background:var(--blue)}
+.syntax-t{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+.syntax-box.bad .syntax-t{color:var(--red)}
+.syntax-box.good .syntax-t{color:var(--green)}
+.syntax-box.cyan .syntax-t{color:var(--cyan)}
+.syntax-box.blue .syntax-t{color:var(--blue)}
+.code-wrap{position:relative;margin:1.5rem 0;border-radius:10px;overflow:hidden;background:#0d1117;border:1px solid var(--border);box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.code-head{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1rem;background:#161b22;border-bottom:1px solid var(--border);font-size:.78rem;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.code-head-l{display:flex;align-items:center;gap:.7rem;font-weight:700}
+.code-dots{display:flex;gap:5px}
+.code-dots span{width:10px;height:10px;border-radius:50%}
+.code-dots span:nth-child(1){background:#ff5f56}
+.code-dots span:nth-child(2){background:#ffbd2e}
+.code-dots span:nth-child(3){background:#27c93f}
+.copy-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:.25rem .6rem;border-radius:4px;cursor:pointer;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;transition:all .2s}
+.copy-btn:hover{background:var(--cyan);color:#000;border-color:var(--cyan)}
+.copy-btn.ok{background:var(--green);color:#000;border-color:var(--green)}
+.code-pre{margin:0;padding:1.1rem;background:transparent;font-size:.82rem;line-height:1.65;overflow-x:auto}
+.code-pre::-webkit-scrollbar{height:8px}
+.code-pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+pre .kw{color:#c678dd}pre .fn{color:#61afef}pre .str{color:#98c379}pre .cm{color:#5c6370;font-style:italic}pre .num{color:#d19a66}pre .ty{color:#e5c07b}
+p code,li code,td code{background:var(--bg-2);color:var(--cyan);padding:.12rem .4rem;border-radius:4px;font-size:.85em;border:1px solid var(--border-dim);font-weight:600}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;border:1px solid;display:flex;gap:.85rem;align-items:flex-start}
+.callout-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;font-weight:900}
+.callout-content{flex:1;min-width:0;font-size:.9rem}
+.callout-title{font-family:'Space Grotesk',sans-serif;font-weight:700;margin-bottom:.25rem;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase}
+.callout-body{color:var(--text);line-height:1.6}
+.callout.tip{background:rgba(0,217,255,.05);border-color:rgba(0,217,255,.4)}
+.callout.tip .callout-icon{background:rgba(0,217,255,.2);color:var(--cyan)}
+.callout.tip .callout-title{color:var(--cyan)}
+.callout.bug{background:rgba(255,77,109,.06);border-color:rgba(255,77,109,.4)}
+.callout.bug .callout-icon{background:rgba(255,77,109,.2);color:var(--red)}
+.callout.bug .callout-title{color:var(--red)}
+.callout.warn{background:rgba(255,217,61,.05);border-color:rgba(255,217,61,.4)}
+.callout.warn .callout-icon{background:rgba(255,217,61,.2);color:var(--yellow)}
+.callout.warn .callout-title{color:var(--yellow)}
+.callout.success{background:rgba(61,255,160,.05);border-color:rgba(61,255,160,.4)}
+.callout.success .callout-icon{background:rgba(61,255,160,.2);color:var(--green)}
+.callout.success .callout-title{color:var(--green)}
+.callout.quest{background:rgba(43,127,255,.06);border-color:rgba(43,127,255,.4)}
+.callout.quest .callout-icon{background:rgba(43,127,255,.2);color:var(--blue)}
+.callout.quest .callout-title{color:var(--blue)}
+.sim{background:var(--bg-1);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin:1.75rem 0;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.sim::before{content:'';position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(0,217,255,.06),transparent 70%);pointer-events:none}
+.sim-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:.75rem;flex-wrap:wrap;position:relative}
+.sim-title{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--cyan);font-size:.95rem;display:flex;align-items:center;gap:.5rem;letter-spacing:.05em;text-transform:uppercase}
+.sim-title::before{content:'';width:8px;height:8px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan)}
+.btn{padding:.6rem 1.1rem;border:1px solid var(--border);background:var(--bg-2);color:var(--text);border-radius:6px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem}
+.btn:hover{background:var(--bg-3);border-color:var(--cyan);color:var(--cyan)}
+.btn.primary{background:var(--grad-blue);color:#000;border:none;box-shadow:var(--shadow-cyan)}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,217,255,.6)}
+.btn.teal{background:var(--grad-teal);color:#000;border:none}
+.btn.magenta{background:var(--grad-mag);color:#fff;border:none}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+.ram{display:flex;gap:6px;flex-wrap:wrap;padding:1rem;background:var(--bg-0);border:1px solid var(--border);border-radius:8px;position:relative;margin:1rem 0}
+.ram::before{content:'MEMORY BANK';position:absolute;top:-.5rem;left:1rem;background:var(--bg-0);padding:0 .5rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--cyan);letter-spacing:.15em;font-weight:700}
+.cell{flex:1;min-width:55px;max-width:110px;aspect-ratio:1;background:var(--bg-2);border:2px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;position:relative;transition:all .3s;cursor:pointer}
+.cell .idx{position:absolute;top:2px;left:4px;font-size:.55rem;color:var(--text-dim);font-weight:700}
+.cell .val{font-size:1.2rem;font-weight:700;color:var(--text-bright)}
+.cell.active{border-color:var(--cyan);background:rgba(0,217,255,.12);box-shadow:var(--shadow-cyan);animation:cellPop .4s}
+.cell.error{border-color:var(--red);background:rgba(255,77,109,.15);box-shadow:var(--shadow-red);animation:shake .3s}
+.cell.success{border-color:var(--green);background:rgba(61,255,160,.12);box-shadow:var(--shadow-green)}
+.cell.highlight{border-color:var(--yellow);background:rgba(255,217,61,.08);box-shadow:0 0 15px rgba(255,217,61,.4)}
+@keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.nightmare{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;padding:1rem;background:var(--bg-0);border:1px solid var(--red);border-radius:8px;margin:1rem 0;position:relative}
+.nightmare::before{content:'⚠ 50 VARIABLES SUELTAS — CAOS';position:absolute;top:-.6rem;left:1rem;background:var(--bg-0);padding:0 .5rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--red);letter-spacing:.1em;font-weight:700}
+.nightmare-cell{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);border-radius:4px;padding:.25rem;font-family:'JetBrains Mono',monospace;font-size:.55rem;text-align:center;color:var(--red)}
+.shelf{display:flex;gap:4px;padding:1rem;background:var(--bg-0);border:1px solid var(--green);border-radius:8px;margin:1rem 0;position:relative}
+.shelf::before{content:'✓ ARREGLO — ORDEN';position:absolute;top:-.6rem;left:1rem;background:var(--bg-0);padding:0 .5rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green);letter-spacing:.1em;font-weight:700}
+.shelf .cell{border-color:rgba(61,255,160,.3)}
+.dnd-game{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1rem 0}
+@media(max-width:800px){.dnd-game{grid-template-columns:1fr}}
+.dnd-values{background:var(--bg-0);border:1px solid var(--border);border-radius:8px;padding:1rem;min-height:120px}
+.dnd-values-t{font-family:'JetBrains Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.75rem;font-weight:700}
+.dnd-chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{padding:.5rem .9rem;background:var(--bg-2);border:1.5px solid var(--cyan);border-radius:6px;cursor:grab;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--cyan);user-select:none;transition:all .2s;font-size:.9rem}
+.chip:active{cursor:grabbing}
+.chip:hover{background:rgba(0,217,255,.1);box-shadow:var(--shadow-cyan)}
+.chip.used{opacity:.3;cursor:not-allowed}
+.chip.dragging{opacity:.5}
+.dnd-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem}
+.slot{aspect-ratio:1;background:var(--bg-0);border:2px dashed var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;transition:all .2s;position:relative}
+.slot.drag-over{border-color:var(--cyan);background:rgba(0,217,255,.08);box-shadow:var(--shadow-cyan)}
+.slot.filled{border-style:solid;border-color:var(--green);background:rgba(61,255,160,.06)}
+.slot.wrong{border-color:var(--red);background:rgba(255,77,109,.08);animation:shake .3s}
+.slot .idx{font-size:.7rem;color:var(--text-dim);position:absolute;top:4px;left:6px}
+.slot .val{font-size:1.1rem;font-weight:700;color:var(--green)}
+.shelves{display:grid;gap:1.25rem}
+.shelf-wrap{background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:1rem;position:relative}
+.shelf-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.shelf-label .type{color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.shelf-label .decl{color:var(--text-dim)}
+.input-row{display:flex;gap:.5rem;margin:1rem 0;align-items:center;flex-wrap:wrap}
+.input-row label{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.input-field{flex:1;min-width:100px;padding:.55rem .7rem;background:var(--bg-0);border:1px solid var(--border);color:var(--text-bright);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none;transition:all .2s}
+.input-field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,217,255,.15)}
+.console-out{background:#000;border:1px solid var(--border);border-radius:6px;padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;min-height:60px;color:var(--green);margin-top:.75rem;line-height:1.5;max-height:180px;overflow-y:auto;white-space:pre-wrap}
+.console-out::-webkit-scrollbar{width:6px}
+.console-out::-webkit-scrollbar-thumb{background:var(--border)}
+.console-out .prompt{color:var(--cyan)}
+.console-out .err{color:var(--red)}
+.console-out .out{color:var(--text-bright)}
+.grades-sim{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:900px){.grades-sim{grid-template-columns:1fr}}
+.grades-input{background:var(--bg-1);border:1px solid var(--border);border-radius:10px;padding:1.25rem}
+.grades-results{background:linear-gradient(135deg,rgba(0,217,255,.04),rgba(20,241,212,.04));border:1px solid var(--cyan);border-radius:10px;padding:1.25rem}
+.grade-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem}
+.grade-row label{min-width:90px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text-dim);font-weight:700}
+.grade-row .val{flex:1;font-family:'JetBrains Mono',monospace;color:var(--cyan);font-weight:700}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-top:1rem}
+.stat{background:var(--bg-0);border:1px solid var(--border);border-radius:8px;padding:.75rem;text-align:center}
+.stat .label{font-family:'JetBrains Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.3rem}
+.stat .value{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--cyan)}
+.stat.good .value{color:var(--green)}
+.stat.warn .value{color:var(--yellow)}
+.stat.bad .value{color:var(--red)}
+.workshop{background:var(--bg-1);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin:1.5rem 0;position:relative;overflow:hidden}
+.workshop::before{content:'';position:absolute;top:0;right:0;width:150px;height:150px;background:radial-gradient(circle,rgba(255,62,165,.08),transparent 70%);pointer-events:none}
+.workshop-head{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.workshop-badge{padding:.3rem .75rem;background:var(--grad-mag);color:#fff;border-radius:100px;font-size:.72rem;font-weight:900;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 15px rgba(255,62,165,.3)}
+.workshop-title{font-weight:700;color:var(--text-bright);font-size:1.05rem}
+.ws-code{background:#0d1117;border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin:1rem 0;font-family:'JetBrains Mono',monospace;font-size:.85rem;line-height:1.7;overflow-x:auto;color:#d4d4d4;white-space:pre-wrap}
+.ws-code .kw{color:#c678dd}
+.ws-code .ty{color:#e5c07b}
+.ws-code .str{color:#98c379}
+.ws-code .num{color:#d19a66}
+.ws-code .cm{color:#5c6370;font-style:italic}
+.ws-code .fn{color:#61afef}
+.ws-input{display:inline-block;background:var(--bg-0);border:1.5px dashed var(--cyan);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:.85rem;padding:.15rem .5rem;border-radius:5px;min-width:100px;outline:none;text-align:center;font-weight:600;transition:all .2s}
+.ws-input:focus{border-style:solid;box-shadow:0 0 0 3px rgba(0,217,255,.15)}
+.ws-input.correct{background:rgba(61,255,160,.1);border-color:var(--green);color:var(--green);border-style:solid}
+.ws-input.wrong{background:rgba(255,77,109,.1);border-color:var(--red);color:var(--red);border-style:solid}
+.quiz-fb{margin-top:1rem;padding:.85rem 1rem;border-radius:8px;font-size:.88rem;display:none}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{background:rgba(61,255,160,.08);border:1px solid var(--green);color:var(--green)}
+.quiz-fb.no{background:rgba(255,77,109,.08);border:1px solid var(--red);color:var(--red)}
+.table-wrap{margin:1.5rem 0;overflow-x:auto;border-radius:10px;border:1px solid var(--border);background:var(--bg-1)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--bg-2);padding:.75rem 1rem;text-align:left;font-weight:700;color:var(--cyan);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--border-dim)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(0,217,255,.03)}
+td code{font-family:'JetBrains Mono',monospace}
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0}
+.compare-card{padding:1.2rem;background:var(--bg-1);border:1px solid var(--border);border-radius:10px;position:relative;overflow:hidden}
+.compare-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.compare-card.a::before{background:var(--grad-blue)}
+.compare-card.b::before{background:var(--grad-teal)}
+.compare-card.c::before{background:var(--grad-mag)}
+.compare-card h4{margin-top:0;font-size:.95rem}
+.compare-card.a h4{color:var(--cyan)}
+.compare-card.b h4{color:var(--teal)}
+.compare-card.c h4{color:var(--magenta)}
+footer{text-align:center;padding:3rem 1rem;color:var(--text-dim);border-top:1px dashed var(--border);margin-top:4rem;font-size:.85rem;font-family:'JetBrains Mono',monospace}
+footer .f-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;background:var(--bg-1);border:1px solid var(--border);border-radius:100px;font-weight:700;color:var(--cyan);margin-bottom:.75rem;letter-spacing:.05em}
+@media(max-width:768px){
+  body{font-size:15px}
+  .sec-head{flex-wrap:wrap}
+  .sec-meta{margin-left:0;margin-top:.5rem}
+  h3{font-size:1.15rem}
+  .dnd-slots{grid-template-columns:repeat(3,1fr)}
+  .nightmare{grid-template-columns:repeat(5,1fr)}
+  .btn-row{flex-direction:column;align-items:stretch}
+  .m3-grid{grid-template-columns:1fr !important}
+}
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-ic">[ ]</div>
+      <div class="logo-txt">
+        <strong>Data Architect</strong>
+        <small>arrays_1D.cs // v1.0</small>
+      </div>
+    </div>
+
+    <div class="sb-sec">// modules</div>
+    <ul class="sb-nav">
+      <li><a href="#intro"><span class="idx">00</span>mission_brief</a></li>
+      <li><a href="#m1"><span class="idx">01</span>nightmare_vars</a></li>
+      <li><a href="#m2"><span class="idx">02</span>anatomy_array</a></li>
+      <li><a href="#m3"><span class="idx">03</span>data_shelves</a></li>
+      <li><a href="#m4"><span class="idx">04</span>mass_processing</a></li>
+      <li><a href="#m5"><span class="idx">05</span>final_lab</a></li>
+    </ul>
+
+    <div class="sb-stats">
+      <div class="sb-stats-row"><span>runtime</span><strong>3.5h</strong></div>
+      <div class="sb-stats-row"><span>clearance</span><strong>Architect</strong></div>
+      <div class="sb-stats-row"><span>lang</span><strong>C#</strong></div>
+      <div class="sb-stats-row"><span>xp_earned</span><strong id="xpDisp">0/600</strong></div>
+      <div class="sb-bar"><div class="sb-fill" id="sbFill"></div></div>
+    </div>
+
+    <div class="badges">
+      <div class="badges-t">// achievements</div>
+      <div class="badges-g">
+        <div class="bdg" id="bdg-m1" title="chaos_solver">📦</div>
+        <div class="bdg" id="bdg-m2" title="index_master">🔢</div>
+        <div class="bdg" id="bdg-m3" title="data_access">🗃️</div>
+        <div class="bdg" id="bdg-m4" title="for_loop_pro">⚙️</div>
+        <div class="bdg" id="bdg-m5" title="search_expert">🔍</div>
+        <div class="bdg" id="bdg-master" title="architect">👑</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-eyebrow"><span class="dot"></span>OPERATION: DATA STRUCTURE</div>
+        <h1>Construye la <span class="grad">Memoria</span><br>de tu <span class="grad">Ciudad Digital</span><span class="cursor"></span></h1>
+        <p class="hero-sub">Eres un <strong>Arquitecto de Datos</strong>. Una nueva metrópolis digital necesita que diseñes su base de datos desde cero. El problema: el alcalde tiene 10,000 ciudadanos y no puedes crear 10,000 variables. La solución: los <strong>Arreglos Unidimensionales</strong> — la herramienta más usada del 90% de los programas reales.</p>
+
+        <div class="brief">
+          <div class="ln">&gt; <span class="key">TARGET:</span> Dominar arreglos unidimensionales en C#</div>
+          <div class="ln">&gt; <span class="key">TOOLS:</span> int[] · string[] · double[] · for loop</div>
+          <div class="ln">&gt; <span class="key">MISSIONS:</span> 5 módulos interactivos + laboratorio final</div>
+          <div class="ln">&gt; <span class="key">ENEMIES:</span> IndexOutOfRangeException · Off-by-one bugs</div>
+        </div>
+
+        <div class="badges-row">
+          <span class="badge hl">⏱ 3.5 horas</span>
+          <span class="badge">🧠 RAM Simulator</span>
+          <span class="badge">🎮 5 interactivos</span>
+          <span class="badge">⚡ XP + badges</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="intro" class="fade-in">
+      <div class="sec-head">
+        <div class="sec-num m1">00</div>
+        <div class="sec-title-group">
+          <h2>mission_brief</h2>
+          <div class="sec-sub">// ¿Qué vas a construir hoy?</div>
+        </div>
+        <div class="sec-meta"><span class="meta-pill">15 MIN</span></div>
+      </div>
+
+      <div class="lead">Piensa en tu mochila. Dentro tienes cuadernos, lápices, libros. ¿Los tiras todos al fondo sin orden? No. Los guardas en <strong>compartimentos</strong>. Los arreglos son los compartimentos de la memoria RAM. Sin ellos, todo sería un caos de variables sueltas.</div>
+
+      <h3>Lo que vas a aprender</h3>
+      <div class="compare-grid">
+        <div class="compare-card a">
+          <h4>📦 Concepto</h4>
+          <p style="color:var(--text);font-size:.88rem;margin:.5rem 0 0">Qué es un arreglo y por qué es una <strong>estructura homogénea</strong>.</p>
+        </div>
+        <div class="compare-card b">
+          <h4>🔢 Índices</h4>
+          <p style="color:var(--text);font-size:.88rem;margin:.5rem 0 0">El <strong>poder del cero</strong> y cómo acceder a cualquier posición en O(1).</p>
+        </div>
+        <div class="compare-card c">
+          <h4>⚙️ Procesamiento</h4>
+          <p style="color:var(--text);font-size:.88rem;margin:.5rem 0 0">Recorrer arreglos con <code>for</code>, calcular promedios y buscar datos.</p>
+        </div>
+      </div>
+
+      <h3>Tu ruta de entrenamiento</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Module</th><th>Herramienta</th><th>Tiempo</th><th>XP</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>01 · La Pesadilla de las Variables</td><td style="color:var(--red)">Comparación visual</td><td>30 min</td><td>75 XP</td></tr>
+            <tr><td>02 · Anatomía y el Poder del Cero</td><td style="color:var(--teal)">Drag &amp; drop</td><td>45 min</td><td>125 XP</td></tr>
+            <tr><td>03 · Manipulación de Datos</td><td style="color:var(--blue)">Simulador RAM</td><td>60 min</td><td>150 XP</td></tr>
+            <tr><td>04 · Taller de Procesamiento Masivo</td><td style="color:var(--green)">Calculadora</td><td>60 min</td><td>150 XP</td></tr>
+            <tr><td>05 · El Gran Almacén</td><td style="color:var(--magenta)">Laboratorio final</td><td>45 min</td><td>100 XP</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <div class="callout-title">Pro-Tip del Arquitecto Senior</div>
+          <div class="callout-body">Los arreglos son el primer paso a estructuras más poderosas: <code>List&lt;T&gt;</code>, <code>Dictionary</code>, <code>Queue</code>, <code>Stack</code>. Dominar los arreglos básicos te prepara para el 80% de las estructuras de datos avanzadas.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="m1" class="fade-in">
+      <div class="sec-head">
+        <div class="sec-num m1">01</div>
+        <div class="sec-title-group">
+          <h2>La Pesadilla de las Variables Individuales</h2>
+          <div class="sec-sub">// ¿Qué pasa cuando todo se sale de control?</div>
+        </div>
+        <div class="sec-meta"><span class="meta-pill">30 MIN</span><span class="meta-pill">75 XP</span></div>
+      </div>
+
+      <div class="lead">Imagina que eres el programador de una tienda y necesitas guardar la edad de 50 clientes. La primera opción obvia es crear 50 variables: <code>edad1</code>, <code>edad2</code>, <code>edad3</code>... <strong>Eso es una pesadilla</strong>.</div>
+
+      <h3>La pesadilla: 50 variables sueltas</h3>
+      <div class="nightmare" id="nightmare"></div>
+
+      <div class="callout bug">
+        <div class="callout-icon">🐛</div>
+        <div class="callout-content">
+          <div class="callout-title">¡Cuidado, Bug! El problema real</div>
+          <div class="callout-body">
+            <ul style="padding-left:1.2rem;margin-top:.4rem">
+              <li>¿Qué pasa si quieres calcular el promedio? Tienes que escribir <code>edad1 + edad2 + edad3 + ... + edad50</code>.</li>
+              <li>¿Y si son 1,000 clientes? Escribirías 1,000 líneas de código.</li>
+              <li>¿Y si quieres encontrar la edad más alta? Un caos de <code>if</code> anidados.</li>
+              <li>Cada variable tiene su propio nombre, su propio espacio, su propio desorden.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3>La solución: el arreglo (una estantería organizada)</h3>
+      <div class="shelf">
+        <div class="cell"><span class="idx">0</span><span class="val">25</span></div>
+        <div class="cell"><span class="idx">1</span><span class="val">32</span></div>
+        <div class="cell"><span class="idx">2</span><span class="val">18</span></div>
+        <div class="cell"><span class="idx">3</span><span class="val">45</span></div>
+        <div class="cell"><span class="idx">4</span><span class="val">27</span></div>
+        <div class="cell"><span class="idx">5</span><span class="val">31</span></div>
+        <div class="cell"><span class="idx">6</span><span class="val">22</span></div>
+        <div class="cell"><span class="idx">7</span><span class="val">38</span></div>
+        <div class="cell"><span class="idx">8</span><span class="val">29</span></div>
+        <div class="cell"><span class="idx">9</span><span class="val">41</span></div>
+      </div>
+
+      <div class="callout success">
+        <div class="callout-icon">✓</div>
+        <div class="callout-content">
+          <div class="callout-title">Arreglo = estructura homogénea</div>
+          <div class="callout-body">Un arreglo es una colección de <strong>datos del mismo tipo</strong> almacenados en <strong>posiciones contiguas de memoria</strong>. Un solo nombre (por ejemplo <code>edades</code>) y múltiples casillas numeradas (índices).</div>
+        </div>
+      </div>
+
+      <h3>Comparación directa en C#</h3>
+      <div class="syntax-cmp">
+        <div class="syntax-box bad">
+          <div class="syntax-t">❌ Caos de variables</div>
+<pre class="code-pre"><span class="kw">int</span> edad1 = 25;
+<span class="kw">int</span> edad2 = 32;
+<span class="kw">int</span> edad3 = 18;
+<span class="kw">int</span> edad4 = 45;
+<span class="kw">int</span> edad5 = 27;
+<span class="cm">// ... ¡y así 50 veces!</span>
+
+<span class="cm">// ¿Promedio?</span>
+<span class="kw">double</span> prom = (edad1 + edad2 + edad3 +
+               edad4 + edad5 + ... ) / 50;</pre>
+        </div>
+        <div class="syntax-box good">
+          <div class="syntax-t">✓ Arreglo elegante</div>
+<pre class="code-pre"><span class="kw">int</span>[] edades = { 25, 32, 18, 45, 27,
+                 31, 22, 38, 29, 41 };
+
+<span class="cm">// ¿Promedio? Un bucle.</span>
+<span class="kw">double</span> suma = 0;
+<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; edades.Length; i++)
+    suma += edades[i];
+<span class="kw">double</span> prom = suma / edades.Length;</pre>
+        </div>
+      </div>
+
+      <div class="callout quest">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-content">
+          <div class="callout-title">Mini-reto mental</div>
+          <div class="callout-body">Si tuvieras que guardar 1,000 edades con variables sueltas, ¿cuántas líneas de código escribirías? ¿Y con un arreglo? Respuesta: ~1,000 líneas vs 1 línea de declaración. Esa es la potencia de los arreglos.</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" onclick="addXP(15,'m1')">✓ Entendido (+15 XP)</button>
+      </div>
+    </section>
+
+    <section id="m2" class="fade-in">
+      <div class="sec-head">
+        <div class="sec-num m2">02</div>
+        <div class="sec-title-group">
+          <h2>Anatomía del Arreglo y el Poder del Cero</h2>
+          <div class="sec-sub">// Declaración, índices y acceso directo</div>
+        </div>
+        <div class="sec-meta"><span class="meta-pill">45 MIN</span><span class="meta-pill">125 XP</span></div>
+      </div>
+
+      <div class="lead">Un arreglo necesita tres cosas: un <strong>tipo de dato</strong>, un <strong>nombre</strong>, y un <strong>tamaño</strong>. Y lo más raro: la primera posición es el <code>0</code>, no el <code>1</code>. Hoy entenderás por qué.</div>
+
+      <h3>Declaración en C#: 3 formas</h3>
+      <div class="syntax-cmp">
+        <div class="syntax-box cyan">
+          <div class="syntax-t">Forma 1 · Solo declarar</div>
+<pre class="code-pre"><span class="cm">// Creas el arreglo, todo en 0 por defecto</span>
+<span class="kw">int</span>[] edades = <span class="kw">new int</span>[5];
+
+<span class="cm">// edades[0] = 0, edades[1] = 0, ...</span></pre>
+        </div>
+        <div class="syntax-box blue">
+          <div class="syntax-t">Forma 2 · Inicializar al declarar</div>
+<pre class="code-pre"><span class="cm">// Valores al momento de crear</span>
+<span class="kw">int</span>[] edades = { 25, 32, 18, 45, 27 };
+
+<span class="cm">// El tamaño se infiere: 5 elementos</span></pre>
+        </div>
+      </div>
+      <div class="syntax-box cyan">
+        <div class="syntax-t">Forma 3 · Combinada (explícita)</div>
+<pre class="code-pre"><span class="kw">int</span>[] edades = <span class="kw">new int</span>[] { 25, 32, 18, 45, 27 };
+<span class="kw">string</span>[] nombres = <span class="kw">new string</span>[3] { <span class="str">"Ana"</span>, <span class="str">"Luis"</span>, <span class="str">"María"</span> };</pre>
+      </div>
+
+      <h3>El Poder del Cero: ¿Por qué contamos desde 0?</h3>
+      <div class="card">
+        <p>En la memoria RAM, un arreglo es un <strong>bloque contiguo de celdas</strong>. El nombre del arreglo (ej: <code>edades</code>) en realidad es la <strong>dirección de memoria de la primera celda</strong>.</p>
+        <p>Cuando escribes <code>edades[3]</code>, la computadora calcula:</p>
+<pre class="code-pre" style="background:var(--bg-0);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:.75rem 0">dirección_final = dirección_base + (índice × tamaño_elemento)
+
+edades[3] = dirección_base + (3 × 4 bytes)   // int ocupa 4 bytes</pre>
+        <p>Si empezamos desde <code>0</code>, el cálculo es <strong>directo y eficiente</strong>: <code>edades[0]</code> = dirección base + 0 = la misma base. No necesitamos restar 1 cada vez.</p>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-content">
+          <div class="callout-title">Regla de oro</div>
+          <div class="callout-body">Si un arreglo tiene <code>N</code> elementos, los índices van de <code>0</code> a <code>N-1</code>. El <strong>último elemento</strong> siempre está en <code>arreglo[arreglo.Length - 1]</code>.</div>
+        </div>
+      </div>
+
+      <h3>🎮 Taller: Arrastra los valores al índice correcto</h3>
+      <p>Tienes los valores <code>[42, 18, 27, 35, 19]</code>. El orden correcto es: <code>edades[0]=42</code>, <code>edades[1]=18</code>, etc. Arrastra cada ficha a su casilla.</p>
+
+      <div class="sim">
+        <div class="sim-head">
+          <div class="sim-title">🎯 Index Master — Drag &amp; Drop</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text-dim)">
+            <span>Correctos: </span><strong id="dndCorrect" style="color:var(--green)">0</strong> / 5
+          </div>
+        </div>
+
+        <div class="dnd-game">
+          <div class="dnd-values">
+            <div class="dnd-values-t">// Valores disponibles</div>
+            <div class="dnd-chips" id="dndChips">
+              <div class="chip" draggable="true" data-value="18">18</div>
+              <div class="chip" draggable="true" data-value="42">42</div>
+              <div class="chip" draggable="true" data-value="27">27</div>
+              <div class="chip" draggable="true" data-value="35">35</div>
+              <div class="chip" draggable="true" data-value="19">19</div>
+            </div>
+            <div class="btn-row">
+              <button class="btn ghost" onclick="resetDnD()">↺ Reiniciar</button>
+            </div>
+          </div>
+
+          <div class="dnd-slots" id="dndSlots">
+            <div class="slot" data-idx="0" data-expected="42"><span class="idx">edades[0]</span></div>
+            <div class="slot" data-idx="1" data-expected="18"><span class="idx">edades[1]</span></div>
+            <div class="slot" data-idx="2" data-expected="27"><span class="idx">edades[2]</span></div>
+            <div class="slot" data-idx="3" data-expected="35"><span class="idx">edades[3]</span></div>
+            <div class="slot" data-idx="4" data-expected="19"><span class="idx">edades[4]</span></div>
+          </div>
+        </div>
+
+        <div id="dndFeedback" class="quiz-fb"></div>
+      </div>
+
+      <h3>Acceso directo: O(1) ⚡</h3>
+      <div class="syntax-box good">
+        <div class="syntax-t">Leer un valor</div>
+<pre class="code-pre"><span class="kw">int</span>[] edades = { 42, 18, 27, 35, 19 };
+
+Console.<span class="fn">WriteLine</span>(edades[0]);  <span class="cm">// 42 — primera posición</span>
+Console.<span class="fn">WriteLine</span>(edades[2]);  <span class="cm">// 27 — tercera posición</span>
+Console.<span class="fn">WriteLine</span>(edades[4]);  <span class="cm">// 19 — última posición</span>
+
+<span class="cm">// Modificar un valor</span>
+edades[1] = 20;  <span class="cm">// ahora edades[1] vale 20 en lugar de 18</span></pre>
+      </div>
+
+      <div class="callout bug">
+        <div class="callout-icon">🐛</div>
+        <div class="callout-content">
+          <div class="callout-title">¡Cuidado, Bug! IndexOutOfRangeException</div>
+          <div class="callout-body">
+<pre class="code-pre" style="background:rgba(255,77,109,.08);border:1px solid var(--red);border-radius:6px;padding:.75rem;margin-top:.5rem"><span class="kw">int</span>[] edades = { 42, 18, 27, 35, 19 };
+Console.<span class="fn">WriteLine</span>(edades[5]);  <span class="cm">// 💥 CRASH! Solo hay índices 0-4</span>
+Console.<span class="fn">WriteLine</span>(edades[-1]); <span class="cm">// 💥 CRASH! Índices negativos no existen</span></pre>
+            El error más común: intentar acceder a un índice que no existe. <strong>Siempre verifica</strong> que tu índice sea <code>&gt;= 0</code> y <code>&lt; arreglo.Length</code>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="m3" class="fade-in">
+      <div class="sec-head">
+        <div class="sec-num m3">03</div>
+        <div class="sec-title-group">
+          <h2>Manipulación de Datos en la Ciudad Digital</h2>
+          <div class="sec-sub">// 3 estanterías: nombres, edades y calificaciones</div>
+        </div>
+        <div class="sec-meta"><span class="meta-pill">60 MIN</span><span class="meta-pill">150 XP</span></div>
+      </div>
+
+      <div class="lead">Como Arquitecto de Datos, manejas la base de datos de la ciudad. Tienes 5 ciudadanos registrados. Cada ciudadano tiene: <strong>nombre</strong> (string), <strong>edad</strong> (int) y <strong>calificación de ciudadano</strong> (double). Los accesos al mismo índice entre arreglos diferentes representan al mismo ciudadano.</div>
+
+      <h3>🗃️ Simulador de Memoria RAM</h3>
+      <p>Escribe un índice (0-4) y presiona "Acceder". Verás los datos de ese ciudadano y el código C# correspondiente.</p>
+
+      <div class="sim">
+        <div class="sim-head">
+          <div class="sim-title">🗃️ Data Access Console</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text-dim)">
+            <span>Accesos: </span><strong id="m3Access" style="color:var(--cyan)">0</strong>
+          </div>
+        </div>
+
+        <div class="shelves">
+          <div class="shelf-wrap">
+            <div class="shelf-label">
+              <span class="type">string[] nombres</span>
+              <span class="decl">// Ciudadanos registrados</span>
+            </div>
+            <div class="ram" id="shelfNombres"></div>
+          </div>
+          <div class="shelf-wrap">
+            <div class="shelf-label">
+              <span class="type">int[] edades</span>
+              <span class="decl">// Edad de cada ciudadano</span>
+            </div>
+            <div class="ram" id="shelfEdades"></div>
+          </div>
+          <div class="shelf-wrap">
+            <div class="shelf-label">
+              <span class="type">double[] calificaciones</span>
+              <span class="decl">// Reputación ciudadana (0-10)</span>
+            </div>
+            <div class="ram" id="shelfCals"></div>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <label>Índice:</label>
+          <input type="number" class="input-field" id="accessIdx" value="0" min="0" max="4" style="max-width:120px">
+          <button class="btn primary" id="accessBtn">▶ Acceder</button>
+          <button class="btn ghost" id="randomBtn">🎲 Aleatorio</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem" class="m3-grid">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;font-weight:700">// Código C# equivalente</div>
+            <div class="ws-code" id="m3Code" style="font-size:.82rem"><span class="cm">// Esperando acceso...</span></div>
+          </div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;font-weight:700">// Salida de consola</div>
+            <div class="console-out" id="m3Console"><span class="prompt">C:\&gt;</span> <span class="out">_</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Arreglos paralelos: el patrón del ciudadano</h3>
+      <p>Cuando tienes <strong>múltiples arreglos del mismo tamaño</strong> y usas el <strong>mismo índice</strong> para acceder a datos relacionados, estás usando el patrón de <strong>arreglos paralelos</strong>. Es el patrón clásico antes de aprender POO.</p>
+
+      <div class="syntax-box blue">
+        <div class="syntax-t">Código completo del simulador</div>
+<pre class="code-pre"><span class="kw">using</span> System;
+
+<span class="kw">class</span> <span class="ty">CiudadDigital</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="cm">// Tres arreglos PARALELOS</span>
+        <span class="kw">string</span>[] nombres       = { <span class="str">"Ana Ruiz"</span>, <span class="str">"Luis Torres"</span>,
+                                 <span class="str">"María Vega"</span>, <span class="str">"Pedro Soto"</span>,
+                                 <span class="str">"Sofía Lima"</span> };
+        <span class="kw">int</span>[]    edades         = { 28, 35, 22, 41, 29 };
+        <span class="kw">double</span>[] calificaciones = { 8.5, 9.2, 7.8, 6.5, 9.8 };
+
+        <span class="cm">// Acceder al ciudadano #2 (índice 2)</span>
+        <span class="kw">int</span> i = 2;
+        Console.<span class="fn">WriteLine</span>(<span class="str">$"Nombre:  {nombres[i]}"</span>);
+        Console.<span class="fn">WriteLine</span>(<span class="str">$"Edad:    {edades[i]}"</span>);
+        Console.<span class="fn">WriteLine</span>(<span class="str">$"Calif:   {calificaciones[i]:F1}"</span>);
+    }
+}</pre>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-content">
+          <div class="callout-title">Pro-Tip: Arreglos paralelos son un antipatrón</div>
+          <div class="callout-body">Aunque funcionan, los arreglos paralelos son frágiles: si eliminas un elemento de <code>nombres</code> pero no de <code>edades</code>, los índices dejan de coincidir. <strong>La solución profesional es usar una clase</strong> (<code>class Ciudadano</code>) con POO. Lo aprenderás en el próximo módulo.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="m4" class="fade-in">
+      <div class="sec-head">
+        <div class="sec-num m4">04</div>
+        <div class="sec-title-group">
+          <h2>El Taller de Procesamiento Masivo</h2>
+          <div class="sec-sub">// Recorrer arreglos con for y calcular estadísticas</div>
+        </div>
+        <div class="sec-meta"><span class="meta-pill">60 MIN</span><span class="meta-pill">150 XP</span></div>
+      </div>
+
+      <div class="lead">El verdadero poder de los arreglos se libera cuando los <strong>recorres con un ciclo</strong>. Un <code>for</code> puede visitar cada casilla y procesarla: sumar, contar, buscar, comparar. Esto es la base del análisis de datos.</div>
+
+      <h3>El patrón universal: recorrer con <code>for</code></h3>
+      <div class="syntax-cmp">
+        <div class="syntax-box cyan">
+          <div class="syntax-t">Patrón clásico</div>
+<pre class="code-pre"><span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; arreglo.Length; i++)
+{
+    <span class="cm">// Procesa arreglo[i]</span>
+    Console.<span class="fn">WriteLine</span>(arreglo[i]);
+}</pre>
+        </div>
+        <div class="syntax-box blue">
+          <div class="syntax-t">Patrón moderno: foreach</div>
+<pre class="code-pre"><span class="kw">foreach</span> (<span class="kw">var</span> elemento <span class="kw">in</span> arreglo)
+{
+    <span class="cm">// No necesitas índice</span>
+    Console.<span class="fn">WriteLine</span>(elemento);
+}</pre>
+        </div>
+      </div>
+
+      <h3>🎮 Desafío: Calculadora de Calificaciones</h3>
+      <p>Ingresa 5 calificaciones. El simulador guardará cada una en el arreglo y calculará automáticamente el <strong>promedio</strong>, la <strong>nota más alta</strong> y la <strong>nota más baja</strong>.</p>
+
+      <div class="sim">
+        <div class="sim-head">
+          <div class="sim-title">⚙️ Grades Analyzer</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text-dim)">
+            <span>Ciclo for ejecutado: </span><strong id="m4Cycles" style="color:var(--green)">0</strong> iteraciones
+          </div>
+        </div>
+
+        <div class="grades-sim">
+          <div class="grades-input">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--cyan);margin-bottom:1rem">📥 Ingreso de calificaciones</div>
+            <div class="ram" id="gradesRam"></div>
+
+            <div class="input-row" style="margin-top:1rem">
+              <label>Nota #<span id="gradeIdx">1</span>:</label>
+              <input type="number" class="input-field" id="gradeInput" value="8.5" step="0.1" min="0" max="10">
+              <button class="btn primary" id="addGradeBtn">+ Añadir</button>
+            </div>
+            <div class="btn-row">
+              <button class="btn teal" id="calcBtn">📊 Calcular estadísticas</button>
+              <button class="btn ghost" id="resetGradesBtn">↺ Reiniciar</button>
+              <button class="btn ghost" id="autoFillBtn">⚡ Auto-llenar</button>
+            </div>
+          </div>
+
+          <div class="grades-results">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--cyan);margin-bottom:1rem">📊 Análisis en vivo</div>
+
+            <div class="grade-row"><label>Suma:</label><span class="val" id="rSum">0</span></div>
+            <div class="grade-row"><label>Elementos:</label><span class="val" id="rCount">0</span></div>
+
+            <div class="stat-grid">
+              <div class="stat"><div class="label">Promedio</div><div class="value" id="rAvg">—</div></div>
+              <div class="stat good"><div class="label">Más Alta</div><div class="value" id="rMax">—</div></div>
+              <div class="stat warn"><div class="label">Más Baja</div><div class="value" id="rMin">—</div></div>
+              <div class="stat"><div class="label">Estado</div><div class="value" id="rStatus" style="font-size:1rem">—</div></div>
+            </div>
+
+            <div style="margin-top:1rem">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;font-weight:700">// Algoritmo ejecutándose</div>
+              <div class="ws-code" id="m4Code" style="font-size:.78rem;max-height:200px;overflow-y:auto;white-space:pre-wrap"><span class="cm">// Esperando datos...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>💻 El código completo en C#</h3>
+      <div class="code-wrap">
+        <div class="code-head">
+          <div class="code-head-l"><div class="code-dots"><span></span><span></span><span></span></div>Calificaciones.cs</div>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+<pre class="code-pre"><span class="kw">using</span> System;
+
+<span class="kw">class</span> <span class="ty">AnalisisCalificaciones</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="kw">const int</span> TOTAL = 5;
+        <span class="kw">double</span>[] notas = <span class="kw">new double</span>[TOTAL];
+
+        <span class="cm">// LLENAR EL ARREGLO</span>
+        <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; TOTAL; i++)
+        {
+            Console.<span class="fn">Write</span>(<span class="str">$"Nota #{i + 1}: "</span>);
+            notas[i] = <span class="kw">double</span>.<span class="fn">Parse</span>(Console.<span class="fn">ReadLine</span>());
+        }
+
+        <span class="cm">// CALCULAR ESTADÍSTICAS</span>
+        <span class="kw">double</span> suma = 0;
+        <span class="kw">double</span> mayor = notas[0];
+        <span class="kw">double</span> menor = notas[0];
+
+        <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; TOTAL; i++)
+        {
+            suma += notas[i];
+            <span class="kw">if</span> (notas[i] &gt; mayor) mayor = notas[i];
+            <span class="kw">if</span> (notas[i] &lt; menor) menor = notas[i];
+        }
+
+        <span class="kw">double</span> promedio = suma / TOTAL;
+
+        <span class="cm">// MOSTRAR RESULTADOS</span>
+        Console.<span class="fn">WriteLine</span>(<span class="str">$"\nPromedio: {promedio:F2}"</span>);
+        Console.<span class="fn">WriteLine</span>(<span class="str">$"Más alta: {mayor:F2}"</span>);
+        Console.<span class="fn">WriteLine</span>(<span class="str">$"Más baja: {menor:F2}"</span>);
+        Console.<span class="fn">WriteLine</span>(promedio &gt;= 6 ? <span class="str">"✅ Aprobado"</span> : <span class="str">"❌ Reprobado"</span>);
+    }
+}</pre>
+      </div>
+
+      <h3>Patrones de procesamiento masivo</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Patrón</th><th>Código</th><th>Uso</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>🔢 Sumar</td><td><code>suma += arr[i];</code></td><td>Promedios, totales</td></tr>
+            <tr><td>🔍 Buscar máximo</td><td><code>if (arr[i] &gt; max) max = arr[i];</code></td><td>Top 1, mejor nota</td></tr>
+            <tr><td>🔍 Buscar mínimo</td><td><code>if (arr[i] &lt; min) min = arr[i];</code></td><td>Peor nota, más barato</td></tr>
+            <tr><td>🎯 Contar condición</td><td><code>if (cond) count++;</code></td><td>Aprobados, pares</td></tr>
+            <tr><td>🔎 Buscar elemento</td><td><code>if (arr[i] == x) return i;</code></td><td>Encontrar posición</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <div class="callout-title">Error común: inicializar mal el max/min</div>
+          <div class="callout-body">Nunca uses <code>int max = 0</code> cuando los valores pueden ser negativos, o <code>int max = 1000000</code> sin razón. <strong>Siempre inicializa con <code>arr[0]</code></strong>, el primer elemento real del arreglo.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="m5" class="fade-in">
+      <div class="sec-head">
+        <div class="sec-num m5">05</div>
+        <div class="sec-title-group">
+          <h2>Reto Final: El Gran Almacén</h2>
+          <div class="sec-sub">// Completa el código y demuestra lo aprendido</div>
+        </div>
+        <div class="sec-meta"><span class="meta-pill">45 MIN</span><span class="meta-pill">100 XP</span></div>
+      </div>
+
+      <div class="lead">Hora de la verdad. Eres el Arquitecto de Datos del almacén central. Debes <strong>declarar el arreglo de productos</strong>, <strong>llenarlo</strong>, y <strong>buscar un producto específico</strong>. Rellena los espacios en blanco y valida tu lógica.</div>
+
+      <div class="workshop">
+        <div class="workshop-head">
+          <span class="workshop-badge">Lab 1</span>
+          <div class="workshop-title">📦 Declarar el arreglo de productos</div>
+        </div>
+        <p style="color:var(--text-dim);font-size:.88rem">Declara un arreglo de <code>string</code> con 5 productos del almacén:</p>
+        <div class="ws-code"><span class="cm">// Declara un arreglo de 5 strings llamado productos</span>
+<input class="ws-input" data-ans="string[]" data-ws="1" placeholder="tipo[]"> productos = <input class="ws-input" data-ans="new string[5]" data-ws="1" placeholder="creación">;</div>
+        <button class="btn primary" onclick="checkWorkshop(1)">✓ Validar Lab 1</button>
+        <div class="quiz-fb" id="ws-fb-1"></div>
+      </div>
+
+      <div class="workshop">
+        <div class="workshop-head">
+          <span class="workshop-badge">Lab 2</span>
+          <div class="workshop-title">✏️ Llenar el arreglo con productos</div>
+        </div>
+        <p style="color:var(--text-dim);font-size:.88rem">Asigna productos a cada posición del arreglo:</p>
+        <div class="ws-code">productos[<input class="ws-input" data-ans="0" data-ws="2" style="min-width:40px" placeholder="?">] = <span class="str">"Laptop"</span>;
+productos[<input class="ws-input" data-ans="1" data-ws="2" style="min-width:40px" placeholder="?">] = <span class="str">"Mouse"</span>;
+productos[<input class="ws-input" data-ans="2" data-ws="2" style="min-width:40px" placeholder="?">] = <span class="str">"Teclado"</span>;
+productos[<input class="ws-input" data-ans="3" data-ws="2" style="min-width:40px" placeholder="?">] = <span class="str">"Monitor"</span>;
+productos[<input class="ws-input" data-ans="4" data-ws="2" style="min-width:40px" placeholder="?">] = <span class="str">"Audífonos"</span>;</div>
+        <button class="btn primary" onclick="checkWorkshop(2)">✓ Validar Lab 2</button>
+        <div class="quiz-fb" id="ws-fb-2"></div>
+      </div>
+
+      <div class="workshop">
+        <div class="workshop-head">
+          <span class="workshop-badge">Lab 3</span>
+          <div class="workshop-title">🔁 Recorrer e imprimir todos los productos</div>
+        </div>
+        <p style="color:var(--text-dim);font-size:.88rem">Usa un ciclo <code>for</code> para mostrar cada producto con su índice:</p>
+        <div class="ws-code"><span class="kw">for</span> (<span class="kw">int</span> i = <input class="ws-input" data-ans="0" data-ws="3" style="min-width:40px" placeholder="?">; i &lt; productos.<input class="ws-input" data-ans="Length" data-ws="3" placeholder="?">; i<input class="ws-input" data-ans="++" data-ws="3" style="min-width:40px" placeholder="?">)
+{
+    Console.<span class="fn">WriteLine</span>(<span class="str">$"[{i}] {productos[<input class="ws-input" data-ans="i" data-ws="3" style="min-width:40px" placeholder="?">}]}"</span>);
+}</div>
+        <button class="btn primary" onclick="checkWorkshop(3)">✓ Validar Lab 3</button>
+        <div class="quiz-fb" id="ws-fb-3"></div>
+      </div>
+
+      <div class="workshop">
+        <div class="workshop-head">
+          <span class="workshop-badge">Lab Final</span>
+          <div class="workshop-title">🔍 Buscar un producto específico (Búsqueda Lineal)</div>
+        </div>
+        <p style="color:var(--text-dim);font-size:.88rem">Implementa un algoritmo de búsqueda: recorre el arreglo y reporta si "Teclado" existe:</p>
+        <div class="ws-code"><span class="kw">string</span> buscado = <span class="str">"Teclado"</span>;
+<span class="kw">bool</span> encontrado = <input class="ws-input" data-ans="false" data-ws="4" placeholder="?">;
+<span class="kw">int</span> posicion = -1;
+
+<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; productos.Length; i++)
+{
+    <span class="kw">if</span> (productos[i] <input class="ws-input" data-ans="==" data-ws="4" placeholder="?"> buscado)
+    {
+        encontrado = <input class="ws-input" data-ans="true" data-ws="4" placeholder="?">;
+        posicion = <input class="ws-input" data-ans="i" data-ws="4" style="min-width:40px" placeholder="?">;
+        <input class="ws-input" data-ans="break" data-ws="4" placeholder="?">;  <span class="cm">// sale del bucle</span>
+    }
+}
+
+<span class="kw">if</span> (<input class="ws-input" data-ans="encontrado" data-ws="4" placeholder="?">)
+    Console.<span class="fn">WriteLine</span>(<span class="str">$"✓ '{buscado}' está en posición {posicion}"</span>);
+<span class="kw">else</span>
+    Console.<span class="fn">WriteLine</span>(<span class="str">$"✗ '{buscado}' no encontrado"</span>);</div>
+        <button class="btn magenta" onclick="checkWorkshop(4)">🏆 Validar Lab Final</button>
+        <div class="quiz-fb" id="ws-fb-4"></div>
+      </div>
+
+      <h3>Simulador en vivo: Prueba tu búsqueda</h3>
+      <div class="sim">
+        <div class="sim-head">
+          <div class="sim-title">🔍 Search Simulator</div>
+        </div>
+
+        <div class="ram" id="searchRam"></div>
+
+        <div class="input-row">
+          <label>Buscar:</label>
+          <input type="text" class="input-field" id="searchTerm" value="Teclado" style="max-width:200px">
+          <button class="btn primary" id="searchBtn">🔍 Ejecutar búsqueda</button>
+          <button class="btn ghost" id="searchReset">↺ Reset</button>
+        </div>
+
+        <div class="console-out" id="searchConsole" style="margin-top:1rem"><span class="prompt">C:\&gt;</span> <span class="out">_</span></div>
+      </div>
+
+      <div class="callout success" style="margin-top:2rem">
+        <div class="callout-icon">👑</div>
+        <div class="callout-content">
+          <div class="callout-title">¡Misión completada, Arquitecto!</div>
+          <div class="callout-body">Has dominado los <strong>arreglos unidimensionales</strong>: declaración, acceso por índice, recorrido con <code>for</code>, cálculo de estadísticas y búsqueda lineal. Estos patrones son el 80% de lo que harás en programación real. Ahora estás listo para el siguiente nivel: <strong>POO y clases</strong> — donde los arreglos paralelos desaparecen y los objetos toman el control. 🚀</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="f-badge">🏗️ DATA_ARCHITECT · v1.0</div>
+      <div>// Arreglos Unidimensionales en C# · 3.5 horas · Clearance: Architect</div>
+      <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-dim)">for (int i = 0; i &lt; knowledge.Length; i++) { learn(knowledge[i]); }</div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+// ============ XP + BADGES ============
+let xp = 0;
+const badges = {};
+function addXP(n, key) {
+  xp += n;
+  document.getElementById('xpDisp').textContent = xp + '/600';
+  document.getElementById('sbFill').style.width = Math.min(100, (xp/600)*100) + '%';
+  if (key && !badges[key]) {
+    badges[key] = true;
+    const el = document.getElementById('bdg-' + key);
+    if (el) el.classList.add('on');
+  }
+  if (xp >= 600 && !badges.master) {
+    badges.master = true;
+    const m = document.getElementById('bdg-master');
+    if (m) m.classList.add('on');
+  }
+}
+
+// ============ Progress bar + active section ============
+const pBar = document.getElementById('progressBar');
+window.addEventListener('scroll', function() {
+  const s = window.scrollY;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  pBar.style.width = ((s/h)*100) + '%';
+});
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.sb-nav a');
+const io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      navLinks.forEach(function(l) { l.classList.remove('active'); });
+      const a = document.querySelector('.sb-nav a[href="#' + e.target.id + '"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(function(s) { io.observe(s); });
+const fadeIO = new IntersectionObserver(function(es) {
+  es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.05 });
+document.querySelectorAll('.fade-in').forEach(function(el) { fadeIO.observe(el); });
+
+// ============ Copy code ============
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('.code-pre');
+  navigator.clipboard.writeText(pre.innerText).then(function() {
+    const t = btn.innerText;
+    btn.innerText = '✓ copied';
+    btn.classList.add('ok');
+    setTimeout(function() { btn.innerText = t; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+// ============ M1: Nightmare generator ============
+(function() {
+  const c = document.getElementById('nightmare');
+  if (!c) return;
+  for (let i = 1; i <= 50; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'nightmare-cell';
+    cell.textContent = 'edad' + i;
+    c.appendChild(cell);
+  }
+})();
+
+// ============ M2: Drag & Drop ============
+let dndCorrectCount = 0;
+function setupDnD() {
+  const chips = document.querySelectorAll('#dndChips .chip');
+  const slots = document.querySelectorAll('#dndSlots .slot');
+  dndCorrectCount = 0;
+  const correctEl = document.getElementById('dndCorrect');
+  if (correctEl) correctEl.textContent = '0';
+
+  chips.forEach(function(chip) {
+    chip.classList.remove('used');
+    chip.setAttribute('draggable', 'true');
+    chip.ondragstart = function(e) {
+      e.dataTransfer.setData('text/plain', chip.dataset.value);
+      chip.classList.add('dragging');
+    };
+    chip.ondragend = function() { chip.classList.remove('dragging'); };
+  });
+
+  slots.forEach(function(slot) {
+    slot.innerHTML = '<span class="idx">edades[' + slot.dataset.idx + ']</span>';
+    slot.classList.remove('filled','wrong');
+    slot.ondragover = function(e) { e.preventDefault(); slot.classList.add('drag-over'); };
+    slot.ondragleave = function() { slot.classList.remove('drag-over'); };
+    slot.ondrop = function(e) {
+      e.preventDefault();
+      slot.classList.remove('drag-over');
+      if (slot.classList.contains('filled')) return;
+      const val = e.dataTransfer.getData('text/plain');
+      const expected = slot.dataset.expected;
+      if (val === expected) {
+        slot.classList.add('filled');
+        slot.innerHTML += '<span class="val">' + val + '</span>';
+        const chip = document.querySelector('.chip[data-value="' + val + '"]');
+        if (chip) { chip.classList.add('used'); chip.setAttribute('draggable', 'false'); }
+        dndCorrectCount++;
+        if (correctEl) correctEl.textContent = dndCorrectCount;
+        addXP(10);
+        if (dndCorrectCount === 5) {
+          addXP(25, 'm2');
+          showDnDFeedback(true);
+        }
+      } else {
+        slot.classList.add('wrong');
+        setTimeout(function() { slot.classList.remove('wrong'); }, 500);
+        showDnDFeedback(false);
+      }
+    };
+  });
+}
+
+function resetDnD() {
+  setupDnD();
+  const fb = document.getElementById('dndFeedback');
+  if (fb) { fb.classList.remove('show'); fb.className = 'quiz-fb'; }
+}
+
+function showDnDFeedback(ok) {
+  const fb = document.getElementById('dndFeedback');
+  if (!fb) return;
+  fb.classList.add('show');
+  if (ok) {
+    fb.className = 'quiz-fb show ok';
+    fb.innerHTML = '✅ ¡Perfecto! Los 5 valores están en su índice correcto. Has demostrado entender el "Poder del Cero".';
+  } else if (!fb.classList.contains('ok')) {
+    fb.className = 'quiz-fb show no';
+    fb.innerHTML = '❌ Ese valor no va en ese índice. Recuerda: <code>edades[0]=42</code>, <code>edades[1]=18</code>, etc.';
+  }
+}
+
+// ============ M3: Shelves Simulator ============
+const m3Data = {
+  nombres: ['Ana Ruiz', 'Luis Torres', 'María Vega', 'Pedro Soto', 'Sofía Lima'],
+  edades: [28, 35, 22, 41, 29],
+  cals: [8.5, 9.2, 7.8, 6.5, 9.8]
+};
+let m3AccessCount = 0;
+
+function renderShelf(id, data, fmt) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  data.forEach(function(v, i) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = '<span class="idx">' + i + '</span><span class="val">' + (fmt ? fmt(v) : v) + '</span>';
+    cell.dataset.idx = i;
+    el.appendChild(cell);
+  });
+}
+
+function highlightShelf(idx, color) {
+  ['shelfNombres', 'shelfEdades', 'shelfCals'].forEach(function(id) {
+    const cells = document.querySelectorAll('#' + id + ' .cell');
+    cells.forEach(function(c) {
+      c.classList.remove('active', 'error');
+      if (parseInt(c.dataset.idx) === idx) c.classList.add(color);
+    });
+  });
+}
+
+function m3Access(idx) {
+  const consoleEl = document.getElementById('m3Console');
+  const codeEl = document.getElementById('m3Code');
+  if (!consoleEl || !codeEl) return;
+
+  if (idx < 0 || idx >= 5) {
+    highlightShelf(-1, 'error');
+    consoleEl.innerHTML = '<span class="prompt">C:\\&gt;</span> <span class="err">💥 IndexOutOfRangeException: Index ' + idx + ' fuera de rango [0-4]</span>';
+    codeEl.innerHTML = '<span class="cm">// ERROR: índice inválido</span>\n<span class="kw">int</span> i = <span class="num">' + idx + '</span>;  <span class="cm">// ❌ ' + idx + (idx < 0 ? ' < 0' : ' >= Length') + '</span>\nConsole.<span class="fn">WriteLine</span>(nombres[i]); <span class="cm">// 💥 CRASH</span>';
+    addXP(2);
+    return;
+  }
+
+  m3AccessCount++;
+  const accessEl = document.getElementById('m3Access');
+  if (accessEl) accessEl.textContent = m3AccessCount;
+  highlightShelf(idx, 'active');
+
+  const n = m3Data.nombres[idx], e = m3Data.edades[idx], c = m3Data.cals[idx];
+
+  codeEl.innerHTML = '<span class="kw">int</span> i = <span class="num">' + idx + '</span>;\n\nConsole.<span class="fn">WriteLine</span>(nombres[i]);       <span class="cm">// → "' + n + '"</span>\nConsole.<span class="fn">WriteLine</span>(edades[i]);         <span class="cm">// → ' + e + '</span>\nConsole.<span class="fn">WriteLine</span>(calificaciones[i]); <span class="cm">// → ' + c.toFixed(1) + '</span>';
+
+  consoleEl.innerHTML = '<span class="prompt">C:\\&gt;</span> Console.<span class="fn">WriteLine</span>(nombres[<span class="num">' + idx + '</span>]);\n<span class="out">' + n + '</span>\n<span class="prompt">C:\\&gt;</span> Console.<span class="fn">WriteLine</span>(edades[<span class="num">' + idx + '</span>]);\n<span class="out">' + e + '</span>\n<span class="prompt">C:\\&gt;</span> Console.<span class="fn">WriteLine</span>(calificaciones[<span class="num">' + idx + '</span>]);\n<span class="out">' + c.toFixed(1) + '</span>';
+
+  addXP(3);
+  if (m3AccessCount >= 5 && !badges.m3) addXP(20, 'm3');
+}
+
+// ============ M4: Grades Calculator ============
+const GRADES_SIZE = 5;
+let grades = new Array(GRADES_SIZE).fill(null);
+let gradePtr = 0;
+let m4Cycles = 0;
+
+function renderGradesRam() {
+  const el = document.getElementById('gradesRam');
+  if (!el) return;
+  el.innerHTML = '';
+  grades.forEach(function(v, i) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.innerHTML = '<span class="idx">' + i + '</span><span class="val">' + (v !== null ? v.toFixed(1) : '—') + '</span>';
+    if (i === gradePtr && gradePtr < GRADES_SIZE) cell.classList.add('highlight');
+    if (v !== null) cell.classList.add('success');
+    cell.dataset.idx = i;
+    el.appendChild(cell);
+  });
+  const idxEl = document.getElementById('gradeIdx');
+  if (idxEl) idxEl.textContent = Math.min(gradePtr + 1, GRADES_SIZE);
+}
+
+// ============ M5: Workshop validation ============
+function checkWorkshop(id) {
+  const inputs = document.querySelectorAll('.ws-input[data-ws="' + id + '"]');
+  const fb = document.getElementById('ws-fb-' + id);
+  if (!fb) return;
+  let allOk = true;
+  inputs.forEach(function(inp) {
+    const got = inp.value.trim().replace(/\s+/g,' ').toLowerCase();
+    const exp = inp.dataset.ans.toLowerCase();
+    const ok = got === exp || got === exp.replace(/\s+/g,'');
+    inp.classList.remove('correct','wrong');
+    inp.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) allOk = false;
+  });
+  fb.classList.add('show');
+  if (allOk) {
+    fb.className = 'quiz-fb show ok';
+    const rewards = { 1:15, 2:15, 3:20, 4:30 };
+    const msgs = {
+      1:'¡Correcto! Has declarado correctamente un arreglo de strings con <code>new string[5]</code>.',
+      2:'¡Perfecto! Los índices van de 0 a 4. Recuerda: el primer elemento siempre es el índice 0.',
+      3:'¡Excelente! El ciclo <code>for</code> recorre desde 0 hasta <code>Length - 1</code>. El <code>i++</code> es el incremento clásico.',
+      4:'🏆 ¡LABORATORIO COMPLETO! Has implementado la <strong>búsqueda lineal</strong>: un algoritmo clásico que recorre el arreglo hasta encontrar el elemento o terminar. Patrón fundamental en todo Data Architect.'
+    };
+    fb.innerHTML = '✅ ' + msgs[id] + ' <strong>+' + rewards[id] + ' XP</strong>';
+    addXP(rewards[id], id === 4 ? 'm5' : null);
+  } else {
+    fb.className = 'quiz-fb show no';
+    const hints = {
+      1:'Pista: el tipo es <code>string[]</code> y se crea con <code>new string[5]</code>.',
+      2:'Pista: los índices empiezan en 0 y van hasta 4 (para un arreglo de 5 elementos).',
+      3:'Pista: inicia en 0, usa <code>productos.Length</code> para el límite, incrementa con <code>++</code>, y accede con <code>[i]</code>.',
+      4:'Pista: la bandera inicia en <code>false</code>, se compara con <code>==</code>, se asigna <code>true</code> al encontrar, se guarda la posición <code>i</code>, se usa <code>break</code> para salir.'
+    };
+    fb.innerHTML = '❌ Algunas respuestas son incorrectas (marcadas en rojo). ' + hints[id];
+  }
+}
+
+// ============ M5: Search Simulator ============
+const searchProducts = ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'Audífonos'];
+function renderSearchRam(highlightIdx) {
+  const el = document.getElementById('searchRam');
+  if (!el) return;
+  if (highlightIdx === undefined) highlightIdx = -1;
+  el.innerHTML = '';
+  searchProducts.forEach(function(p, i) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.style.minWidth = '100px';
+    cell.style.maxWidth = 'none';
+    cell.style.aspectRatio = 'auto';
+    cell.style.padding = '1rem .5rem';
+    cell.style.fontSize = '.8rem';
+    cell.innerHTML = '<span class="idx">' + i + '</span><span class="val" style="font-size:.85rem">' + p + '</span>';
+    if (i === highlightIdx) cell.classList.add('success');
+    el.appendChild(cell);
+  });
+}
+
+// ============ INIT ALL ============
+window.addEventListener('DOMContentLoaded', function() {
+  setupDnD();
+
+  renderShelf('shelfNombres', m3Data.nombres, function(v) { return v.split(' ')[0]; });
+  renderShelf('shelfEdades', m3Data.edades);
+  renderShelf('shelfCals', m3Data.cals, function(v) { return v.toFixed(1); });
+
+  renderGradesRam();
+  renderSearchRam();
+
+  // M3 event listeners
+  const accessBtn = document.getElementById('accessBtn');
+  if (accessBtn) {
+    accessBtn.addEventListener('click', function() {
+      const v = parseInt(document.getElementById('accessIdx').value);
+      m3Access(isNaN(v) ? -1 : v);
+    });
+  }
+  const randomBtn = document.getElementById('randomBtn');
+  if (randomBtn) {
+    randomBtn.addEventListener('click', function() {
+      const r = Math.floor(Math.random() * 5);
+      document.getElementById('accessIdx').value = r;
+      m3Access(r);
+    });
+  }
+
+  // M4 event listeners
+  const addGradeBtn = document.getElementById('addGradeBtn');
+  if (addGradeBtn) {
+    addGradeBtn.addEventListener('click', function() {
+      if (gradePtr >= GRADES_SIZE) {
+        alert('Ya llenaste las 5 calificaciones. Presiona Reiniciar o Calcular.');
+        return;
+      }
+      const v = parseFloat(document.getElementById('gradeInput').value);
+      if (isNaN(v) || v < 0 || v > 10) {
+        alert('Ingresa una nota entre 0 y 10');
+        return;
+      }
+      grades[gradePtr] = v;
+      gradePtr++;
+      addXP(3);
+      renderGradesRam();
+    });
+  }
+
+  const autoFillBtn = document.getElementById('autoFillBtn');
+  if (autoFillBtn) {
+    autoFillBtn.addEventListener('click', function() {
+      grades = [8.5, 7.2, 9.0, 6.8, 9.5];
+      gradePtr = GRADES_SIZE;
+      renderGradesRam();
+      addXP(5);
+    });
+  }
+
+  const resetGradesBtn = document.getElementById('resetGradesBtn');
+  if (resetGradesBtn) {
+    resetGradesBtn.addEventListener('click', function() {
+      grades = new Array(GRADES_SIZE).fill(null);
+      gradePtr = 0;
+      m4Cycles = 0;
+      const cEl = document.getElementById('m4Cycles');
+      if (cEl) cEl.textContent = '0';
+      const sEl = document.getElementById('rSum'); if (sEl) sEl.textContent = '0';
+      const coEl = document.getElementById('rCount'); if (coEl) coEl.textContent = '0';
+      ['rAvg','rMax','rMin','rStatus'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '—';
+      });
+      const m4CodeEl = document.getElementById('m4Code');
+      if (m4CodeEl) m4CodeEl.innerHTML = '<span class="cm">// Esperando datos...</span>';
+      renderGradesRam();
+    });
+  }
+
+  const calcBtn = document.getElementById('calcBtn');
+  if (calcBtn) {
+    calcBtn.addEventListener('click', async function() {
+      const filledCount = grades.filter(function(g) { return g !== null; }).length;
+      if (filledCount === 0) {
+        alert('Añade al menos 1 calificación');
+        return;
+      }
+
+      const codeEl = document.getElementById('m4Code');
+      m4Cycles = 0;
+
+      let sum = 0, max = grades[0], min = grades[0];
+      let codeText = '<span class="kw">double</span> suma = <span class="num">0</span>;\n<span class="kw">double</span> mayor = notas[<span class="num">0</span>];\n<span class="kw">double</span> menor = notas[<span class="num">0</span>];\n\n';
+
+      for (let i = 0; i < filledCount; i++) {
+        m4Cycles++;
+        const cycEl = document.getElementById('m4Cycles');
+        if (cycEl) cycEl.textContent = m4Cycles;
+
+        document.querySelectorAll('#gradesRam .cell').forEach(function(c) { c.classList.remove('active'); });
+        const cells = document.querySelectorAll('#gradesRam .cell');
+        if (cells[i]) cells[i].classList.add('active');
+
+        sum += grades[i];
+        if (grades[i] > max) max = grades[i];
+        if (grades[i] < min) min = grades[i];
+
+        const sumEl = document.getElementById('rSum'); if (sumEl) sumEl.textContent = sum.toFixed(1);
+        const countEl = document.getElementById('rCount'); if (countEl) countEl.textContent = i + 1;
+
+        codeText += '<span class="cm">// i = ' + i + ' → notas[' + i + '] = ' + grades[i].toFixed(1) + '</span>\nsuma += ' + grades[i].toFixed(1) + ';  <span class="cm">// suma = ' + sum.toFixed(1) + '</span>\n';
+        if (codeEl) {
+          codeEl.innerHTML = codeText;
+          codeEl.scrollTop = codeEl.scrollHeight;
+        }
+
+        await new Promise(function(r) { setTimeout(r, 400); });
+      }
+
+      const avg = sum / filledCount;
+      const avgEl = document.getElementById('rAvg'); if (avgEl) avgEl.textContent = avg.toFixed(2);
+      const maxEl = document.getElementById('rMax'); if (maxEl) maxEl.textContent = max.toFixed(1);
+      const minEl = document.getElementById('rMin'); if (minEl) minEl.textContent = min.toFixed(1);
+
+      const statusEl = document.getElementById('rStatus');
+      if (statusEl) {
+        if (avg >= 9) { statusEl.textContent = '⭐ Excelente'; statusEl.parentElement.className = 'stat good'; }
+        else if (avg >= 7) { statusEl.textContent = '✓ Bueno'; statusEl.parentElement.className = 'stat good'; }
+        else if (avg >= 6) { statusEl.textContent = '😐 Aprobado'; statusEl.parentElement.className = 'stat warn'; }
+        else { statusEl.textContent = '✗ Reprobado'; statusEl.parentElement.className = 'stat bad'; }
+      }
+
+      codeText += '\n<span class="kw">double</span> promedio = suma / ' + filledCount + ';  <span class="cm">// ' + avg.toFixed(2) + '</span>\n<span class="cm">// mayor = ' + max.toFixed(1) + ' | menor = ' + min.toFixed(1) + '</span>';
+      if (codeEl) codeEl.innerHTML = codeText;
+
+      document.querySelectorAll('#gradesRam .cell').forEach(function(c) { c.classList.remove('active'); });
+      addXP(30, 'm4');
+    });
+  }
+
+  // M5 search
+  const searchBtn = document.getElementById('searchBtn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', async function() {
+      const term = document.getElementById('searchTerm').value.trim();
+      const con = document.getElementById('searchConsole');
+      if (!con) return;
+      con.innerHTML = '<span class="prompt">C:\\&gt;</span> <span class="out">Buscando "' + term + '"...</span>\n';
+
+      let found = false, pos = -1;
+      for (let i = 0; i < searchProducts.length; i++) {
+        renderSearchRam(-1);
+        const cells = document.querySelectorAll('#searchRam .cell');
+        if (cells[i]) cells[i].classList.add('active');
+        con.innerHTML += '<span class="prompt">  [' + i + ']</span> <span class="out">Comparando: "' + searchProducts[i] + '" ' + (searchProducts[i] === term ? '==' : '!=') + ' "' + term + '"</span>\n';
+        con.scrollTop = con.scrollHeight;
+        await new Promise(function(r) { setTimeout(r, 400); });
+
+        if (searchProducts[i] === term) {
+          found = true;
+          pos = i;
+          break;
+        }
+      }
+
+      if (found) {
+        renderSearchRam(pos);
+        con.innerHTML += '\n<span class="out" style="color:var(--green)">✓ \'' + term + '\' encontrado en posición ' + pos + '</span>';
+        addXP(10);
+      } else {
+        renderSearchRam();
+        con.innerHTML += '\n<span class="out" style="color:var(--red)">✗ \'' + term + '\' no encontrado en el almacén</span>';
+        addXP(3);
+      }
+    });
+  }
+
+  const searchReset = document.getElementById('searchReset');
+  if (searchReset) {
+    searchReset.addEventListener('click', function() {
+      renderSearchRam();
+      const con = document.getElementById('searchConsole');
+      if (con) con.innerHTML = '<span class="prompt">C:\\&gt;</span> <span class="out">_</span>';
+    });
+  }
+});
+</script>
+</body>
+</html>
+
