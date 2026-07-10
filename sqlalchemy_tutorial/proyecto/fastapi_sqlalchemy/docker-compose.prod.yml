@@ -1,0 +1,71 @@
+# =============================================================================
+# docker-compose.prod.yml — Para PRODUCCIÓN
+# Diferencias con dev:
+#   - Sin volúmenes montados (no hot reload).
+#   - DB NO expuesta al host.
+#   - Restart policy always.
+#   - Variables de entorno desde .env.
+#   - Imagen pre-construida (no build).
+# =============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tienda_db_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Debes definir POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: ${POSTGRES_DB:-tienda}
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    # NO exponer el puerto en producción
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - tienda_net_prod
+    # Limitar recursos en producción (opcional)
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  api:
+    image: ${API_IMAGE:-tienda-api:latest}
+    container_name: tienda_api_prod
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DEBUG: "false"
+      APP_NAME: Mi API de Tienda
+    ports:
+      - "8000:8000"
+    networks:
+      - tienda_net_prod
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    # No montamos el código en prod: usamos la imagen
+    # No command custom: usa el CMD del Dockerfile
+    # El entrypoint del Dockerfile aplica las migraciones antes de arrancar
+
+volumes:
+  pgdata_prod:
+    name: tienda_pgdata_prod
+
+networks:
+  tienda_net_prod:
+    name: tienda_net_prod
+    driver: bridge

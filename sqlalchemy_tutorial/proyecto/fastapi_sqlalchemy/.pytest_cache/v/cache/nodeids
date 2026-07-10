@@ -1,0 +1,14 @@
+[
+  "tests/test_productos.py::test_borrar_producto",
+  "tests/test_productos.py::test_crear_producto",
+  "tests/test_productos.py::test_crear_producto_sku_duplicado",
+  "tests/test_productos.py::test_health",
+  "tests/test_productos.py::test_listar_productos",
+  "tests/test_productos.py::test_listar_productos_con_filtros",
+  "tests/test_productos.py::test_obtener_producto",
+  "tests/test_productos.py::test_obtener_producto_inexistente",
+  "tests/test_productos.py::test_patch_parcial",
+  "tests/test_productos.py::test_root",
+  "tests/test_productos.py::test_validacion_precio_negativo",
+  "tests/test_productos.py::test_validacion_sku_largo"
+]

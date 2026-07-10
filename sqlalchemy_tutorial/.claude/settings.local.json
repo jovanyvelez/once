@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import ast, sys; [ast.parse\\(open\\(f\\).read\\(\\)\\) for f in __import__\\('pathlib'\\).Path\\('.'\\).rglob\\('*.py'\\)]; print\\('✅ Syntax OK'\\)\")",
+      "Bash(/tmp/test_venv/bin/pip install *)",
+      "Bash(/tmp/test_venv/bin/python -c ' *)"
+    ]
+  }
+}
